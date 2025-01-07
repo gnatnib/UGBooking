@@ -63,12 +63,6 @@ Route::controller(ForgotPasswordController::class)->group(function () {
     Route::post('forget-password', 'postEmail')->name('forget-password');
 });
 
-// ----------------------------- reset password -----------------------------//
-Route::controller(ResetPasswordController::class)->group(function () {
-    Route::get('reset-password/{token}', 'getPassword');
-    Route::post('reset-password', 'updatePassword');
-});
-
 // ----------------------------- booking -----------------------------//
 Route::controller(BookingController::class)->group(function () {
     Route::get('form/allbooking', 'allbooking')->name('form/allbooking')->middleware('auth');
@@ -97,6 +91,12 @@ Route::controller(RoomsController::class)->group(function () {
     Route::post('form/room/save', 'saveRecordRoom')->middleware('auth')->name('form/room/save');
     Route::post('form/room/delete', 'deleteRecord')->middleware('auth')->name('form/room/delete');
     Route::post('form/room/update', 'updateRecord')->middleware('auth')->name('form/room/update');
+    //add ruangan
+    Route::post('form/room-type/add', 'addRoomType')->middleware('auth')->name('room.type.add');
+    //delete ruangan
+    Route::post('form/room-type/delete', [RoomsController::class, 'deleteRoomType'])
+        ->middleware('auth')
+        ->name('room.type.delete');
 });
 
 // ----------------------- user management -------------------------//

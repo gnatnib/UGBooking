@@ -29,7 +29,7 @@
                             <li><a class="{{ set_active(['form/allrooms/page']) }}"
                                     href="{{ route('form/allrooms/page') }}">All Rooms </a></li>
                             <li><a class="{{ set_active(['form/addroom/page']) }}"
-                                    href="{{ route('form/addroom/page') }}"> Add Rooms </a></li>
+                                    href="{{ route('form/addroom/page') }}"> Add Room </a></li>
                         </ul>
                     </li>
 

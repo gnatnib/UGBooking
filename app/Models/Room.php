@@ -10,17 +10,14 @@ class Room extends Model
     use HasFactory;
     protected $fillable = [
         'bkg_room_id',
-        'name',
         'room_type',
-        'ac_non_ac',
-        'food',
-        'bed_count',
-        'charges_for_cancellation',
-        'rent',
-        'phone_number',
+        'capacity',
         'fileupload',
-        'message',
+        'has_projector',
+        'has_sound_system',
+        'has_tv'
     ];
+
 
     /** generate id */
     protected static function boot()
