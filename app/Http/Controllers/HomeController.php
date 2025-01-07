@@ -47,7 +47,8 @@ class HomeController extends Controller
             'new_password' => 'required|min:8|confirmed',
         ]);
 
-        $user = Auth::user();
+        $user = Auth::user(); // instance of \Illuminate\Contracts\Auth\Authenticatable
+        $user = \App\Models\User::find($user->id); // cast to User model
 
         // Check if current password matches
         if (!Hash::check($request->current_password, $user->password)) {
