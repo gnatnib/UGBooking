@@ -20,7 +20,7 @@ class BookingController extends Controller
     /** Page */
     public function bookingAdd()
     {
-        $data = DB::table('room_types')->get();
+        $data = DB::table('rooms')->select('room_type')->where('status', 'Ready')->distinct()->get();
         $user = DB::table('users')->get();
         return view('formbooking.bookingadd', compact('data', 'user'));
     }

@@ -48,7 +48,11 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <div class="actions"> <a href="#" class="btn btn-sm bg-success-light mr-2">Active</a> </div>
+                                                @if($rooms->status=='Ready')
+                                                    <div class="actions"> <a href="#" class="btn btn-sm bg-success-light mr-2">{{$rooms->status}}</a> </div>
+                                                @elseif ($rooms->status=='Maintenance')
+                                                    <div class="actions"> <a href="#" class="btn btn-sm bg-danger-light mr-2">{{$rooms->status}}</a> </div>
+                                                @endif
                                             </td>
                                             <td class="text-right">
                                                 <div class="dropdown dropdown-action">

@@ -13,6 +13,7 @@ class Room extends Model
         'room_type',
         'capacity',
         'fileupload',
+        'status',
         'has_projector',
         'has_sound_system',
         'has_tv'

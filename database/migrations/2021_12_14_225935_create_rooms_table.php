@@ -19,6 +19,7 @@ class CreateRoomsTable extends Migration
             $table->string('room_type');
             $table->integer('capacity');
             $table->string('fileupload')->nullable();
+            $table->string('status')->nullable();
             // Adding room facilities as boolean fields
             $table->boolean('has_projector')->default(false);
             $table->boolean('has_sound_system')->default(false);

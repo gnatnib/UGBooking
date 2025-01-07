@@ -15,7 +15,7 @@
                     <div class="col-lg-12">
                         <div class="row formtype">
                             <input class="form-control" type="hidden" name="bkg_room_id" value="{{ $roomEdit->bkg_room_id }}" readonly>
-                            
+
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Room Type</label>
@@ -54,6 +54,16 @@
                                              alt="Room Photo" class="img-thumbnail" style="max-width: 150px">
                                     </div>
                                     @endif
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Status</label>
+                                    <select class="form-control @error('status') is-invalid @enderror" id="status" name="status">
+                                        <option value="Ready" {{ $roomEdit->status === 'Ready' ? 'selected' : '' }}>Ready</option>
+                                        <option value="Maintenance" {{ $roomEdit->status === 'Maintenance' ? 'selected' : '' }}>Maintenance</option>
+                                    </select>
                                 </div>
                             </div>
 

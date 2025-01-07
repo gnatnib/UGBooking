@@ -42,13 +42,11 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Room Type</label>
-                                    <select class="form-control @error('room_type') is-invalid @enderror" id="sel2"
-                                        name="room_type" required>
+                                    <select class="form-control @error('room_type') is-invalid @enderror" id="sel2" name="room_type" required>
                                         <option selected disabled> --Select Room Type-- </option>
-                                        @foreach ($data as $items)
-                                            <option value="{{ $items->room_name }}"
-                                                {{ old('room_type') == $items->room_name ? 'selected' : '' }}>
-                                                {{ $items->room_name }}
+                                        @foreach ($data as $item)
+                                            <option value="{{ $item->room_type }}" {{ old('room_type') == $item->room_type ? 'selected' : '' }}>
+                                                {{ $item->room_type }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -59,6 +57,7 @@
                                     @enderror
                                 </div>
                             </div>
+                            
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Total Members</label>

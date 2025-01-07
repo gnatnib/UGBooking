@@ -41,7 +41,11 @@ class RoomsController extends Controller
             'capacity' => 'required|integer|min:1|max:50',
             'fileupload' => 'required|file|mimes:jpeg,png,jpg|max:2048',
         ]);
-
+        $existingRoom = Room::where('room_type', $request->room_type)->first();
+        if ($existingRoom) {
+            flash()->error('Room type already exists. Cannot add duplicate room type.');
+            return redirect()->back()->withInput();
+        }
         DB::beginTransaction();
         try {
             $photo = $request->fileupload;
@@ -52,6 +56,7 @@ class RoomsController extends Controller
             $room->room_type = $request->room_type;
             $room->capacity = $request->capacity;
             $room->fileupload = $file_name;
+            $room->status = 'Ready';
             $room->has_projector = $request->has('has_projector');
             $room->has_sound_system = $request->has('has_sound_system');
             $room->has_tv = $request->has('has_tv');
@@ -70,55 +75,65 @@ class RoomsController extends Controller
 
     /** Update Record */
     public function updateRecord(Request $request)
-{
-    $request->validate([
-        'room_type' => 'required|string|max:255',
-        'capacity' => 'required|integer|min:1|max:50',
-        'fileupload' => 'nullable|file|mimes:jpeg,png,jpg|max:2048',
-    ]);
-
-    DB::beginTransaction();
-    try {
-        // Handle file upload
-        if ($request->hasFile('fileupload')) {
-            $photo = $request->fileupload;
-            $file_name = rand() . '.' . $photo->getClientOriginalExtension();
-            $photo->move(public_path('/assets/upload/'), $file_name);
-            
-            // Delete old file if exists
-            if ($request->hidden_fileupload) {
-                $old_file_path = public_path('/assets/upload/') . $request->hidden_fileupload;
-                if (file_exists($old_file_path)) {
-                    unlink($old_file_path);
-                }
-            }
-        } else {
-            $file_name = $request->hidden_fileupload;
+    {
+        $request->validate([
+            'room_type' => 'required|string|max:255',
+            'capacity' => 'required|integer|min:1|max:50',
+            'fileupload' => 'nullable|file|mimes:jpeg,png,jpg|max:2048',
+            'status' => 'required|string|in:Ready,Maintenance',
+        ]);
+        
+        // Check if the room type already exists for a different room
+        $existingRoom = Room::where('room_type', $request->room_type)
+            ->where('bkg_room_id', '!=', $request->bkg_room_id)
+            ->first();
+        if ($existingRoom) {
+            flash()->error('Room type already exists for another room. Cannot update to a duplicate room type.');
+            return redirect()->back()->withInput();
         }
+        DB::beginTransaction();
+        try {
+            // Handle file upload
+            if ($request->hasFile('fileupload')) {
+                $photo = $request->fileupload;
+                $file_name = rand() . '.' . $photo->getClientOriginalExtension();
+                $photo->move(public_path('/assets/upload/'), $file_name);
 
-        // Update room data
-        $update = [
-            'room_type' => $request->room_type,
-            'capacity' => $request->capacity,
-            'fileupload' => $file_name,
-            'has_projector' => $request->has('has_projector') ? 1 : 0,
-            'has_sound_system' => $request->has('has_sound_system') ? 1 : 0,
-            'has_tv' => $request->has('has_tv') ? 1 : 0,
-            'updated_at' => now()
-        ];
+                // Delete old file if exists
+                if ($request->hidden_fileupload) {
+                    $old_file_path = public_path('/assets/upload/') . $request->hidden_fileupload;
+                    if (file_exists($old_file_path)) {
+                        unlink($old_file_path);
+                    }
+                }
+            } else {
+                $file_name = $request->hidden_fileupload;
+            }
 
-        Room::where('bkg_room_id', $request->bkg_room_id)->update($update);
+            // Update room data
+            $update = [
+                'room_type' => $request->room_type,
+                'capacity' => $request->capacity,
+                'fileupload' => $file_name,
+                'status' => $request->status, // Update status field
+                'has_projector' => $request->has('has_projector') ? 1 : 0,
+                'has_sound_system' => $request->has('has_sound_system') ? 1 : 0,
+                'has_tv' => $request->has('has_tv') ? 1 : 0,
+                'updated_at' => now()
+            ];
 
-        DB::commit();
-        flash()->success('Room updated successfully');
-        return redirect()->route('form/allrooms/page');
-    } catch (\Exception $e) {
-        DB::rollback();
-        Log::error($e->getMessage());
-        flash()->error('Failed to update room: ' . $e->getMessage());
-        return redirect()->back();
+            Room::where('bkg_room_id', $request->bkg_room_id)->update($update);
+
+            DB::commit();
+            flash()->success('Room updated successfully');
+            return redirect()->route('form/allrooms/page');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e->getMessage());
+            flash()->error('Failed to update room: ' . $e->getMessage());
+            return redirect()->back();
+        }
     }
-}
     /** Delete Record */
     public function deleteRecord(Request $request)
     {
