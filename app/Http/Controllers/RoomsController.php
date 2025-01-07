@@ -70,42 +70,55 @@ class RoomsController extends Controller
 
     /** Update Record */
     public function updateRecord(Request $request)
-    {
-        DB::beginTransaction();
-        try {
-            if (!empty($request->fileupload)) {
-                $photo = $request->fileupload;
-                $file_name = rand() . '.' . $photo->getClientOriginalExtension();
-                $photo->move(public_path('/assets/upload/'), $file_name);
-            } else {
-                $file_name = $request->hidden_fileupload;
+{
+    $request->validate([
+        'room_type' => 'required|string|max:255',
+        'capacity' => 'required|integer|min:1|max:50',
+        'fileupload' => 'nullable|file|mimes:jpeg,png,jpg|max:2048',
+    ]);
+
+    DB::beginTransaction();
+    try {
+        // Handle file upload
+        if ($request->hasFile('fileupload')) {
+            $photo = $request->fileupload;
+            $file_name = rand() . '.' . $photo->getClientOriginalExtension();
+            $photo->move(public_path('/assets/upload/'), $file_name);
+            
+            // Delete old file if exists
+            if ($request->hidden_fileupload) {
+                $old_file_path = public_path('/assets/upload/') . $request->hidden_fileupload;
+                if (file_exists($old_file_path)) {
+                    unlink($old_file_path);
+                }
             }
-
-            $update = [
-                'bkg_room_id'              => $request->bkg_room_id,
-                'name'                     => $request->name,
-                'room_type'                => $request->room_type,
-                'ac_non_ac'                => $request->ac_non_ac,
-                'food'                     => $request->food,
-                'bed_count'                => $request->bed_count,
-                'charges_for_cancellation' => $request->charges_for_cancellation,
-                'phone_number'             => $request->phone_number,
-                'fileupload'               => $file_name,
-                'message'                  => $request->message,
-            ];
-            Room::where('bkg_room_id', $request->bkg_room_id)->update($update);
-
-            DB::commit();
-            flash()->error('Updated room successfully :)');
-            return redirect()->back();
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error($e->getMessage());
-            flash()->error('Update room fail :)');
-            return redirect()->back();
+        } else {
+            $file_name = $request->hidden_fileupload;
         }
-    }
 
+        // Update room data
+        $update = [
+            'room_type' => $request->room_type,
+            'capacity' => $request->capacity,
+            'fileupload' => $file_name,
+            'has_projector' => $request->has('has_projector') ? 1 : 0,
+            'has_sound_system' => $request->has('has_sound_system') ? 1 : 0,
+            'has_tv' => $request->has('has_tv') ? 1 : 0,
+            'updated_at' => now()
+        ];
+
+        Room::where('bkg_room_id', $request->bkg_room_id)->update($update);
+
+        DB::commit();
+        flash()->success('Room updated successfully');
+        return redirect()->route('form/allrooms/page');
+    } catch (\Exception $e) {
+        DB::rollback();
+        Log::error($e->getMessage());
+        flash()->error('Failed to update room: ' . $e->getMessage());
+        return redirect()->back();
+    }
+}
     /** Delete Record */
     public function deleteRecord(Request $request)
     {

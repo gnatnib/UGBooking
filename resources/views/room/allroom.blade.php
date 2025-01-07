@@ -21,41 +21,32 @@
                                     <thead>
                                         <tr>
                                             <th>Booking ID</th>
-                                            <th hidden></th>
-                                            <th hidden></th>
-                                            <th>Name</th>
                                             <th>Room Type</th>
-                                            <th>AC/NON-AC</th>
-                                            <th>Food</th>
-                                            <th>Bed Count</th>
-                                            <th>Charges For cancellation</th>
-                                            <th>Rent</th>
-                                            <th>Ph.Number</th>
+                                            <th>Capacity</th>
+                                            <th>Facilities</th>
                                             <th>Status</th>
                                             <th class="text-right">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($allRooms as $rooms )
+                                        @foreach ($allRooms as $rooms)
                                         <tr>
                                             <td hidden class="id">{{ $rooms->id }}</td>
                                             <td hidden class="fileupload">{{ $rooms->fileupload }}</td>
                                             <td>{{ $rooms->bkg_room_id }}</td>
-                                            <td>
-                                                <h2 class="table-avatar">
-                                                <a href="profile.html" class="avatar avatar-sm mr-2">
-                                                    <img class="avatar-img rounded-circle" src="{{ URL::to('/assets/upload/'.$rooms->fileupload) }}" alt="{{ $rooms->fileupload }}">
-                                                </a>
-                                                <a href="profile.html">{{ $rooms->name }}<span>{{ $rooms->bkg_room_id }}</span></a>
-                                                </h2>
-                                            </td>
                                             <td>{{ $rooms->room_type }}</td>
-                                            <td>{{ $rooms->ac_non_ac }}</td>
-                                            <td>{{ $rooms->food }}</td>
-                                            <td>{{ $rooms->bed_count }}</td>
-                                            <td>{{ $rooms->charges_for_cancellation }}</td>
-                                            <td>{{ $rooms->rent }}</td>
-                                            <td>{{ $rooms->phone_number }}</td>
+                                            <td>{{ $rooms->capacity }}</td>
+                                            <td>
+                                                @if($rooms->has_projector)
+                                                    <span class="badge badge-info">Projector</span>
+                                                @endif
+                                                @if($rooms->has_sound_system)
+                                                    <span class="badge badge-info">Sound System</span>
+                                                @endif
+                                                @if($rooms->has_tv)
+                                                    <span class="badge badge-info">TV</span>
+                                                @endif
+                                            </td>
                                             <td>
                                                 <div class="actions"> <a href="#" class="btn btn-sm bg-success-light mr-2">Active</a> </div>
                                             </td>
@@ -93,7 +84,7 @@
                         <form action="{{ route('form/room/delete') }}" method="POST">
                             @csrf
                             <img src="{{ URL::to('assets/img/sent.png') }}" alt="" width="50" height="46">
-                            <h3 class="delete_class">Are you sure want to delete this Asset?</h3>
+                            <h3 class="delete_class">Are you sure want to delete this Room?</h3>
                             <div class="m-t-20">
                                 <a href="#" class="btn btn-white" data-dismiss="modal">Close</a>
                                 <input class="form-control" type="hidden" id="e_id" name="id" value="">
@@ -105,7 +96,6 @@
                 </div>
             </div>
         </div>
-        {{-- end delete model --}}
     </div>
     @section('script')
         {{-- delete model --}}

@@ -121,3 +121,5 @@ Route::controller(EmployeeController::class)->group(function () {
     Route::get('form/employee/add', 'employeesAdd')->middleware('auth')->name('form/employee/add');
     Route::get('form/leaves/page', 'leavesPage')->middleware('auth')->name('form/leaves/page');
 });
+
+
