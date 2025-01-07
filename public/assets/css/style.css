@@ -1944,24 +1944,24 @@ html.menu-opened body {
     background: #ffbf00;
     background: -moz-linear-gradient(
         -45deg,
-        rgba(0, 150, 136, 1) 0%,
-        rgba(6, 198, 180, 1) 52%,
-        rgba(0, 150, 136, 1) 100%,
-        rgba(6, 198, 180, 1) 100%
+        rgba(255, 191, 0, 1) 0%,
+        rgba(255, 179, 0, 1) 52%,
+        rgba(255, 191, 0, 1) 100%,
+        rgba(255, 179, 0, 1) 100%
     );
     background: -webkit-linear-gradient(
         -45deg,
-        rgba(0, 150, 136, 1) 0%,
-        rgba(6, 198, 180, 1) 52%,
-        rgba(0, 150, 136, 1) 100%,
-        rgba(6, 198, 180, 1) 100%
+        rgba(255, 191, 0, 1) 0%,
+        rgba(255, 179, 0, 1) 52%,
+        rgba(255, 191, 0, 1) 100%,
+        rgba(255, 179, 0, 1) 100%
     );
     background: linear-gradient(
         135deg,
-        rgba(0, 150, 136, 1) 0%,
-        rgba(6, 198, 180, 1) 52%,
-        rgba(0, 150, 136, 1) 100%,
-        rgba(6, 198, 180, 1) 100%
+        rgba(255, 191, 0, 1) 0%,
+        rgba(255, 179, 0, 1) 52%,
+        rgba(255, 191, 0, 1) 100%,
+        rgba(255, 179, 0, 1) 100%
     );
     border-radius: 6px 0 0 6px;
     flex-direction: column;
