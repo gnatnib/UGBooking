@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Booking;
-use DB;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class BookingController extends Controller
 {
@@ -12,7 +13,7 @@ class BookingController extends Controller
     public function allbooking()
     {
         $allBookings = DB::table('bookings')->get();
-        return view('formbooking.allbooking',compact('allBookings'));
+        return view('formbooking.allbooking', compact('allBookings'));
     }
 
     /** Page */
@@ -20,14 +21,14 @@ class BookingController extends Controller
     {
         $data = DB::table('room_types')->get();
         $user = DB::table('users')->get();
-        return view('formbooking.bookingadd',compact('data','user'));
+        return view('formbooking.bookingadd', compact('data', 'user'));
     }
-    
+
     /** View Record */
     public function bookingEdit($bkg_id)
     {
-        $bookingEdit = DB::table('bookings')->where('bkg_id',$bkg_id)->first();
-        return view('formbooking.bookingedit',compact('bookingEdit'));
+        $bookingEdit = DB::table('bookings')->where('bkg_id', $bkg_id)->first();
+        return view('formbooking.bookingedit', compact('bookingEdit'));
     }
 
     /** Save Record */
@@ -50,10 +51,10 @@ class BookingController extends Controller
         DB::beginTransaction();
         try {
 
-            $photo= $request->fileupload;
-            $file_name = rand() . '.' .$photo->getClientOriginalName();
+            $photo = $request->fileupload;
+            $file_name = rand() . '.' . $photo->getClientOriginalName();
             $photo->move(public_path('/assets/upload/'), $file_name);
-           
+
             $booking                = new Booking;
             $booking->name          = $request->name;
             $booking->room_type     = $request->room_type;
@@ -67,15 +68,14 @@ class BookingController extends Controller
             $booking->fileupload    = $file_name;
             $booking->message       = $request->message;
             $booking->save();
-            
+
             DB::commit();
             flash()->success('Create new booking successfully :)');
             return redirect()->back();
-            
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             flash()->error('Add Booking fail :)');
-            \Log::info($e->getMessage());
+            Log::info($e->getMessage());
             return redirect()->back();
         }
     }
@@ -109,15 +109,15 @@ class BookingController extends Controller
                 'message'       => $request->message,
             ];
 
-            Booking::where('bkg_id',$request->bkg_id)->update($update);
-        
+            Booking::where('bkg_id', $request->bkg_id)->update($update);
+
             DB::commit();
             flash()->success('Updated booking successfully :)');
             return redirect()->back();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             flash()->error('Update booking fail :)');
-            \Log::info($e->getMessage());
+            Log::info($e->getMessage());
             return redirect()->back();
         }
     }
@@ -128,16 +128,14 @@ class BookingController extends Controller
         try {
 
             Booking::destroy($request->id);
-            unlink('assets/upload/'.$request->fileupload);
+            unlink('assets/upload/' . $request->fileupload);
             flash()->success('Booking deleted successfully :)');
             return redirect()->back();
-        
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             flash()->error('Booking delete fail :)');
-            \Log::info($e->getMessage());
+            Log::info($e->getMessage());
             return redirect()->back();
         }
     }
-
 }

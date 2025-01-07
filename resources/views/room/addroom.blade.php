@@ -17,10 +17,11 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Name</label>
-                                    <select class="form-control @error('name') is-invalid @enderror" id="sel1" name="name" value="{{ old('name') }}">
+                                    <select class="form-control @error('name') is-invalid @enderror" id="sel1"
+                                        name="name" value="{{ old('name') }}">
                                         <option selected disabled> --Select Name-- </option>
-                                        @foreach ($user as $users )
-                                        <option value="{{ $users->name }}">{{ $users->name }}</option>
+                                        @foreach ($user as $users)
+                                            <option value="{{ $users->name }}">{{ $users->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -28,18 +29,20 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Room Type</label>
-                                    <select class="form-control @error('room_type') is-invalid @enderror" id="room_type" name="room_type">
+                                    <select class="form-control @error('room_type') is-invalid @enderror" id="room_type"
+                                        name="room_type">
                                         <option selected disabled> --Select Room Type-- </option>
-                                            @foreach ($data as $items )
+                                        @foreach ($data as $items)
                                             <option value="{{ $items->room_name }}">{{ $items->room_name }}</option>
-                                            @endforeach
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>AC/NON-AC</label>
-                                    <select class="form-control @error('ac_non_ac') is-invalid @enderror" id="ac_non_ac" name="ac_non_ac">
+                                    <select class="form-control @error('ac_non_ac') is-invalid @enderror" id="ac_non_ac"
+                                        name="ac_non_ac">
                                         <option disabled selected>--Select--</option>
                                         <option value="AC">AC</option>
                                         <option value="NON-AC">NON-AC</option>
@@ -49,7 +52,8 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Food</label>
-                                    <select class="form-control @error('food') is-invalid @enderror" id="food" name="food">
+                                    <select class="form-control @error('food') is-invalid @enderror" id="food"
+                                        name="food">
                                         <option disabled selected>--Select--</option>
                                         <option value="Free Breakfast">Free Breakfast</option>
                                         <option value="Free Lunch">Free Lunch</option>
@@ -63,7 +67,8 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Bed Count</label>
-                                    <select class="form-control @error('bed_count') is-invalid @enderror" id="bed_count" name="bed_count">
+                                    <select class="form-control @error('bed_count') is-invalid @enderror" id="bed_count"
+                                        name="bed_count">
                                         <option disabled selected>--Select--</option>
                                         <option value="1">1</option>
                                         <option value="2">2</option>
@@ -77,7 +82,8 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Charges For cancellation</label>
-                                    <select class="form-control @error('charges_for_cancellation') is-invalid @enderror" id="charges_for_cancellation" name="charges_for_cancellation">
+                                    <select class="form-control @error('charges_for_cancellation') is-invalid @enderror"
+                                        id="charges_for_cancellation" name="charges_for_cancellation">
                                         <option disabled selected> --Select--</option>
                                         <option value="Free">Free</option>
                                         <option value="5% Before 24Hours">5% Before 24Hours</option>
@@ -88,20 +94,24 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Rent</label>
-                                    <input type="text" class="form-control @error('rent') is-invalid @enderror" id="rent" name="rent" value="{{ old('rent') }}">
+                                    <input type="text" class="form-control @error('rent') is-invalid @enderror"
+                                        id="rent" name="rent" value="{{ old('rent') }}">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Phone Number</label>
-                                    <input type="number" class="form-control @error('phone_number') is-invalid @enderror" id="phone_number" name="phone_number" value="{{ old('phone_number') }}">
+                                    <input type="number" class="form-control @error('phone_number') is-invalid @enderror"
+                                        id="phone_number" name="phone_number" value="{{ old('phone_number') }}">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>File Upload</label>
                                     <div class="custom-file mb-3">
-                                        <input type="file" class="custom-file-input @error('fileupload') is-invalid @enderror" id="fileupload" name="fileupload">
+                                        <input type="file"
+                                            class="custom-file-input @error('fileupload') is-invalid @enderror"
+                                            id="fileupload" name="fileupload">
                                         <label class="custom-file-label" for="customFile">Choose file</label>
                                     </div>
                                 </div>
@@ -109,7 +119,8 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Message</label>
-                                    <textarea class="form-control @error('message') is-invalid @enderror" rows="1.5" id="message" name="message" value="{{ old('message') }}"></textarea>
+                                    <textarea class="form-control @error('message') is-invalid @enderror" rows="1.5" id="message" name="message"
+                                        value="{{ old('message') }}"></textarea>
                                 </div>
                             </div>
                         </div>
