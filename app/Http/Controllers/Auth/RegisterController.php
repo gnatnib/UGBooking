@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Carbon\Carbon;
-use Hash;
+use Illuminate\Support\Facades\Hash;
 use DB;
 
 class RegisterController extends Controller
@@ -29,17 +29,17 @@ class RegisterController extends Controller
             'password'     => 'required|string|min:8|confirmed',
             'password_confirmation' => 'required',
         ]);
-        
+
         $dt       = Carbon::now();
         $join_date = $dt->toDayDateTimeString();
 
-        if(!empty($profile)) {
-            $image = time().'.'.$profile->extension();  
+        if (!empty($profile)) {
+            $image = time() . '.' . $profile->extension();
             $profile->move(public_path('assets/img'), $image);
         } else {
             $image = ' ';
         }
-        
+
         $user = new User();
         $user->name         = $request->name;
         $user->email        = $request->email;
@@ -51,7 +51,7 @@ class RegisterController extends Controller
         $user->avatar       = $image;
         $user->password     = Hash::make($request->password);
         $user->save();
-    
+
         flash()->success('Create new account successfully :)');
         return redirect('login');
     }
