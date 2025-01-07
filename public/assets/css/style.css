@@ -1668,6 +1668,10 @@ html.menu-opened body {
     position: relative;
     margin-left: 38px;
 }
+.submenu_class a:hover {
+    color: #29357d !important;
+    background-color: transparent !important;
+}
 .sidebar-menu ul {
     font-size: 15px;
     list-style-type: none;
@@ -1687,18 +1691,19 @@ html.menu-opened body {
 }
 .sidebar-menu > ul > li > a:hover {
     color: #fff !important;
-    background-color: #01776c;
+    background-color: #29357d !important;
 }
 .sidebar-menu > ul > li.active > a:hover {
-    border-color: #01776c;
-    color: #fff;
+    border-color: #29357d;
+    color: #fff !important;
+    background: #29357d !important;
 }
 .sidebar-menu li.active a {
     border-radius: 8px;
     color: #fff !important;
-    box-shadow: 0 7px 12px 0 rgba(95, 118, 232, 0.21);
+    box-shadow: 0 7px 12px 0 rgba(41, 53, 125, 0.21);
     opacity: 1;
-    background: #ffbf00;
+    background: #29357d !important;
 }
 .menu-title {
     color: #000;
