@@ -5,7 +5,7 @@
     $hour = date('G');
     $minute = date('i');
     $second = date('s');
-    $msg = ' Today is ' . date('l, M. d, Y.');
+    $msg = ' Today is ' . date('l, M d, Y.');
     
     if ($hour == 00 && $hour <= 9 && $minute <= 59 && $second <= 59) {
         $greet = 'Good Morning,';

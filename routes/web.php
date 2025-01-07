@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -27,14 +27,11 @@ Route::get('/', function () {
     return view('auth.login');
 });
 
-Route::group(['middleware'=>'auth'],function()
-{
-    Route::get('home',function()
-    {
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('home', function () {
         return view('home');
     });
-    Route::get('home',function()
-    {
+    Route::get('home', function () {
         return view('home');
     });
 });
@@ -66,12 +63,6 @@ Route::controller(ForgotPasswordController::class)->group(function () {
     Route::post('forget-password', 'postEmail')->name('forget-password');
 });
 
-// ----------------------------- reset password -----------------------------//
-Route::controller(ResetPasswordController::class)->group(function () {
-    Route::get('reset-password/{token}', 'getPassword');
-    Route::post('reset-password', 'updatePassword');
-});
-
 // ----------------------------- booking -----------------------------//
 Route::controller(BookingController::class)->group(function () {
     Route::get('form/allbooking', 'allbooking')->name('form/allbooking')->middleware('auth');
@@ -100,16 +91,27 @@ Route::controller(RoomsController::class)->group(function () {
     Route::post('form/room/save', 'saveRecordRoom')->middleware('auth')->name('form/room/save');
     Route::post('form/room/delete', 'deleteRecord')->middleware('auth')->name('form/room/delete');
     Route::post('form/room/update', 'updateRecord')->middleware('auth')->name('form/room/update');
+    //add ruangan
+    Route::post('form/room-type/add', 'addRoomType')->middleware('auth')->name('room.type.add');
+    //delete ruangan
+    Route::post('form/room-type/delete', [RoomsController::class, 'deleteRoomType'])
+        ->middleware('auth')
+        ->name('room.type.delete');
 });
 
 // ----------------------- user management -------------------------//
 Route::controller(UserManagementController::class)->group(function () {
     Route::get('users/list/page', 'userList')->middleware('auth')->name('users/list/page');
-    Route::get('users/add/new', 'userAddNew')->middleware('auth')->name('users/add/new'); /** add new users */
-    Route::get('users/add/edit/{user_id}', 'userView'); /** add new users */
-    Route::post('users/update', 'userUpdate')->name('users/update'); /** update record */
-    Route::get('users/delete/{id}', 'userDelete')->name('users/delete'); /** delere record */
-    Route::get('get-users-data', 'getUsersData')->name('get-users-data'); /** get all data users */
+    Route::get('users/add/new', 'userAddNew')->middleware('auth')->name('users/add/new');
+    /** add new users */
+    Route::get('users/add/edit/{user_id}', 'userView');
+    /** add new users */
+    Route::post('users/update', 'userUpdate')->name('users/update');
+    /** update record */
+    Route::get('users/delete/{id}', 'userDelete')->name('users/delete');
+    /** delere record */
+    Route::get('get-users-data', 'getUsersData')->name('get-users-data');
+    /** get all data users */
 });
 
 // ----------------------------- employee -----------------------------//

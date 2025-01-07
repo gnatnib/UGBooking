@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 class CreateRoomTypesTable extends Migration
 {
@@ -20,12 +21,9 @@ class CreateRoomTypesTable extends Migration
         });
 
         DB::table('room_types')->insert([
-            ['room_name' => 'Single'],
-            ['room_name' => 'Double'],
-            ['room_name' => 'Quad'],
-            ['room_name' => 'King'],
-            ['room_name' => 'Suite'],
-            ['room_name' => 'Villa'],
+            ['room_name' => 'Ruang Meeting Besar'],
+            ['room_name' => 'Ruang Meeting Kecil'],
+            ['room_name' => 'Ruang Diskusi'],
         ]);
     }
 

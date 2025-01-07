@@ -14,6 +14,7 @@ class BookingController extends Controller
     {
         $allBookings = DB::table('bookings')->get();
         return view('formbooking.allbooking', compact('allBookings'));
+        return view('formbooking.allbooking', compact('allBookings'));
     }
 
     /** Page */
@@ -22,8 +23,9 @@ class BookingController extends Controller
         $data = DB::table('room_types')->get();
         $user = DB::table('users')->get();
         return view('formbooking.bookingadd', compact('data', 'user'));
+        return view('formbooking.bookingadd', compact('data', 'user'));
     }
-    
+
     /** View Record */
     public function bookingEdit($bkg_id)
     {
@@ -98,15 +100,14 @@ class BookingController extends Controller
             $booking->status_meet = 'pending';
             $booking->approval = 'pending';
             $booking->save();
-            
+
             DB::commit();
             flash()->success('Create new booking successfully :)');
             return redirect()->back();
-            
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             flash()->error('Add Booking fail :)');
-            \Log::info($e->getMessage());
+            Log::info($e->getMessage());
             return redirect()->back();
         }
     }
@@ -160,10 +161,10 @@ class BookingController extends Controller
             DB::commit();
             flash()->success('Updated booking successfully :)');
             return redirect()->back();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             flash()->error('Update booking fail :)');
-            \Log::info($e->getMessage());
+            Log::info($e->getMessage());
             return redirect()->back();
         }
     }
@@ -178,11 +179,10 @@ class BookingController extends Controller
             
             flash()->success('Booking deleted successfully :)');
             return redirect()->back();
-        
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             flash()->error('Booking delete fail :)');
-            \Log::info($e->getMessage());
+            Log::info($e->getMessage());
             return redirect()->back();
         }
     }

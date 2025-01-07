@@ -14,6 +14,7 @@
     <link rel="stylehseet" href="https://cdn.oesmith.co.uk/morris-0.5.1.css">
     <link rel="stylesheet" href="{{ URL::to('assets/plugins/morris/morris.css') }}">
     <link rel="stylesheet" href="{{ URL::to('assets/css/style.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <link rel="stylesheet" type="text/css" href="{{ URL::to('assets/css/bootstrap-datetimepicker.min.css') }}">
 
@@ -74,6 +75,7 @@
     <script src="{{ URL::to('assets/js/chart.morris.js') }}"></script>
 
     @yield('script')
+    @stack('scripts')
 
 </body>
 
