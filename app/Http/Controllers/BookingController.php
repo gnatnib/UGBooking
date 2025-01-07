@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Booking;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class BookingController extends Controller
 {
@@ -31,6 +32,29 @@ class BookingController extends Controller
         return view('formbooking.bookingedit', compact('bookingEdit'));
     }
 
+    /**
+     * Check for booking time conflicts
+     */
+    private function hasTimeConflict($room_type, $date, $time_start, $time_end, $excluding_bkg_id = null)
+    {
+        $query = Booking::where('room_type', $room_type)
+            ->where('date', $date)
+            ->where(function($q) use ($time_start, $time_end) {
+                // Check if the new booking overlaps with any existing booking
+                $q->where(function($query) use ($time_start, $time_end) {
+                    $query->where('time_start', '<', $time_end)
+                          ->where('time_end', '>', $time_start);
+                });
+            });
+
+        // Exclude current booking when updating
+        if ($excluding_bkg_id) {
+            $query->where('bkg_id', '!=', $excluding_bkg_id);
+        }
+
+        return $query->exists();
+    }
+
     /** Save Record */
     public function saveRecord(Request $request)
     {
@@ -38,35 +62,42 @@ class BookingController extends Controller
             'name'          => 'required|string|max:255',
             'room_type'     => 'required|string|max:255',
             'total_numbers' => 'required|string|max:255',
-            'date'          => 'required|string|max:255',
-            'time'          => 'required|string|max:255',
-            'arrival_date'  => 'required|string|max:255',
-            'depature_date' => 'required|string|max:255',
-            'email'         => 'required|string|max:255',
+            'date'          => 'required|date',
+            'time_start'    => 'required',
+            'time_end'      => 'required|after:time_start',
+            'email'         => 'required|email|max:255',
             'phone_number'  => 'required|string|max:255',
-            'fileupload'    => 'required|file',
             'message'       => 'required|string|max:255',
         ]);
 
         DB::beginTransaction();
         try {
+            // Check for time conflicts
+            if ($this->hasTimeConflict(
+                $request->room_type,
+                $request->date,
+                $request->time_start,
+                $request->time_end
+            )) {
+                flash()->error('This room is already booked for the selected time slot.');
+                return redirect()->back()->withInput();
+            }
 
-            $photo = $request->fileupload;
-            $file_name = rand() . '.' . $photo->getClientOriginalName();
-            $photo->move(public_path('/assets/upload/'), $file_name);
-
-            $booking                = new Booking;
-            $booking->name          = $request->name;
-            $booking->room_type     = $request->room_type;
+           
+           
+            $booking = new Booking;
+            $booking->name = $request->name;
+            $booking->room_type = $request->room_type;
             $booking->total_numbers = $request->total_numbers;
-            $booking->date          = $request->date;
-            $booking->time          = $request->time;
-            $booking->arrival_date  = $request->arrival_date;
-            $booking->depature_date = $request->depature_date;
-            $booking->email         = $request->email;
-            $booking->ph_number     = $request->phone_number;
-            $booking->fileupload    = $file_name;
-            $booking->message       = $request->message;
+            $booking->date = $request->date;
+            $booking->time_start = $request->time_start;
+            $booking->time_end = $request->time_end;
+            $booking->email = $request->email;
+            $booking->ph_number = $request->phone_number;
+            
+            $booking->message = $request->message;
+            $booking->status_meet = 'pending';
+            $booking->approval = 'pending';
             $booking->save();
 
             DB::commit();
@@ -83,34 +114,49 @@ class BookingController extends Controller
     /** Update Record */
     public function updateRecord(Request $request)
     {
+        $request->validate([
+            'name'          => 'required|string|max:255',
+            'room_type'     => 'required|string|max:255',
+            'total_numbers' => 'required|string|max:255',
+            'date'          => 'required|date',
+            'time_start'    => 'required',
+            'time_end'      => 'required|after:time_start',
+            'email'         => 'required|email|max:255',
+            'phone_number'  => 'required|string|max:255',
+            
+            'message'       => 'required|string|max:255',
+        ]);
+
         DB::beginTransaction();
         try {
-
-            if (!empty($request->fileupload)) {
-                $photo = $request->fileupload;
-                $file_name = rand() . '.' . $photo->getClientOriginalExtension();
-                $photo->move(public_path('/assets/upload/'), $file_name);
-            } else {
-                $file_name = $request->hidden_fileupload;
+            // Check for time conflicts excluding current booking
+            if ($this->hasTimeConflict(
+                $request->room_type,
+                $request->date,
+                $request->time_start,
+                $request->time_end,
+                $request->bkg_id
+            )) {
+                flash()->error('This room is already booked for the selected time slot.');
+                return redirect()->back()->withInput();
             }
 
+            
+
             $update = [
-                'bkg_id'        => $request->bkg_id,
                 'name'          => $request->name,
                 'room_type'     => $request->room_type,
                 'total_numbers' => $request->total_numbers,
                 'date'          => $request->date,
-                'time'          => $request->time,
-                'arrival_date'  => $request->arrival_date,
-                'depature_date' => $request->depature_date,
+                'time_start'    => $request->time_start,
+                'time_end'      => $request->time_end,
                 'email'         => $request->email,
                 'ph_number'     => $request->phone_number,
-                'fileupload'    => $file_name,
                 'message'       => $request->message,
             ];
 
             Booking::where('bkg_id', $request->bkg_id)->update($update);
-
+        
             DB::commit();
             flash()->success('Updated booking successfully :)');
             return redirect()->back();
@@ -126,9 +172,10 @@ class BookingController extends Controller
     public function deleteRecord(Request $request)
     {
         try {
-
-            Booking::destroy($request->id);
-            unlink('assets/upload/' . $request->fileupload);
+            $booking = Booking::findOrFail($request->id);
+            
+            $booking->delete();
+            
             flash()->success('Booking deleted successfully :)');
             return redirect()->back();
         } catch (\Exception $e) {

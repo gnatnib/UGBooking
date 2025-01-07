@@ -9,6 +9,11 @@
                     </div>
                 </div>
             </div>
+            @if (session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+            @endif
             <form action="{{ route('form/booking/save') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
@@ -17,29 +22,49 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Name</label>
-                                    <select class="form-control @error('name') is-invalid @enderror" id="sel1" name="name">
+                                    <select class="form-control @error('name') is-invalid @enderror" id="sel1" name="name" required>
                                         <option selected disabled> --Select Name-- </option>
-                                        @foreach ($user as $users )
-                                        <option {{ old('name') == $users->name ? "selected" : "" }} value="{{ $users->name }}">{{ $users->name }}</option>
+                                        @foreach ($user as $users)
+                                        <option value="{{ $users->name }}" {{ old('name') == $users->name ? "selected" : "" }}>
+                                            {{ $users->name }}
+                                        </option>
                                         @endforeach
                                     </select>
+                                    @error('name')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Room Type</label>
-                                    <select class="form-control @error('room_type') is-invalid @enderror" id="sel2" name="room_type">
+                                    <select class="form-control @error('room_type') is-invalid @enderror" id="sel2" name="room_type" required>
                                         <option selected disabled> --Select Room Type-- </option>
-                                        @foreach ($data as $items )
-                                        <option {{ old('room_type') == $items->room_name ? "selected" : "" }} value="{{ $items->room_name }}">{{ $items->room_name }}</option>
+                                        @foreach ($data as $items)
+                                        <option value="{{ $items->room_name }}" {{ old('room_type') == $items->room_name ? "selected" : "" }}>
+                                            {{ $items->room_name }}
+                                        </option>
                                         @endforeach
                                     </select>
+                                    @error('room_type')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Total Members</label>
-                                    <input type="number" class="form-control @error('total_numbers') is-invalid @enderror"name="total_numbers" value="{{ old('total_numbers') }}">
+                                    <input type="number" class="form-control @error('total_numbers') is-invalid @enderror" 
+                                           name="total_numbers" value="{{ old('total_numbers') }}" required>
+                                    @error('total_numbers')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -52,53 +77,67 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>Time</label>
+                                    <label>Start Time</label>
                                     <div class="time-icon">
-                                        <input type="text" class="form-control @error('time') is-invalid @enderror" id="datetimepicker3" name="time" value="{{ old('time') }}">
+                                        <input type="time" class="form-control @error('time_start') is-invalid @enderror" 
+                                               name="time_start" value="{{ old('time_start') }}" required>
+                                        @error('time_start')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>Arrival Date</label>
-                                    <div class="cal-icon">
-                                        <input type="text" class="form-control datetimepicker @error('arrival_date') is-invalid @enderror" name="arrival_date" value="{{ old('arrival_date') }}">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Depature Date</label>
-                                    <div class="cal-icon">
-                                        <input type="text" class="form-control datetimepicker @error('depature_date') is-invalid @enderror" name="depature_date" value="{{ old('depature_date') }}"> 
+                                    <label>End Time</label>
+                                    <div class="time-icon">
+                                        <input type="time" class="form-control @error('time_end') is-invalid @enderror" 
+                                               name="time_end" value="{{ old('time_end') }}" required>
+                                        @error('time_end')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Email</label>
-                                    <input type="text" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}">
+                                    <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                                           name="email" value="{{ old('email') }}" required>
+                                    @error('email')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Phone Number</label>
-                                    <input type="text" class="form-control @error('phone_number') is-invalid @enderror" id="usr1" name="phone_number" value="{{ old('phone_number') }}">
+                                    <input type="text" class="form-control @error('phone_number') is-invalid @enderror" 
+                                           name="phone_number" value="{{ old('phone_number') }}" required>
+                                    @error('phone_number')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>File Upload</label>
-                                    <div class="custom-file mb-3">
-                                        <input type="file" class="custom-file-input @error('fileupload') is-invalid @enderror" id="customFile" name="fileupload" value="{{ old('fileupload') }}">
-                                        <label class="custom-file-label" for="customFile">Choose file</label>
-                                    </div>
-                                </div>
-                            </div>
+                    
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Message</label>
-                                    <textarea class="form-control @error('message') is-invalid @enderror" rows="1.5" id="message" name="message">{{ old('message') }}</textarea>
+                                    <textarea class="form-control @error('message') is-invalid @enderror" 
+                                              rows="3" name="message" required>{{ old('message') }}</textarea>
+                                    @error('message')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -108,14 +147,29 @@
             </form>
         </div>
     </div>
-    @section('script')
-    <script>
-        $(function() {
-            $('#datetimepicker3').datetimepicker({
-                format: 'LT'
-            });
-        });
-        </script>
-    @endsection
-    
+
+@section('script')
+<script>
+$(document).ready(function() {
+    // Update file input label when file is selected
+    $(".custom-file-input").on("change", function() {
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });
+
+    // Time validation
+    $('form').on('submit', function(e) {
+        var startTime = $('input[name="time_start"]').val();
+        var endTime = $('input[name="time_end"]').val();
+        
+        if (startTime && endTime && startTime >= endTime) {
+            e.preventDefault();
+            alert('End time must be after start time');
+            return false;
+        }
+    });
+});
+</script>
+@endsection
+
 @endsection

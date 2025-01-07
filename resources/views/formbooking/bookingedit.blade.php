@@ -110,19 +110,7 @@
                                     <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ $bookingEdit->ph_number }}">
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>File Upload</label>
-                                    <div class="custom-file mb-3">
-                                        <input type="file" class="custom-file-input" id="customFile" name="fileupload">
-                                        <input type="hidden" class="form-control" name="hidden_fileupload" value="{{ $bookingEdit->fileupload }}">
-                                        <a href="profile.html" class="avatar avatar-sm mr-2">
-                                            <img class="avatar-img rounded-circle" src="{{ URL::to('/assets/upload/'.$bookingEdit->fileupload) }}" alt="{{ $bookingEdit->fileupload }}">
-                                        </a>
-                                        <label class="custom-file-label" for="customFile">Choose file</label>
-                                    </div>
-                                </div>
-                            </div>
+                            
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Message</label>
