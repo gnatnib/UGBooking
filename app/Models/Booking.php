@@ -14,12 +14,13 @@ class Booking extends Model
         'room_type',
         'total_numbers',
         'date',
-        'time',
-        'depature_date',
+        'time_start',
+        'time_end',
         'email',
         'ph_number',
-        'fileupload',
         'message',
+        'approval',
+        'status_meet',
     ];
 
     /** generate id */

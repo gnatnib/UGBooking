@@ -20,13 +20,13 @@ class CreateBookingsTable extends Migration
             $table->string('room_type')->nullable();
             $table->string('total_numbers')->nullable();
             $table->string('date')->nullable();
-            $table->string('time')->nullable();
-            $table->string('arrival_date')->nullable();
-            $table->string('depature_date')->nullable();
+            $table->string('time_start')->nullable();
+            $table->string('time_end')->nullable();
             $table->string('email')->nullable();
             $table->string('ph_number')->nullable();
-            $table->string('fileupload')->nullable();
             $table->string('message')->nullable();
+            $table->string('approval')->nullable();
+            $table->string('status_meet')->nullable();
             $table->timestamps();
         });
     }

@@ -12,11 +12,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var string[]
-     */
     protected $fillable = [
         'user_id',
         'name',
@@ -31,24 +26,26 @@ class User extends Authenticatable
         'password',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    // Tambahkan fungsi untuk cek role admin
+    public function isAdmin()
+    {
+        return $this->role_name === 'admin';
+    }
+
+    // Tambahkan fungsi untuk cek role user
+    public function isUser()
+    {
+        return $this->role_name === 'user';
+    }
 
     /** generate id */
     protected static function boot()
@@ -67,5 +64,4 @@ class User extends Authenticatable
             }
         });
     }
-
 }

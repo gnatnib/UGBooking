@@ -25,12 +25,12 @@
                                             <th>Room Type</th>
                                             <th>Total Numbers</th>
                                             <th>Date</th>
-                                            <th>Time</th>
-                                            <th>Arrival Date</th>
-                                            <th>Depature Date</th>
+                                            <th>Time_start</th>
+                                            <th>Time_end</th>
                                             <th>Email</th>
                                             <th>Ph.Number</th>
                                             <th>Status</th>
+                                            <th>Approval</th>
                                             <th class="text-right">Actions</th>
                                         </tr>
                                     </thead>
@@ -40,23 +40,23 @@
                                             <td>{{ $bookings->bkg_id }}</td>
                                             <td>
                                                 <h2 class="table-avatar">
-                                                <a href="#" class="avatar avatar-sm mr-2">
-                                                    <img class="avatar-img rounded-circle" src="{{ URL::to('/assets/upload/'.$bookings->fileupload) }}" alt="{{ $bookings->fileupload }}">
-                                                </a>
+                                                
                                                 <a href="#">{{ $bookings->name }}<span>{{ $bookings->bkg_id }}</span></a>
                                                 </h2>
                                             </td>
                                             <td>{{ $bookings->room_type }}</td>
                                             <td>{{ $bookings->total_numbers }}</td>
                                             <td>{{ $bookings->date }}</td>
-                                            <td>{{ $bookings->time }}</td>
-                                            <td>{{ $bookings->arrival_date }}</td>
-                                            <td>{{ $bookings->depature_date }}</td>
+                                            <td>{{ $bookings->time_start }}</td>
+                                            <td>{{ $bookings->time_end }}</td>
                                             <td><a href="#" class="__cf_email__" data-cfemail="2652494b4b5f44435448474a66435e474b564a430845494b">{{ $bookings->email }}</a></td>
                                             <td>{{ $bookings->ph_number }}</td>
+                                            <td>{{ $bookings->approval}}</td>
+                                            <td>{{ $bookings->status_meet }}</td>
                                             <td>
                                                 <div class="actions"> <a href="#" class="btn btn-sm bg-success-light mr-2">Active</a> </div>
                                             </td>
+
                                             <td class="text-right">
                                                 <div class="dropdown dropdown-action">
                                                     <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -66,7 +66,7 @@
                                                         <a class="dropdown-item" href="{{ url('form/booking/edit/'.$bookings->bkg_id) }}">
                                                             <i class="fas fa-pencil-alt m-r-5"></i> Edit
                                                         </a>
-                                                        <a class="dropdown-item bookingDelete" data-toggle="modal" data-target="#delete_asset" data-id="{{ $bookings->id }}" data-fileupload="{{ $bookings->fileupload }}">
+                                                        <a class="dropdown-item bookingDelete" data-toggle="modal" data-target="#delete_asset" data-id="{{ $bookings->id }}" >
                                                             <i class="fas fa-trash-alt m-r-5"></i> Delete
                                                         </a> 
                                                     </div>
@@ -111,7 +111,7 @@
         $(document).on('click','.bookingDelete',function()
         {
             $('#e_id').val($(this).data('id'));
-            $('#e_fileupload').val($(this).data('fileupload'));
+            
         });
     </script>
     @endsection
