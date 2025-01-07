@@ -23,12 +23,6 @@
                                     <button class="btn btn-primary btn-block" type="submit">Login</button>
                                 </div>
                             </form>
-                            <div class="text-center forgotpass">
-                                <a href="{{ route('forget-password') }}">Forgot Password?</a>
-                            </div>
-                            <!-- <div class="text-center dont-have">Don’t have an account?
-                                <a href="{{ route('register') }}">Register</a>
-                            </div> -->
                         </div>
                     </div>
                 </div>
