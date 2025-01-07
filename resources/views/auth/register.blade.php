@@ -4,7 +4,7 @@
         <div class="login-wrapper">
             <div class="container">
                 <div class="loginbox">
-                    <div class="login-left"> <img class="img-fluid" src="assets/img/logo.png" alt="Logo" style=" border-radius: 5px;"> </div>
+                    <div class="login-left"> <img class="img-fluid" src="assets/img/logoUG.png" alt="Logo" style=" border-radius: 5px;"> </div>
                     <div class="login-right">
                         <div class="login-right-wrap">
                             <h1 class="mb-3">Register</h1>
@@ -41,7 +41,7 @@
                                     <button class="btn btn-primary btn-block" type="submit">Register</button>
                                 </div>
                             </form>
-                            <div class="login-or">
+                            <!-- <div class="login-or">
                                 <span class="or-line"></span> 
                                 <span class="span-or">or</span> 
                             </div>
@@ -52,7 +52,7 @@
                                 </a>
                                 <a href="#" class="google">
                                     <i class="fab fa-google"></i></a> 
-                                </div>
+                                </div> -->
                             <div class="text-center dont-have">Already have an account? 
                                 <a href="{{ route('login') }}">Login</a> 
                             </div>
