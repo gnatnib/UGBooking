@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Booking;
-use DB;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class BookingController extends Controller
@@ -14,7 +15,6 @@ class BookingController extends Controller
     {
         $allBookings = DB::table('bookings')->get();
         return view('formbooking.allbooking', compact('allBookings'));
-        return view('formbooking.allbooking', compact('allBookings'));
     }
 
     /** Page */
@@ -22,7 +22,6 @@ class BookingController extends Controller
     {
         $data = DB::table('room_types')->get();
         $user = DB::table('users')->get();
-        return view('formbooking.bookingadd', compact('data', 'user'));
         return view('formbooking.bookingadd', compact('data', 'user'));
     }
 
