@@ -175,7 +175,7 @@ class RoomsController extends Controller
                 'message' => 'Room type deleted successfully'
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error deleting room type: ' . $e->getMessage());
+            Log::error('Error deleting room type: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete room type'

@@ -12,7 +12,7 @@ class UsersTableSeeder extends Seeder
     {
         // Create Admin
         User::create([
-            'name' => 'Admin',
+            'name' => 'Admin Reko',
             'email' => 'admin@example.com',
             'password' => Hash::make('admin123'),
             'role_name' => 'admin',
@@ -25,15 +25,15 @@ class UsersTableSeeder extends Seeder
 
         // Create Sample User
         User::create([
-            'name' => 'Regular User',
-            'email' => 'user@example.com',
-            'password' => Hash::make('user123'),
+            'name' => 'Erni Indah',
+            'email' => 'erniindah@example.com',
+            'password' => Hash::make('erni123'),
             'role_name' => 'user',
             'status' => 'Active',
             'join_date' => now()->format('Y-m-d'),
             'phone_number' => '081234567891',
             'position' => 'Staff',
-            'department' => 'Marketing',
+            'department' => 'Human Resources',
         ]);
     }
 }

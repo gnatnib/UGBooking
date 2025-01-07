@@ -9,8 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Carbon\Carbon;
 use Session;
-use Auth;
-use DB;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -64,10 +63,10 @@ class LoginController extends Controller
         $email    = $request->email;
         $password = $request->password;
 
-        if (Auth::attempt(['email'=>$email,'password'=>$password,'status'=>'Active'])) {
+        if (Auth::attempt(['email' => $email, 'password' => $password, 'status' => 'Active'])) {
             flash()->success('Login successfully :)');
             return redirect()->intended('home');
-        } elseif (Auth::attempt(['email'=>$email,'password'=>$password,'status'=> null])) {
+        } elseif (Auth::attempt(['email' => $email, 'password' => $password, 'status' => null])) {
             flash()->success('Login successfully :)');
             return redirect()->intended('home');
         } else {
@@ -83,5 +82,4 @@ class LoginController extends Controller
         flash()->success('Logout successfully :)');
         return redirect('login');
     }
-
 }

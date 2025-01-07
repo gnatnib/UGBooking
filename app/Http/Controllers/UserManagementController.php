@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use DB;
+use illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\User;
 
 class UserManagementController extends Controller
@@ -23,8 +24,8 @@ class UserManagementController extends Controller
     /** View Record */
     public function userView($user_id)
     {
-        $userData = User::where('user_id',$user_id)->first();
-        return view('usermanagement.useredit',compact('userData'));
+        $userData = User::where('user_id', $user_id)->first();
+        return view('usermanagement.useredit', compact('userData'));
     }
 
     /** Update Record */
@@ -39,15 +40,15 @@ class UserManagementController extends Controller
                 'position'     => $request->position,
                 'department'   => $request->department,
             ];
-            User::where('user_id',$request->user_id)->update($updateRecord);
-        
+            User::where('user_id', $request->user_id)->update($updateRecord);
+
             DB::commit();
             flash()->success('Updated record successfully :)');
             return redirect()->back();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             flash()->error('Update record fail :)');
-            \Log::error($e->getMessage());
+            Log::error($e->getMessage());
             return redirect()->back();
         }
     }
@@ -61,11 +62,10 @@ class UserManagementController extends Controller
             $deleteRecord->delete();
             flash()->success('User deleted successfully :)');
             return redirect()->back();
-        
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             flash()->error('User delete fail :)');
-            \Log::error($e->getMessage());
+            Log::error($e->getMessage());
             return redirect()->back();
         }
     }
@@ -112,7 +112,7 @@ class UserManagementController extends Controller
             ->take($rowPerPage)
             ->get();
         $data_arr = [];
-        
+
         foreach ($records as $key => $record) {
             $modify = '
                 <td class="text-right">
@@ -121,28 +121,28 @@ class UserManagementController extends Controller
                             <i class="fas fa-ellipsis-v ellipse_color"></i>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="'.url('users/add/edit/'.$record->user_id).'">
+                            <a class="dropdown-item" href="' . url('users/add/edit/' . $record->user_id) . '">
                                 <i class="fas fa-pencil-alt m-r-5"></i> Edit
                             </a>
-                            <a class="dropdown-item" href="'.url('users/delete/'.$record->id).'">
+                            <a class="dropdown-item" href="' . url('users/delete/' . $record->id) . '">
                             <i class="fas fa-trash-alt m-r-5"></i> Delete
                         </a>
                         </div>
                     </div>
                 </td>
             ';
-            $data_arr [] = [
+            $data_arr[] = [
                 "user_id"      => $record->user_id,
                 "name"         => $record->name,
                 "email"        => $record->email,
                 "position"     => $record->position,
                 "phone_number" => $record->phone_number,
-                "status"       => $record->status, 
-                "modify"       => $modify, 
+                "status"       => $record->status,
+                "modify"       => $modify,
             ];
         }
 
-        
+
 
         $response = [
             "draw"                 => intval($draw),
