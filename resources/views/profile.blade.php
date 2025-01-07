@@ -55,7 +55,7 @@
                                             </div>
                                             <div class="row">
                                                 <p class="col-sm-3 text-sm-right mb-0 mb-sm-3">Date of Birth</p>
-                                                <p class="col-sm-9">24 Jul 1983</p>
+                                                <p class="col-sm-9">24 Jul </p>
                                             </div>
                                             <div class="row">
                                                 <p class="col-sm-3 text-sm-right mb-0 mb-sm-3">Email ID </p>
