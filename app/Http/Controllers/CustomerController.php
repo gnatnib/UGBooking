@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Customer;
-use DB;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
 {
@@ -12,7 +13,7 @@ class CustomerController extends Controller
     public function allCustomers()
     {
         $allCustomers = DB::table('customers')->get();
-        return view('formcustomers.allcustomers',compact('allCustomers'));
+        return view('formcustomers.allcustomers', compact('allCustomers'));
     }
 
     /** Page Customer */
@@ -20,7 +21,7 @@ class CustomerController extends Controller
     {
         $data = DB::table('room_types')->get();
         $user = DB::table('users')->get();
-        return view('formcustomers.addcustomer',compact('data','user'));
+        return view('formcustomers.addcustomer', compact('data', 'user'));
     }
 
     /** Save Record */
@@ -43,10 +44,10 @@ class CustomerController extends Controller
         DB::beginTransaction();
         try {
 
-            $photo= $request->fileupload;
-            $file_name = rand() . '.' .$photo->getClientOriginalName();
+            $photo = $request->fileupload;
+            $file_name = rand() . '.' . $photo->getClientOriginalName();
             $photo->move(public_path('/assets/upload/'), $file_name);
-           
+
             $customer = new Customer;
             $customer->name = $request->name;
             $customer->room_type     = $request->room_type;
@@ -60,15 +61,14 @@ class CustomerController extends Controller
             $customer->fileupload  = $file_name;
             $customer->message     = $request->message;
             $customer->save();
-            
+
             DB::commit();
             flash()->success('Create new customer successfully :)');
             return redirect()->back();
-            
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             flash()->error('Add Customer fail :)');
-            \Log::error($e->getMessage());
+            Log::error($e->getMessage());
             return redirect()->back();
         }
     }
@@ -76,8 +76,8 @@ class CustomerController extends Controller
     /** View Detail */
     public function updateCustomer($bkg_customer_id)
     {
-        $customerEdit = DB::table('customers')->where('bkg_customer_id',$bkg_customer_id)->first();
-        return view('formcustomers.editcustomer',compact('customerEdit'));
+        $customerEdit = DB::table('customers')->where('bkg_customer_id', $bkg_customer_id)->first();
+        return view('formcustomers.editcustomer', compact('customerEdit'));
     }
 
     /** Update Record */
@@ -108,35 +108,33 @@ class CustomerController extends Controller
                 'fileupload'      => $file_name,
                 'message'         => $request->message,
             ];
-            Customer::where('bkg_customer_id',$request->bkg_customer_id)->update($update);
-        
+            Customer::where('bkg_customer_id', $request->bkg_customer_id)->update($update);
+
             DB::commit();
             flash()->success('Updated customer successfully :)');
             return redirect()->back();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             flash()->error('Update customer fail :)');
-            \Log::error($e->getMessage());
+            Log::error($e->getMessage());
             return redirect()->back();
         }
     }
-    
+
     /** Delete Record */
     public function deleteRecord(Request $request)
     {
         try {
 
             Customer::destroy($request->id);
-            unlink('assets/upload/'.$request->fileupload);
+            unlink('assets/upload/' . $request->fileupload);
             flash()->success('Customer deleted successfully :)');
             return redirect()->back();
-        
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             flash()->error('Customer delete fail :)');
-            \Log::error($e->getMessage());
+            Log::error($e->getMessage());
             return redirect()->back();
         }
     }
-
 }

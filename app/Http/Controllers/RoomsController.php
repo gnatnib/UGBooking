@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Room;
-use DB;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class RoomsController extends Controller
 {
@@ -12,7 +13,7 @@ class RoomsController extends Controller
     public function allrooms()
     {
         $allRooms = DB::table('rooms')->get();
-        return view('room.allroom',compact('allRooms'));
+        return view('room.allroom', compact('allRooms'));
     }
 
     /** Room Page */
@@ -20,16 +21,16 @@ class RoomsController extends Controller
     {
         $data = DB::table('room_types')->get();
         $user = DB::table('users')->get();
-        return view('room.addroom',compact('user','data'));
+        return view('room.addroom', compact('user', 'data'));
     }
 
     /** View Record */
     public function editRoom($bkg_room_id)
     {
-        $roomEdit = DB::table('rooms')->where('bkg_room_id',$bkg_room_id)->first();
+        $roomEdit = DB::table('rooms')->where('bkg_room_id', $bkg_room_id)->first();
         $data = DB::table('room_types')->get();
         $user = DB::table('users')->get();
-        return view('room.editroom',compact('user','data','roomEdit'));
+        return view('room.editroom', compact('user', 'data', 'roomEdit'));
     }
 
     /** Save Record */
@@ -50,11 +51,10 @@ class RoomsController extends Controller
 
         DB::beginTransaction();
         try {
-
-            $photo= $request->fileupload;
-            $file_name = rand() . '.' .$photo->getClientOriginalName();
+            $photo = $request->fileupload;
+            $file_name = rand() . '.' . $photo->getClientOriginalName();
             $photo->move(public_path('/assets/upload/'), $file_name);
-           
+
             $room = new Room;
             $room->name         = $request->name;
             $room->room_type    = $request->room_type;
@@ -67,13 +67,13 @@ class RoomsController extends Controller
             $room->fileupload   = $file_name;
             $room->message      = $request->message;
             $room->save();
-            
+
             DB::commit();
             flash()->success('Create new room successfully :)');
             return redirect()->back();
-            
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
+            Log::error($e->getMessage());
             flash()->error('Add Room fail :)');
             return redirect()->back();
         }
@@ -84,7 +84,6 @@ class RoomsController extends Controller
     {
         DB::beginTransaction();
         try {
-
             if (!empty($request->fileupload)) {
                 $photo = $request->fileupload;
                 $file_name = rand() . '.' . $photo->getClientOriginalExtension();
@@ -105,15 +104,15 @@ class RoomsController extends Controller
                 'fileupload'               => $file_name,
                 'message'                  => $request->message,
             ];
-            Room::where('bkg_room_id',$request->bkg_room_id)->update($update);
-        
+            Room::where('bkg_room_id', $request->bkg_room_id)->update($update);
+
             DB::commit();
             flash()->error('Updated room successfully :)');
             return redirect()->back();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
+            Log::error($e->getMessage());
             flash()->error('Update room fail :)');
-            \Log::error($e->getMessage());
             return redirect()->back();
         }
     }
@@ -122,16 +121,14 @@ class RoomsController extends Controller
     public function deleteRecord(Request $request)
     {
         try {
-
             Room::destroy($request->id);
-            unlink('assets/upload/'.$request->fileupload);
+            unlink('assets/upload/' . $request->fileupload);
             flash()->success('Room deleted successfully :)');
             return redirect()->back();
-        
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
+            Log::error($e->getMessage());
             flash()->error('Room delete fail :)');
-            \Log::error($e->getMessage());
             return redirect()->back();
         }
     }
