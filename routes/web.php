@@ -69,14 +69,12 @@ Route::controller(ForgotPasswordController::class)->group(function () {
 // ----------------------------- booking -----------------------------//
 Route::controller(BookingController::class)->group(function () {
     Route::get('form/allbooking', 'allbooking')->name('form/allbooking')->middleware('auth');
-    Route::get('form/appbooking', 'appbooking')->name('form/appbooking')->middleware('auth');
+   
     Route::get('form/booking/edit/{bkg_id}', 'bookingEdit')->middleware('auth');
     Route::get('form/booking/add', 'bookingAdd')->middleware('auth')->name('form/booking/add');
     Route::post('form/booking/save', 'saveRecord')->middleware('auth')->name('form/booking/save');
     Route::post('form/booking/update', 'updateRecord')->middleware('auth')->name('form/booking/update');
     Route::post('form/booking/delete', 'deleteRecord')->middleware('auth')->name('form/booking/delete');
-    Route::post('form/booking/approve', 'approveBooking')->middleware('auth')->name('form/booking/approve');
-    Route::post('form/booking/reject', 'rejectBooking')->middleware('auth')->name('form/booking/reject');
 });
 
 // ----------------------------- rooms -----------------------------//

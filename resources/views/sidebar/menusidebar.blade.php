@@ -15,16 +15,12 @@
                     <ul class="submenu_class" style="display: none;">
                         <li><a class="{{ set_active(['form/allbooking']) }}" href="{{ route('form/allbooking') }}">
                                 Booking List </a></li>
-                        <li><a class="{{ set_active(['form/booking/add']) }}" href="{{ route('form/booking/add') }}"> My
-                                Booking </a></li>
-                        @if (auth()->user()->isAdmin())
-                            <li><a class="{{ set_active(['form/appbooking']) }}" href="{{ route('form/appbooking') }}"> Booking Approval
-                                    </a></li>
-                        @endif
+                        <li><a class="{{ set_active(['form/booking/add']) }}" href="{{ route('form/booking/add') }}">
+                                Book Now </a></li>
                     </ul>
                 </li>
 
-                @if (auth()->user()->isAdmin())
+                @if (auth()->user()->isSuperAdmin())
                     {{-- Rooms (Admin Only) --}}
                     <li class="submenu">
                         <a href="#"><i class="fas fa-key"></i> <span> Rooms </span> <span
@@ -49,7 +45,6 @@
                                     User</a></li>
                             <li><a class="{{ set_active(['users/list/page']) }}"
                                     href="{{ route('users/list/page') }}">All User</a></li>
-                            <li><a class="{{ request()->is('users/add/edit/*') ? 'active' : '' }}"> Edit User </a></li>
                         </ul>
                     </li>
                 @endif

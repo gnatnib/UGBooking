@@ -17,9 +17,8 @@ class Booking extends Model
         'time_start',
         'time_end',
         'email',
-        'ph_number',
+        'phone_number',
         'message',
-        'approval',
         'status_meet',
     ];
 

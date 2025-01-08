@@ -23,9 +23,8 @@ class CreateBookingsTable extends Migration
             $table->string('time_start')->nullable();
             $table->string('time_end')->nullable();
             $table->string('email')->nullable();
-            $table->string('ph_number')->nullable();
+            $table->string('phone_number')->nullable();
             $table->string('message')->nullable();
-            $table->string('approval')->nullable();
             $table->string('status_meet')->nullable();
             $table->timestamps();
         });

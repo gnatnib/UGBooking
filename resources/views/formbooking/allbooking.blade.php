@@ -29,9 +29,8 @@
                                             <th>Time_start</th>
                                             <th>Time_end</th>
                                             <th>Email</th>
-                                            <th>Ph.Number</th>
+                                            <th>Phone.Number</th>
                                             <th>Status</th>
-                                            <th>Approval</th>
                                             <th class="text-right">Actions</th>
                                         </tr>
                                     </thead>
@@ -51,9 +50,9 @@
                                             <td>{{ $bookings->time_start }}</td>
                                             <td>{{ $bookings->time_end }}</td>
                                             <td><a href="#" class="__cf_email__" data-cfemail="2652494b4b5f44435448474a66435e474b564a430845494b">{{ $bookings->email }}</a></td>
-                                            <td>{{ $bookings->ph_number }}</td>
+                                            <td>{{ $bookings->phone_number }}</td>
                                             <td>{{ $bookings->status_meet }}</td>
-                                            <td>{{ $bookings->approval}}</td>
+                                           
                                             
                                             <td>
                                                 
