@@ -8,11 +8,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
+
 class BookingController extends Controller
 {
     /** View Page All */
     public function allbooking()
     {
+
         $allBookings = DB::table('bookings')->get();
         return view('formbooking.allbooking', compact('allBookings'));
     }

@@ -36,6 +36,7 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($allBookings as $bookings )
+                                            @if()
                                         <tr>
                                             <td>{{ $bookings->bkg_id }}</td>
                                             <td>
