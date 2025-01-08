@@ -52,8 +52,8 @@
                                             <td>{{ $bookings->time_end }}</td>
                                             <td><a href="#" class="__cf_email__" data-cfemail="2652494b4b5f44435448474a66435e474b564a430845494b">{{ $bookings->email }}</a></td>
                                             <td>{{ $bookings->ph_number }}</td>
-                                            <td>{{ $bookings->approval}}</td>
                                             <td>{{ $bookings->status_meet }}</td>
+                                            <td>{{ $bookings->approval}}</td>
                                             <td>
                                                 @if($bookings->approval == 'pending')
                                                     <div class="d-flex">
@@ -72,9 +72,9 @@
                                                             </button>
                                                         </form>
                                                     </div>
-                                                @elseif($bookings->approval == 'approved')
+                                                @elseif($bookings->approval == 'Approved')
                                                     <span class="badge badge-success">Approved</span>
-                                                @elseif($bookings->approval == 'rejected')
+                                                @elseif($bookings->approval == 'Rejected')
                                                     <span class="badge badge-danger">Rejected</span>
                                                 @endif
 

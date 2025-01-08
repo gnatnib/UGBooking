@@ -13,7 +13,7 @@ class BookingController extends Controller
     /** View Page All */
     public function allbooking()
     {
-        $allBookings = DB::table('bookings')->where('approval','approved')->get();
+        $allBookings = DB::table('bookings')->where('approval','Approved')->get();
         return view('formbooking.allbooking', compact('allBookings'));
     }
 
@@ -199,7 +199,7 @@ public function approveBooking(Request $request)
     try {
         $booking = Booking::where('bkg_id', $request->bkg_id)->firstOrFail();
         $booking->update([
-            'approval' => 'approved',
+            'approval' => 'Approved',
             
         ]);
 
@@ -218,7 +218,7 @@ public function rejectBooking(Request $request)
     try {
         $booking = Booking::where('bkg_id', $request->bkg_id)->firstOrFail();
         $booking->update([
-            'approval' => 'rejected',
+            'approval' => 'Rejected',
             
         ]);
 
