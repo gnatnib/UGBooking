@@ -13,6 +13,31 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Success Message --}}
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
+
+            {{-- Error Messages --}}
+            @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
+
             <div class="row">
                 <div class="col-md-12">
                     <div class="profile-header">
@@ -35,12 +60,6 @@
                                     {{ Auth::user()->department }}</div>
                                 <div class="about-text">{{ Auth::user()->role_name === 'admin' ? 'Administrator' : 'User' }}
                                 </div>
-                            </div>
-                            <div class="col-auto profile-btn">
-                                <a href="#" class="btn btn-primary" data-toggle="modal"
-                                    data-target="#edit_personal_details">
-                                    Edit
-                                </a>
                             </div>
                         </div>
                     </div>
@@ -134,6 +153,63 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Personal Details Modal -->
+    <div id="edit_personal_details" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Personal Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('profile.update') }}" method="POST">
+                        @csrf
+                        <div class="row form-row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <input type="text" name="name" class="form-control"
+                                        value="{{ Auth::user()->name }}">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" name="email" class="form-control"
+                                        value="{{ Auth::user()->email }}">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label>Phone Number</label>
+                                    <input type="text" name="phone_number" class="form-control"
+                                        value="{{ Auth::user()->phone_number }}">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label>Position</label>
+                                    <input type="text" name="position" class="form-control"
+                                        value="{{ Auth::user()->position }}">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label>Department</label>
+                                    <input type="text" name="department" class="form-control"
+                                        value="{{ Auth::user()->department }}">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
+                    </form>
                 </div>
             </div>
         </div>
