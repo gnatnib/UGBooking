@@ -7,21 +7,47 @@ use App\Models\Booking;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+
+use App\Models\User;
 
 class BookingController extends Controller
 {
+    
     /** View Page All */
     public function allbooking()
     {
-        $allBookings = DB::table('bookings')->get();
+        $user = Auth::user(); // Get current authenticated user
+        
+        // If user is admin, show all bookings
+        if ($user->role_name === 'admin'|| $user->role_name === 'superadmin') {
+            $allBookings = DB::table('bookings')->get();
+        } else {
+            // If regular user, only show their bookings
+            $allBookings = DB::table('bookings')
+                ->where('name', $user->name)
+                ->get();
+        }
+        
         return view('formbooking.allbooking', compact('allBookings'));
     }
 
     /** Page */
     public function bookingAdd()
     {
+        $user = Auth::user(); // Get current authenticated user
+        
+        // If user is admin, show all bookings
+        if ($user->role_name === 'admin'|| $user->role_name === 'superadmin') {
+            $user = DB::table('users')->get();
+        } else {
+            // If regular user, only show their bookings
+            $user = DB::table('users')
+                ->where('name', $user->name)
+                ->get();
+        }
         $data = DB::table('rooms')->select('room_type')->where('status', 'Ready')->distinct()->get();
-        $user = DB::table('users')->get();
+       
         return view('formbooking.bookingadd', compact('data', 'user'));
     }
 

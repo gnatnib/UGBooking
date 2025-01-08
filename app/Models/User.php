@@ -52,7 +52,10 @@ class User extends Authenticatable
     {
         return $this->role_name === 'user';
     }
-
+    public function User()
+    {
+        return $this->name ;
+    }
     /**
      * Generate ID hanya jika user_id tidak diset
      */
