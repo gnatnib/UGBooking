@@ -55,7 +55,7 @@
                             </div>
                             <div class="col ml-md-n2 profile-user-info">
                                 <h4 class="user-name mb-3">{{ Auth::user()->name }}</h4>
-                                <h6 class="text-muted mt-1">{{ ucfirst(Auth::user()->position) }}</h6>
+                                <h6 class="text-muted mt-1">{{ ucfirst(Auth::user()->division) }}</h6>
                                 <div class="user-Location mt-1"><i class="fas fa-building"></i>
                                     {{ Auth::user()->department }}</div>
                                 <div class="about-text">{{ Auth::user()->role_name === 'admin' ? 'Administrator' : 'User' }}
@@ -102,6 +102,10 @@
                                             <div class="row">
                                                 <p class="col-sm-3 text-sm-right mb-0 mb-sm-3">Phone Number:</p>
                                                 <p class="col-sm-9">{{ Auth::user()->phone_number }}</p>
+                                            </div>
+                                            <div class="row">
+                                                <p class="col-sm-3 text-sm-right mb-0 mb-sm-3">Division:</p>
+                                                <p class="col-sm-9">{{ Auth::user()->division }}</p>
                                             </div>
                                             <div class="row">
                                                 <p class="col-sm-3 text-sm-right mb-0">Department:</p>
@@ -195,9 +199,36 @@
                             </div>
                             <div class="col-12">
                                 <div class="form-group">
-                                    <label>Position</label>
-                                    <input type="text" name="position" class="form-control"
-                                        value="{{ Auth::user()->position }}">
+                                    <label>Division</label>
+                                    <select class="form-control @error('division') is-invalid @enderror" name="division">
+                                        <option selected disabled>Select Division</option>
+                                        <option value="Building Management"
+                                            {{ Auth::user()->division == 'Building Management' ? 'selected' : '' }}>
+                                            Building Management</option>
+                                        <option value="Construction and Property"
+                                            {{ Auth::user()->division == 'Construction and Property' ? 'selected' : '' }}>
+                                            Construction and Property</option>
+                                        <option value="IT Business and Solution"
+                                            {{ Auth::user()->division == 'IT Business and Solution' ? 'selected' : '' }}>IT
+                                            Business and Solution</option>
+                                        <option value="Finance and Accounting"
+                                            {{ Auth::user()->division == 'Finance and Accounting' ? 'selected' : '' }}>
+                                            Finance and Accounting</option>
+                                        <option value="Human Capital and General Affair"
+                                            {{ Auth::user()->division == 'Human Capital and General Affair' ? 'selected' : '' }}>
+                                            Human Capital and General Affair</option>
+                                        <option value="Risk, System, and Compliance"
+                                            {{ Auth::user()->division == 'Risk, System, and Compliance' ? 'selected' : '' }}>
+                                            Risk, System, and Compliance</option>
+                                        <option value="Internal Audit"
+                                            {{ Auth::user()->division == 'Internal Audit' ? 'selected' : '' }}>Internal
+                                            Audit</option>
+                                    </select>
+                                    @error('division')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-12">
