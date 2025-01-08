@@ -2,6 +2,24 @@
 @section('content')
     <div class="page-wrapper">
         <div class="content container-fluid">
+            {{-- Message --}}
+            @if(Session::has('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>{{ Session::get('success') }}</strong>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
+            @if(Session::has('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>{{ Session::get('error') }}</strong>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
+
             <div class="page-header">
                 <div class="row align-items-center">
                     <div class="col">
@@ -23,6 +41,7 @@
                                             <th>Booking ID</th>
                                             <th>Room Type</th>
                                             <th>Capacity</th>
+                                            <th>Image</th>
                                             <th>Facilities</th>
                                             <th>Status</th>
                                             <th class="text-right">Actions</th>
@@ -36,6 +55,16 @@
                                             <td>{{ $rooms->bkg_room_id }}</td>
                                             <td>{{ $rooms->room_type }}</td>
                                             <td>{{ $rooms->capacity }}</td>
+                                            <td>
+                                                @if($rooms->fileupload)
+                                                    <img src="{{ asset('uploads/rooms/'.$rooms->fileupload) }}" 
+                                                         alt="{{ $rooms->room_type }}" 
+                                                         class="img-thumbnail" 
+                                                         style="max-width: 100px;">
+                                                @else
+                                                    No Image
+                                                @endif
+                                            </td>
                                             <td>
                                                 @if($rooms->has_projector)
                                                     <span class="badge badge-info">Projector</span>
@@ -80,7 +109,7 @@
             </div>
         </div>
         
-        {{-- delete model --}}
+        {{-- delete modal --}}
         <div id="delete_asset" class="modal fade delete-modal" role="dialog">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -102,14 +131,22 @@
         </div>
     </div>
     @section('script')
-        {{-- delete model --}}
-        <script>
-            $(document).on('click','.delete_asset',function()
-            {
+    <script>
+        $(document).ready(function() {
+            $('.datatable').DataTable();
+            
+            // delete asset
+            $(document).on('click','.delete_asset',function() {
                 var _this = $(this).parents('tr');
                 $('#e_id').val(_this.find('.id').text());
                 $('#e_fileupload').val(_this.find('.fileupload').text());
             });
-        </script>
+            
+            // Tampilkan alert success/error
+            setTimeout(function() {
+                $(".alert").fadeOut("slow");
+            }, 3000);
+        });
+    </script>
     @endsection
 @endsection

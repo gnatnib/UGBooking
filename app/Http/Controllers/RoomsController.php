@@ -6,34 +6,37 @@ use Illuminate\Http\Request;
 use App\Models\Room;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class RoomsController extends Controller
 {
-    /** Index Page */
+    /** Index Page - All Rooms */
     public function allrooms()
     {
-        $allRooms = DB::table('rooms')->get();
-        return view('room.allroom', compact('allRooms'));
+        try {
+            $allRooms = Room::all();
+            return view('room.allroom', compact('allRooms'));
+        } catch (\Exception $e) {
+            Log::error('Error fetching rooms: ' . $e->getMessage());
+            flash()->error('Failed to load rooms');
+            return redirect()->back();
+        }
     }
 
-    /** Room Page */
+    /** Add Room Page */
     public function addRoom()
     {
-        $data = DB::table('room_types')->get();
-        $user = DB::table('users')->get();
-        return view('room.addroom', compact('user', 'data'));
+        try {
+            $data = DB::table('room_types')->get();
+            return view('room.addroom', compact('data'));
+        } catch (\Exception $e) {
+            Log::error('Error loading add room page: ' . $e->getMessage());
+            flash()->error('Failed to load add room page');
+            return redirect()->back();
+        }
     }
 
-    /** View Record */
-    public function editRoom($bkg_room_id)
-    {
-        $roomEdit = DB::table('rooms')->where('bkg_room_id', $bkg_room_id)->first();
-        $data = DB::table('room_types')->get();
-        $user = DB::table('users')->get();
-        return view('room.editroom', compact('user', 'data', 'roomEdit'));
-    }
-
-    /** Save Record */
+    /** Save Room Record */
     public function saveRecordRoom(Request $request)
     {
         $request->validate([
@@ -41,115 +44,162 @@ class RoomsController extends Controller
             'capacity' => 'required|integer|min:1|max:50',
             'fileupload' => 'required|file|mimes:jpeg,png,jpg|max:2048',
         ]);
-        $existingRoom = Room::where('room_type', $request->room_type)->first();
-        if ($existingRoom) {
-            flash()->error('Room type already exists. Cannot add duplicate room type.');
-            return redirect()->back()->withInput();
-        }
+
         DB::beginTransaction();
         try {
-            $photo = $request->fileupload;
-            $file_name = rand() . '.' . $photo->getClientOriginalExtension();
-            $photo->move(public_path('/assets/upload/'), $file_name);
+            // Check for duplicate room type
+            if (Room::where('room_type', $request->room_type)->exists()) {
+                flash()->error('Room type already exists');
+                return redirect()->back()->withInput();
+            }
 
-            $room = new Room;
-            $room->room_type = $request->room_type;
-            $room->capacity = $request->capacity;
-            $room->fileupload = $file_name;
-            $room->status = 'Ready';
-            $room->has_projector = $request->has('has_projector');
-            $room->has_sound_system = $request->has('has_sound_system');
-            $room->has_tv = $request->has('has_tv');
-            $room->save();
+            // Handle file upload
+            $photo = $request->fileupload;
+            $fileName = time() . '_' . Str::slug($request->room_type) . '.' . $photo->getClientOriginalExtension();
+            $photo->move(public_path('uploads/rooms/'), $fileName);
+
+            // Generate room ID
+            $prefix = '';
+            switch($request->room_type) {
+                case 'Ruang Meeting Besar':
+                    $prefix = 'RMB';
+                    break;
+                case 'Ruang Meeting Kecil':
+                    $prefix = 'RMK';
+                    break;
+                case 'Ruang Diskusi':
+                    $prefix = 'RD';
+                    break;
+                default:
+                    $prefix = 'RM';
+            }
+
+            $lastRoom = Room::where('bkg_room_id', 'like', $prefix.'%')
+                           ->orderBy('bkg_room_id', 'desc')
+                           ->first();
+            
+            $number = $lastRoom ? (int)substr($lastRoom->bkg_room_id, -2) + 1 : 1;
+            $bkg_room_id = $prefix . '-' . str_pad($number, 2, '0', STR_PAD_LEFT);
+
+            // Create new room
+            Room::create([
+                'bkg_room_id' => $bkg_room_id,
+                'room_type' => $request->room_type,
+                'capacity' => $request->capacity,
+                'fileupload' => $fileName,
+                'status' => 'Ready',
+                'has_projector' => $request->has('has_projector'),
+                'has_sound_system' => $request->has('has_sound_system'),
+                'has_tv' => $request->has('has_tv')
+            ]);
 
             DB::commit();
-            flash()->success('Meeting room created successfully');
-            return redirect()->back();
+            flash()->success('Room added successfully');
+            return redirect()->route('form/allrooms/page');
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e->getMessage());
-            flash()->error('Failed to add meeting room');
-            return redirect()->back();
+            Log::error('Error saving room: ' . $e->getMessage());
+            flash()->error('Failed to add room');
+            return redirect()->back()->withInput();
         }
     }
 
-    /** Update Record */
+    /** Edit Room View */
+    public function editRoom($bkg_room_id)
+    {
+        try {
+            $roomEdit = Room::where('bkg_room_id', $bkg_room_id)->firstOrFail();
+            $data = DB::table('room_types')->get();
+            return view('room.editroom', compact('data', 'roomEdit'));
+        } catch (\Exception $e) {
+            Log::error('Error loading edit room: ' . $e->getMessage());
+            flash()->error('Room not found');
+            return redirect()->route('form/allrooms/page');
+        }
+    }
+
+    /** Update Room Record */
     public function updateRecord(Request $request)
     {
         $request->validate([
             'room_type' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1|max:50',
             'fileupload' => 'nullable|file|mimes:jpeg,png,jpg|max:2048',
-            'status' => 'required|string|in:Ready,Maintenance',
+            'status' => 'required|in:Ready,Maintenance',
         ]);
 
-        // Check if the room type already exists for a different room
-        $existingRoom = Room::where('room_type', $request->room_type)
-            ->where('bkg_room_id', '!=', $request->bkg_room_id)
-            ->first();
-        if ($existingRoom) {
-            flash()->error('Room type already exists for another room. Cannot update to a duplicate room type.');
-            return redirect()->back()->withInput();
-        }
         DB::beginTransaction();
         try {
-            // Handle file upload
-            if ($request->hasFile('fileupload')) {
-                $photo = $request->fileupload;
-                $file_name = rand() . '.' . $photo->getClientOriginalExtension();
-                $photo->move(public_path('/assets/upload/'), $file_name);
+            $room = Room::where('bkg_room_id', $request->bkg_room_id)->firstOrFail();
 
-                // Delete old file if exists
-                if ($request->hidden_fileupload) {
-                    $old_file_path = public_path('/assets/upload/') . $request->hidden_fileupload;
-                    if (file_exists($old_file_path)) {
-                        unlink($old_file_path);
+            // Handle file upload if new file is provided
+            if ($request->hasFile('fileupload')) {
+                // Delete old file
+                if ($room->fileupload) {
+                    $oldFilePath = public_path('uploads/rooms/' . $room->fileupload);
+                    if (file_exists($oldFilePath)) {
+                        unlink($oldFilePath);
                     }
                 }
+                
+                $photo = $request->fileupload;
+                $fileName = time() . '_' . Str::slug($request->room_type) . '.' . $photo->getClientOriginalExtension();
+                $photo->move(public_path('uploads/rooms/'), $fileName);
             } else {
-                $file_name = $request->hidden_fileupload;
+                $fileName = $room->fileupload;
             }
 
-            // Update room data
-            $update = [
+            // Update room
+            $room->update([
                 'room_type' => $request->room_type,
                 'capacity' => $request->capacity,
-                'fileupload' => $file_name,
-                'status' => $request->status, // Update status field
-                'has_projector' => $request->has('has_projector') ? 1 : 0,
-                'has_sound_system' => $request->has('has_sound_system') ? 1 : 0,
-                'has_tv' => $request->has('has_tv') ? 1 : 0,
-                'updated_at' => now()
-            ];
-
-            Room::where('bkg_room_id', $request->bkg_room_id)->update($update);
+                'fileupload' => $fileName,
+                'status' => $request->status,
+                'has_projector' => $request->has('has_projector'),
+                'has_sound_system' => $request->has('has_sound_system'),
+                'has_tv' => $request->has('has_tv')
+            ]);
 
             DB::commit();
             flash()->success('Room updated successfully');
             return redirect()->route('form/allrooms/page');
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e->getMessage());
-            flash()->error('Failed to update room: ' . $e->getMessage());
-            return redirect()->back();
+            Log::error('Error updating room: ' . $e->getMessage());
+            flash()->error('Failed to update room');
+            return redirect()->back()->withInput();
         }
     }
-    /** Delete Record */
+
+    /** Delete Room Record */
     public function deleteRecord(Request $request)
     {
+        DB::beginTransaction();
         try {
-            Room::destroy($request->id);
-            unlink('assets/upload/' . $request->fileupload);
-            flash()->success('Room deleted successfully :)');
+            $room = Room::findOrFail($request->id);
+            
+            // Delete room image
+            if ($room->fileupload) {
+                $filePath = public_path('uploads/rooms/' . $room->fileupload);
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+            }
+
+            $room->delete();
+            
+            DB::commit();
+            flash()->success('Room deleted successfully');
             return redirect()->back();
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e->getMessage());
-            flash()->error('Room delete fail :)');
+            Log::error('Error deleting room: ' . $e->getMessage());
+            flash()->error('Failed to delete room');
             return redirect()->back();
         }
     }
 
+    /** Add Room Type */
     public function addRoomType(Request $request)
     {
         try {
@@ -175,6 +225,8 @@ class RoomsController extends Controller
             ], 500);
         }
     }
+
+    /** Delete Room Type */
     public function deleteRoomType(Request $request)
     {
         try {
@@ -182,7 +234,6 @@ class RoomsController extends Controller
                 'room_type_id' => 'required|exists:room_types,id'
             ]);
 
-            // Check if the room type is in use
             $roomsUsingType = Room::where('room_type', function ($query) use ($request) {
                 $query->select('room_name')
                     ->from('room_types')
@@ -211,6 +262,7 @@ class RoomsController extends Controller
         }
     }
 
+    /** Get Room Details */
     public function getRoomDetails($roomType)
     {
         try {
