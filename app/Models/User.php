@@ -11,19 +11,19 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-
+    
     protected $fillable = [
         'user_id',
         'name',
         'email',
-        'join_date',
-        'phone_number',
-        'status',
-        'role_name',
-        'avatar',
-        'position',
-        'department',
         'password',
+        'phone_number',
+        'role_name',
+        'division',
+        'department',
+        'avatar',
+        'status',
+        'join_date'
     ];
 
     protected $hidden = [
@@ -47,20 +47,58 @@ class User extends Authenticatable
         return $this->role_name === 'user';
     }
 
-    /** generate id */
+    /**
+     * Generate ID hanya jika user_id tidak diset
+     */
     protected static function boot()
     {
         parent::boot();
 
         self::creating(function ($model) {
-            $latestUser = self::orderBy('user_id', 'desc')->first();
-            $nextID = $latestUser ? intval(substr($latestUser->user_id, 3)) + 1 : 1;
-            $model->user_id = 'KH-' . sprintf("%04d", $nextID);
+            // Jika user_id sudah diset (dari form atau seeder), gunakan itu
+            if (!empty($model->user_id)) {
+                return;
+            }
 
-            // Ensure the user_id is unique
+            // Jika user_id belum diset, generate secara otomatis berdasarkan divisi
+            $divisionPrefix = 'USR'; // default prefix
+
+            // Set prefix berdasarkan divisi
+            switch($model->division) {
+                case 'Building Management':
+                    $divisionPrefix = 'BM';
+                    break;
+                case 'Construction and Property':
+                    $divisionPrefix = 'CP';
+                    break;
+                case 'IT Business and Solution':
+                    $divisionPrefix = 'ITBS';
+                    break;
+                case 'Finance and Accounting':
+                    $divisionPrefix = 'FA';
+                    break;
+                case 'Human Capital and General Affair':
+                    $divisionPrefix = 'HC';
+                    break;
+                case 'Risk, System, and Compliance':
+                    $divisionPrefix = 'RSC';
+                    break;
+                case 'Internal Audit':
+                    $divisionPrefix = 'IA';
+                    break;
+            }
+
+            // Hitung jumlah user dengan prefix yang sama
+            $count = self::where('user_id', 'like', $divisionPrefix . '%')->count();
+            $nextNumber = $count + 1;
+
+            // Format: [PREFIX]01, [PREFIX]02, dst
+            $model->user_id = $divisionPrefix . sprintf("%02d", $nextNumber);
+
+            // Pastikan user_id unik
             while (self::where('user_id', $model->user_id)->exists()) {
-                $nextID++;
-                $model->user_id = 'KH-' . sprintf("%04d", $nextID);
+                $nextNumber++;
+                $model->user_id = $divisionPrefix . sprintf("%02d", $nextNumber);
             }
         });
     }

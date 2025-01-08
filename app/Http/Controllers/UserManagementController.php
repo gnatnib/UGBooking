@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
 class UserManagementController extends Controller
@@ -15,10 +16,63 @@ class UserManagementController extends Controller
         return view('usermanagement.listuser');
     }
 
-    /** Add Neew Users */
+    /** Add New Users */
     public function userAddNew()
     {
         return view('usermanagement.useraddnew');
+    }
+
+    /** Save New User */
+    public function saveUser(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            // Validasi input
+            $request->validate([
+                'user_id' => 'required|string|max:20|unique:users,user_id', 
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8|confirmed',
+                'phone_number' => 'required|string|max:15',
+                'role_name' => 'required|string|in:admin,user',
+                'division' => 'required|string',
+                'department' => 'required|string|max:50',
+                'profile' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            ]);
+    
+            // Handle file upload
+            $avatarName = null;
+            if ($request->hasFile('profile')) {
+                $avatar = $request->file('profile');
+                $avatarName = time() . '.' . $avatar->getClientOriginalExtension();
+                $avatar->move(public_path('uploads/avatar'), $avatarName);
+            }
+    
+            // Create new user
+            User::create([
+                'user_id' => $request->user_id, // Gunakan user_id dari input form
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'phone_number' => $request->phone_number,
+                'role_name' => $request->role_name,
+                'division' => $request->division,
+                'department' => $request->department,
+                'avatar' => $avatarName,
+                'status' => 'Active',
+                'join_date' => now()->format('Y-m-d'),
+            ]);
+    
+            DB::commit();
+            flash()->success('User added successfully :)');
+            return redirect()->route('user/list');
+    
+        } catch (\Exception $e) {
+            DB::rollback();
+            flash()->error('Failed to add user: ' . $e->getMessage());
+            Log::error($e->getMessage());
+            return redirect()->back()->withInput();
+        }
     }
 
     /** View Record */
@@ -37,7 +91,7 @@ class UserManagementController extends Controller
                 'name'         => $request->name,
                 'email'        => $request->email,
                 'phone_number' => $request->phone_number,
-                'position'     => $request->position,
+                'division'     => $request->division,
                 'department'   => $request->department,
             ];
             User::where('user_id', $request->user_id)->update($updateRecord);
@@ -57,62 +111,66 @@ class UserManagementController extends Controller
     public function userDelete($id)
     {
         try {
-
-            $deleteRecord = User::find($id);
-            $deleteRecord->delete();
-            flash()->success('User deleted successfully :)');
-            return redirect()->back();
+            $user = User::find($id);
+            
+            if (!$user) {
+                return redirect()->back()->with('error', 'User not found!');
+            }
+    
+            // Simpan nama user untuk pesan
+            $userName = $user->name;
+    
+            $user->delete();
+            return redirect()->back()->with('success', "User '{$userName}' has been deleted successfully.");
         } catch (\Exception $e) {
-            DB::rollback();
-            flash()->error('User delete fail :)');
             Log::error($e->getMessage());
-            return redirect()->back();
+            return redirect()->back()->with('error', 'Failed to delete user. Please try again.');
         }
     }
 
     /** Get Users Data */
     public function getUsersData(Request $request)
     {
-        $draw            = $request->get('draw');
-        $start           = $request->get("start");
-        $rowPerPage      = $request->get("length"); // total number of rows per page
+        $draw = $request->get('draw');
+        $start = $request->get("start");
+        $rowPerPage = $request->get("length");
         $columnIndex_arr = $request->get('order');
-        $columnName_arr  = $request->get('columns');
-        $order_arr       = $request->get('order');
-        $search_arr      = $request->get('search');
-
-        $columnIndex     = $columnIndex_arr[0]['column']; // Column index
-        $columnName      = $columnName_arr[$columnIndex]['data']; // Column name
-        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
-        $searchValue     = $search_arr['value']; // Search value
-
-        $users =  DB::table('users');
+        $columnName_arr = $request->get('columns');
+        $order_arr = $request->get('order');
+        $search_arr = $request->get('search');
+    
+        $columnIndex = $columnIndex_arr[0]['column'];
+        $columnName = $columnName_arr[$columnIndex]['data'];
+        $columnSortOrder = $order_arr[0]['dir'];
+        $searchValue = $search_arr['value'];
+    
+        $users = DB::table('users');
         $totalRecords = $users->count();
-
+    
         $totalRecordsWithFilter = $users->where(function ($query) use ($searchValue) {
             $query->where('name', 'like', '%' . $searchValue . '%');
             $query->orWhere('email', 'like', '%' . $searchValue . '%');
-            $query->orWhere('position', 'like', '%' . $searchValue . '%');
+            $query->orWhere('division', 'like', '%' . $searchValue . '%');
+            $query->orWhere('department', 'like', '%' . $searchValue . '%');
             $query->orWhere('phone_number', 'like', '%' . $searchValue . '%');
             $query->orWhere('status', 'like', '%' . $searchValue . '%');
         })->count();
-
-        if ($columnName == 'name') {
-            $columnName = 'name';
-        }
+    
         $records = $users->orderBy($columnName, $columnSortOrder)
             ->where(function ($query) use ($searchValue) {
                 $query->where('name', 'like', '%' . $searchValue . '%');
                 $query->orWhere('email', 'like', '%' . $searchValue . '%');
-                $query->orWhere('position', 'like', '%' . $searchValue . '%');
+                $query->orWhere('division', 'like', '%' . $searchValue . '%');
+                $query->orWhere('department', 'like', '%' . $searchValue . '%');
                 $query->orWhere('phone_number', 'like', '%' . $searchValue . '%');
                 $query->orWhere('status', 'like', '%' . $searchValue . '%');
             })
             ->skip($start)
             ->take($rowPerPage)
             ->get();
+    
         $data_arr = [];
-
+    
         foreach ($records as $key => $record) {
             $modify = '
                 <td class="text-right">
@@ -125,31 +183,32 @@ class UserManagementController extends Controller
                                 <i class="fas fa-pencil-alt m-r-5"></i> Edit
                             </a>
                             <a class="dropdown-item" href="' . url('users/delete/' . $record->id) . '">
-                            <i class="fas fa-trash-alt m-r-5"></i> Delete
-                        </a>
+                                <i class="fas fa-trash-alt m-r-5"></i> Delete
+                            </a>
                         </div>
                     </div>
                 </td>
             ';
+            
             $data_arr[] = [
                 "user_id"      => $record->user_id,
                 "name"         => $record->name,
                 "email"        => $record->email,
-                "position"     => $record->position,
                 "phone_number" => $record->phone_number,
+                "division"     => $record->division,
+                "department"   => $record->department,
                 "status"       => $record->status,
                 "modify"       => $modify,
             ];
         }
-
-
-
+    
         $response = [
             "draw"                 => intval($draw),
             "iTotalRecords"        => $totalRecords,
             "iTotalDisplayRecords" => $totalRecordsWithFilter,
-            "aaData"               => $data_arr
+            "aaData"              => $data_arr
         ];
+        
         return response()->json($response);
     }
 }
