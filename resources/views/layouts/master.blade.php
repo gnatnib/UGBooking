@@ -48,7 +48,14 @@
                             <div class="user-text">
                                 <h6>{{ Auth::user()->name }}</h6>
                                 <p class="text-muted mb-0">
-                                    {{ Auth::user()->role_name === 'admin' ? 'Administrator' : 'User' }}</p>
+                                    @if (Auth::user()->role_name === 'superadmin')
+                                        Superadmin
+                                    @elseif (Auth::user()->role_name === 'admin')
+                                        Administrator
+                                    @else
+                                        User
+                                    @endif
+                                </p>
                             </div>
                         </div>
                         <a class="dropdown-item" href="{{ route('profile') }}">My Profile</a>

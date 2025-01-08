@@ -11,7 +11,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-    
+
     protected $fillable = [
         'user_id',
         'name',
@@ -36,6 +36,12 @@ class User extends Authenticatable
     ];
 
     // Tambahkan fungsi untuk cek role admin
+
+    public function isSuperAdmin()
+    {
+        return $this->role_name === 'superadmin';
+    }
+
     public function isAdmin()
     {
         return $this->role_name === 'admin';
@@ -64,7 +70,7 @@ class User extends Authenticatable
             $divisionPrefix = 'USR'; // default prefix
 
             // Set prefix berdasarkan divisi
-            switch($model->division) {
+            switch ($model->division) {
                 case 'Building Management':
                     $divisionPrefix = 'BM';
                     break;
