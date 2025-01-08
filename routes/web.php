@@ -76,7 +76,7 @@ Route::controller(BookingController::class)->group(function () {
     Route::post('form/booking/update', 'updateRecord')->middleware('auth')->name('form/booking/update');
     Route::post('form/booking/delete', 'deleteRecord')->middleware('auth')->name('form/booking/delete');
     Route::post('form/booking/approve', 'approveBooking')->middleware('auth')->name('form/booking/approve');
-Route::post('form/booking/reject', 'rejectBooking')->middleware('auth')->name('form/booking/reject');
+    Route::post('form/booking/reject', 'rejectBooking')->middleware('auth')->name('form/booking/reject');
 });
 
 // ----------------------------- rooms -----------------------------//
@@ -93,6 +93,7 @@ Route::controller(RoomsController::class)->group(function () {
     Route::post('form/room-type/delete', [RoomsController::class, 'deleteRoomType'])
         ->middleware('auth')
         ->name('room.type.delete');
+    Route::get('/api/room-details/{roomType}', [RoomsController::class, 'getRoomDetails']);
 });
 
 // ----------------------- user management -------------------------//
@@ -109,7 +110,7 @@ Route::controller(UserManagementController::class)->group(function () {
     Route::get('get-users-data', 'getUsersData')->name('get-users-data');
     /** get all data users */
     Route::get('user/list', [UserManagementController::class, 'userList'])->name('user/list');
-Route::get('user/add/new', [UserManagementController::class, 'userAddNew'])->name('user/add/new');
-Route::post('user/save', [UserManagementController::class, 'saveUser'])->name('user/save');
+    Route::get('user/add/new', [UserManagementController::class, 'userAddNew'])->name('user/add/new');
+    Route::post('user/save', [UserManagementController::class, 'saveUser'])->name('user/save');
     Route::post('user/save', [UserManagementController::class, 'saveUser'])->name('user/save');
 });
