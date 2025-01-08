@@ -122,4 +122,10 @@ Route::controller(EmployeeController::class)->group(function () {
     Route::get('form/leaves/page', 'leavesPage')->middleware('auth')->name('form/leaves/page');
 });
 
+Route::get('user/list', [UserManagementController::class, 'userList'])->name('user/list');
+Route::get('user/add/new', [UserManagementController::class, 'userAddNew'])->name('user/add/new');
+Route::post('user/save', [UserManagementController::class, 'saveUser'])->name('user/save');
+
+Route::get('users/delete/{id}', [UserManagementController::class, 'userDelete'])->name('user.delete');
+
 
