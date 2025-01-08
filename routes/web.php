@@ -64,6 +64,7 @@ Route::controller(ForgotPasswordController::class)->group(function () {
     Route::post('forget-password', 'postEmail')->name('forget-password');
 });
 
+
 // ----------------------------- booking -----------------------------//
 Route::controller(BookingController::class)->group(function () {
     Route::get('form/allbooking', 'allbooking')->name('form/allbooking')->middleware('auth');
