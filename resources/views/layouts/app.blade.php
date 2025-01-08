@@ -42,7 +42,7 @@
         }
 
         .login-left {
-            background: #ffc107;
+            background: #ffffff;
             padding: 30px;
             width: 40%;
             display: flex;
