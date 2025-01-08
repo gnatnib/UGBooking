@@ -142,7 +142,7 @@
                                                 <td>{{ $bookings->total_numbers }}</td>
                                                 <td class="text-center">{{ $bookings->room_type }}</td>
                                                 <td class="text-right">
-                                                    <div>{{ $bookings->ph_number }}</div>
+                                                    <div>{{ $bookings->phone_number }}</div>
                                                 </td>
                                                 <td class="text-center">
                                                     <span class="badge badge-pill bg-success inv-badge">INACTIVE</span>
