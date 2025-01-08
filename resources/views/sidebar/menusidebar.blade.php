@@ -14,13 +14,9 @@
                             class="menu-arrow"></span></a>
                     <ul class="submenu_class" style="display: none;">
                         <li><a class="{{ set_active(['form/allbooking']) }}" href="{{ route('form/allbooking') }}">
-                                Booking List </a></li>
-                        <li><a class="{{ set_active(['form/booking/add']) }}" href="{{ route('form/booking/add') }}"> My
-                                Booking </a></li>
-                        @if (auth()->user()->isAdmin())
-                            <li><a class="{{ set_active(['form/appbooking']) }}" href="{{ route('form/appbooking') }}"> Booking Approval
-                                    </a></li>
-                        @endif
+                                My Booking </a></li>
+                        <li><a class="{{ set_active(['form/booking/add']) }}" href="{{ route('form/booking/add') }}"> 
+                                Booking Now </a></li> 
                     </ul>
                 </li>
 
