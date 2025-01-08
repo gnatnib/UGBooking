@@ -65,26 +65,20 @@ class HomeController extends Controller
 
     public function updateProfile(Request $request)
     {
-        $user = Auth::user();
+        $user = User::find(Auth::id());
 
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'phone_number' => 'required|string|max:15',
-            'position' => 'required|string|max:255',
+            'division' => 'required|string|in:Building Management,Construction and Property,IT Business and Solution,Finance and Accounting,Human Capital and General Affair,Risk, System, and Compliance,Internal Audit',
             'department' => 'required|string|max:255',
         ]);
-
-        // Use the User model to find and update
-        $user = User::find(Auth::id());
-
-        // Make sure to add the User model at the top of your controller:
-        // use App\Models\User;
 
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone_number = $request->phone_number;
-        $user->position = $request->position;
+        $user->division = $request->division;
         $user->department = $request->department;
         $user->save();
 

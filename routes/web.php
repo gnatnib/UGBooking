@@ -108,4 +108,8 @@ Route::controller(UserManagementController::class)->group(function () {
     /** delere record */
     Route::get('get-users-data', 'getUsersData')->name('get-users-data');
     /** get all data users */
+    Route::get('user/list', [UserManagementController::class, 'userList'])->name('user/list');
+Route::get('user/add/new', [UserManagementController::class, 'userAddNew'])->name('user/add/new');
+Route::post('user/save', [UserManagementController::class, 'saveUser'])->name('user/save');
+    Route::post('user/save', [UserManagementController::class, 'saveUser'])->name('user/save');
 });
