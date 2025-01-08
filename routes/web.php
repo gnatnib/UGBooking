@@ -43,6 +43,7 @@ Route::controller(HomeController::class)->group(function () {
     Route::get('/home', 'index')->name('home');
     Route::get('/profile', 'profile')->name('profile');
     Route::post('/update-password', 'updatePassword')->name('update.password');
+    Route::post('/profile/update', 'updateProfile')->name('profile.update');
 });
 
 // -----------------------------login----------------------------------------//
@@ -68,21 +69,14 @@ Route::controller(ForgotPasswordController::class)->group(function () {
 // ----------------------------- booking -----------------------------//
 Route::controller(BookingController::class)->group(function () {
     Route::get('form/allbooking', 'allbooking')->name('form/allbooking')->middleware('auth');
+    Route::get('form/appbooking', 'appbooking')->name('form/appbooking')->middleware('auth');
     Route::get('form/booking/edit/{bkg_id}', 'bookingEdit')->middleware('auth');
     Route::get('form/booking/add', 'bookingAdd')->middleware('auth')->name('form/booking/add');
     Route::post('form/booking/save', 'saveRecord')->middleware('auth')->name('form/booking/save');
     Route::post('form/booking/update', 'updateRecord')->middleware('auth')->name('form/booking/update');
     Route::post('form/booking/delete', 'deleteRecord')->middleware('auth')->name('form/booking/delete');
-});
-
-// ---------------------------- customers --------------------------//
-Route::controller(CustomerController::class)->group(function () {
-    Route::get('form/allcustomers/page', 'allCustomers')->middleware('auth')->name('form/allcustomers/page');
-    Route::get('form/addcustomer/page', 'addCustomer')->middleware('auth')->name('form/addcustomer/page');
-    Route::post('form/addcustomer/save', 'saveCustomer')->middleware('auth')->name('form/addcustomer/save');
-    Route::get('form/customer/edit/{bkg_customer_id}', 'updateCustomer')->middleware('auth');
-    Route::post('form/customer/update', 'updateRecord')->middleware('auth')->name('form/customer/update');
-    Route::post('form/customer/delete', 'deleteRecord')->middleware('auth')->name('form/customer/delete');
+    Route::post('form/booking/approve', 'approveBooking')->middleware('auth')->name('form/booking/approve');
+Route::post('form/booking/reject', 'rejectBooking')->middleware('auth')->name('form/booking/reject');
 });
 
 // ----------------------------- rooms -----------------------------//
@@ -115,12 +109,3 @@ Route::controller(UserManagementController::class)->group(function () {
     Route::get('get-users-data', 'getUsersData')->name('get-users-data');
     /** get all data users */
 });
-
-// ----------------------------- employee -----------------------------//
-Route::controller(EmployeeController::class)->group(function () {
-    Route::get('form/emplyee/list', 'employeesList')->middleware('auth')->name('form/emplyee/list');
-    Route::get('form/employee/add', 'employeesAdd')->middleware('auth')->name('form/employee/add');
-    Route::get('form/leaves/page', 'leavesPage')->middleware('auth')->name('form/leaves/page');
-});
-
-

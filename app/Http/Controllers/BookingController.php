@@ -13,7 +13,7 @@ class BookingController extends Controller
     /** View Page All */
     public function allbooking()
     {
-        $allBookings = DB::table('bookings')->get();
+        $allBookings = DB::table('bookings')->where('approval','approved')->get();
         return view('formbooking.allbooking', compact('allBookings'));
     }
 
@@ -185,4 +185,51 @@ class BookingController extends Controller
             return redirect()->back();
         }
     }
+
+        public function appbooking()
+    {
+        $allBookings = DB::table('bookings')->get();
+        return view('formbooking.bookingapproval', compact('allBookings'));
+    }
+
+    // Add these methods to your BookingController
+
+public function approveBooking(Request $request)
+{
+    try {
+        $booking = Booking::where('bkg_id', $request->bkg_id)->firstOrFail();
+        $booking->update([
+            'approval' => 'approved',
+            
+        ]);
+
+        flash()->success('Booking approved successfully');
+        return redirect()->back();
+    } catch (\Exception $e) {
+        DB::rollback();
+        flash()->error('Approval failed');
+        Log::info($e->getMessage());
+        return redirect()->back();
+    }
+}
+
+public function rejectBooking(Request $request)
+{
+    try {
+        $booking = Booking::where('bkg_id', $request->bkg_id)->firstOrFail();
+        $booking->update([
+            'approval' => 'rejected',
+            
+        ]);
+
+        flash()->success('Booking rejected successfully');
+        return redirect()->back();
+    } catch (\Exception $e) {
+        DB::rollback();
+        flash()->error('Rejection failed');
+        Log::info($e->getMessage());
+        return redirect()->back();
+    }
+}
+
 }

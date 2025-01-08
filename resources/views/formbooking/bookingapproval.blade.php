@@ -6,7 +6,7 @@
                 <div class="row align-items-center">
                     <div class="col">
                         <div class="mt-5">
-                            <h4 class="card-title float-left mt-2">Appointments</h4>
+                            <h4 class="card-title float-left mt-2">Approval</h4>
                             <a href="{{ route('form/booking/add') }}" class="btn btn-primary float-right veiwbutton ">Add
                                 Booking</a>
                         </div>
@@ -52,12 +52,32 @@
                                             <td>{{ $bookings->time_end }}</td>
                                             <td><a href="#" class="__cf_email__" data-cfemail="2652494b4b5f44435448474a66435e474b564a430845494b">{{ $bookings->email }}</a></td>
                                             <td>{{ $bookings->ph_number }}</td>
-                                            <td>{{ $bookings->status_meet }}</td>
                                             <td>{{ $bookings->approval}}</td>
-                                            
+                                            <td>{{ $bookings->status_meet }}</td>
                                             <td>
-                                                
-                                                <div class="actions"> <a href="#" class="btn btn-sm bg-success-light mr-2">Active</a> </div>
+                                                @if($bookings->approval == 'pending')
+                                                    <div class="d-flex">
+                                                        <form action="{{ route('form/booking/approve') }}" method="POST" class="mr-2">
+                                                            @csrf
+                                                            <input type="hidden" name="bkg_id" value="{{ $bookings->bkg_id }}">
+                                                            <button type="submit" class="btn btn-success btn-sm">
+                                                                <i class="fas fa-check"></i> Approve
+                                                            </button>
+                                                        </form>
+                                                        <form action="{{ route('form/booking/reject') }}" method="POST">
+                                                            @csrf
+                                                            <input type="hidden" name="bkg_id" value="{{ $bookings->bkg_id }}">
+                                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                                <i class="fas fa-times"></i> Reject
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                @elseif($bookings->approval == 'approved')
+                                                    <span class="badge badge-success">Approved</span>
+                                                @elseif($bookings->approval == 'rejected')
+                                                    <span class="badge badge-danger">Rejected</span>
+                                                @endif
+
                                             </td>
 
                                             <td class="text-right">
