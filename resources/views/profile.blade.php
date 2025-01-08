@@ -84,27 +84,27 @@
                                                 </a>
                                             </h5>
                                             <div class="row mt-5">
-                                                <p class="col-sm-3 text-sm-right mb-0 mb-sm-3">Name</p>
+                                                <p class="col-sm-3 text-sm-right mb-0 mb-sm-3">Name:</p>
                                                 <p class="col-sm-9">{{ Auth::user()->name }}</p>
                                             </div>
                                             <div class="row">
-                                                <p class="col-sm-3 text-sm-right mb-0 mb-sm-3">Employee ID</p>
+                                                <p class="col-sm-3 text-sm-right mb-0 mb-sm-3">Employee ID:</p>
                                                 <p class="col-sm-9">{{ Auth::user()->user_id }}</p>
                                             </div>
                                             <div class="row">
-                                                <p class="col-sm-3 text-sm-right mb-0 mb-sm-3">Join Date</p>
+                                                <p class="col-sm-3 text-sm-right mb-0 mb-sm-3">Join Date:</p>
                                                 <p class="col-sm-9">{{ Auth::user()->join_date }}</p>
                                             </div>
                                             <div class="row">
-                                                <p class="col-sm-3 text-sm-right mb-0 mb-sm-3">Email ID</p>
+                                                <p class="col-sm-3 text-sm-right mb-0 mb-sm-3">Email ID:</p>
                                                 <p class="col-sm-9">{{ Auth::user()->email }}</p>
                                             </div>
                                             <div class="row">
-                                                <p class="col-sm-3 text-sm-right mb-0 mb-sm-3">Mobile</p>
+                                                <p class="col-sm-3 text-sm-right mb-0 mb-sm-3">Phone Number:</p>
                                                 <p class="col-sm-9">{{ Auth::user()->phone_number }}</p>
                                             </div>
                                             <div class="row">
-                                                <p class="col-sm-3 text-sm-right mb-0">Department</p>
+                                                <p class="col-sm-3 text-sm-right mb-0">Department:</p>
                                                 <p class="col-sm-9 mb-0">{{ Auth::user()->department }}</p>
                                             </div>
                                         </div>
