@@ -82,7 +82,7 @@ class RoomsController extends Controller
             'fileupload' => 'nullable|file|mimes:jpeg,png,jpg|max:2048',
             'status' => 'required|string|in:Ready,Maintenance',
         ]);
-        
+
         // Check if the room type already exists for a different room
         $existingRoom = Room::where('room_type', $request->room_type)
             ->where('bkg_room_id', '!=', $request->bkg_room_id)
@@ -207,6 +207,33 @@ class RoomsController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete room type'
+            ], 500);
+        }
+    }
+
+    public function getRoomDetails($roomType)
+    {
+        try {
+            $room = Room::where('room_type', $roomType)
+                ->where('status', 'Ready')
+                ->first();
+
+            if (!$room) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Room not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'room' => $room
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching room details: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching room details'
             ], 500);
         }
     }

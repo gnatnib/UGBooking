@@ -46,7 +46,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Room Photo</label>
+                                    <label>Room Image</label>
                                     <div class="custom-file">
                                         <input type="file"
                                             class="custom-file-input @error('fileupload') is-invalid @enderror"
@@ -226,7 +226,8 @@
                             error: function(xhr, status, error) {
                                 console.error(error);
                                 alert(
-                                    'Failed to delete room type. It might be in use by existing rooms.');
+                                    'Failed to delete room type. It might be in use by existing rooms.'
+                                    );
                             }
                         });
                     }
