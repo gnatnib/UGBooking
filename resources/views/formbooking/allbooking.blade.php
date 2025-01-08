@@ -27,16 +27,14 @@
                                             <th>Total Numbers</th>
                                             <th>Date</th>
                                             <th>Time</th>
-                                           
                                             <th>Email</th>
-                                            <th>Phone.Number</th>
+                                            <th>Phone Number</th>
                                             <th>Status</th>
                                             <th class="text-right">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($allBookings as $bookings )
-                                            @if()
                                         <tr>
                                             <td>{{ $bookings->bkg_id }}</td>
                                             <td>
