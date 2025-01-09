@@ -1,230 +1,196 @@
 @extends('layouts.master')
 @section('content')
-<div class="page-wrapper">
-    <div class="content container-fluid">
-        <div class="page-header">
-            <div class="row align-items-center">
-                <div class="col">
-                    <h3 class="page-title mt-5">Room Booking Calendar</h3>
-                </div>
-                <div class="col-auto">
-                    <a href="{{ route('form.booking.add') }}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Book Now
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Room Filter -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label>Filter by Room</label>
-                    <select class="form-control" id="roomFilter">
-                        <option value="">All Rooms</option>
-                        @foreach($data as $room)
-                            <option value="{{ $room->room_type }}">{{ $room->room_type }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-body">
-                        <div id="calendar"></div>
+    <div class="page-wrapper">
+        <div class="content container-fluid">
+            <div class="page-header">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="page-title mt-5">Edit Booking</h3>
                     </div>
                 </div>
             </div>
+
+            {{-- Tampilkan pesan error validasi --}}
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form action="{{ route('form/booking/update') }}" method="POST">
+                @csrf
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="row formtype">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Booking ID</label>
+                                    <input class="form-control @error('bkg_id') is-invalid @enderror" 
+                                           type="text" name="bkg_id" value="{{ $bookingEdit->bkg_id }}" readonly>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <input class="form-control @error('name') is-invalid @enderror" 
+                                           type="text" name="name" value="{{ old('name', $bookingEdit->name) }}" 
+                                           {{ Auth::user()->role_name == 'user' ? 'readonly' : '' }}>
+                                    @error('name')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Room Type</label>
+                                    <select class="form-control @error('room_type') is-invalid @enderror" name="room_type">
+                                        @foreach($data as $room)
+                                            <option value="{{ $room->room_type }}" 
+                                                {{ old('room_type', $bookingEdit->room_type) == $room->room_type ? 'selected' : '' }}>
+                                                {{ $room->room_type }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('room_type')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Total Members</label>
+                                    <input class="form-control @error('total_numbers') is-invalid @enderror" 
+                                           type="number" name="total_numbers" 
+                                           value="{{ old('total_numbers', $bookingEdit->total_numbers) }}">
+                                    @error('total_numbers')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Date</label>
+                                    <div class="cal-icon">
+                                        <input type="text" class="form-control datetimepicker @error('date') is-invalid @enderror" 
+                                               name="date" value="{{ old('date', $bookingEdit->date) }}">
+                                        @error('date')
+                                            <span class="invalid-feedback">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Start Time</label>
+                                    <div class="time-icon">
+                                        <input type="time" class="form-control @error('time_start') is-invalid @enderror" 
+                                               name="time_start" value="{{ old('time_start', $bookingEdit->time_start) }}">
+                                        @error('time_start')
+                                            <span class="invalid-feedback">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>End Time</label>
+                                    <div class="time-icon">
+                                        <input type="time" class="form-control @error('time_end') is-invalid @enderror" 
+                                               name="time_end" value="{{ old('time_end', $bookingEdit->time_end) }}">
+                                        @error('time_end')
+                                            <span class="invalid-feedback">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                                           name="email" value="{{ old('email', $bookingEdit->email) }}">
+                                    @error('email')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Phone Number</label>
+                                    <input type="text" class="form-control @error('phone_number') is-invalid @enderror" 
+                                           name="phone_number" value="{{ old('phone_number', $bookingEdit->phone_number) }}">
+                                    @error('phone_number')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Message</label>
+                                    <textarea class="form-control @error('message') is-invalid @enderror" 
+                                              name="message" rows="1.5">{{ old('message', $bookingEdit->message) }}</textarea>
+                                    @error('message')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            @if(Auth::user()->role_name == 'admin' || Auth::user()->role_name == 'superadmin')
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Status</label>
+                                        <select class="form-control @error('status_meet') is-invalid @enderror" name="status_meet">
+                                            <option value="pending" {{ old('status_meet', $bookingEdit->status_meet) == 'pending' ? 'selected' : '' }}>
+                                                Pending
+                                            </option>
+                                            <option value="approved" {{ old('status_meet', $bookingEdit->status_meet) == 'approved' ? 'selected' : '' }}>
+                                                Approved
+                                            </option>
+                                            <option value="rejected" {{ old('status_meet', $bookingEdit->status_meet) == 'rejected' ? 'selected' : '' }}>
+                                                Rejected
+                                            </option>
+                                        </select>
+                                        @error('status_meet')
+                                            <span class="invalid-feedback">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary buttonedit mt-3">Update Booking</button>
+                <a href="{{ route('form/allbooking') }}" class="btn btn-secondary mt-3 ml-2">Cancel</a>
+            </form>
         </div>
     </div>
-</div>
 
-@endsection
-
-@section('script')
-<!-- Add these in your master layout if not already present -->
-<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<!-- Tambahkan moment.js jika belum -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-<!-- Tambahkan jQuery dan Bootstrap untuk tooltip jika belum -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Pastikan Bootstrap JS sudah terpasang untuk tooltip -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendar');
-    var selectedRoom = '';
-
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'timeGridWeek',
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        },
-        slotMinTime: '07:00:00',
-        slotMaxTime: '18:00:00',
-        allDaySlot: false,
-        events: function(fetchInfo, successCallback, failureCallback) {
-            $.ajax({
-                url: '{{ route("form.booking.events") }}',
-                type: 'GET',
-                data: {
-                    room: selectedRoom,
-                    start: fetchInfo.startStr,
-                    end: fetchInfo.endStr
-                },
-                success: function(response) {
-                    successCallback(response);
-                },
-                error: function(error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Failed to load booking data'
-                    });
-                    failureCallback(error);
+    @section('script')
+    <script>
+        $(function() {
+            $('.datetimepicker').datetimepicker({
+                format: 'YYYY-MM-DD',
+                minDate: new Date(),
+                icons: {
+                    up: "fas fa-chevron-up",
+                    down: "fas fa-chevron-down",
+                    next: 'fas fa-chevron-right',
+                    previous: 'fas fa-chevron-left'
                 }
             });
-        },
-        eventClick: function(info) {
-            showBookingDetails(info.event);
-        },
-        eventContent: function(arg) {
-            // Tentukan warna status
-            let statusBadge = '';
-            if (arg.event.extendedProps.status_meet === 'pending') {
-                statusBadge = '<span class="badge badge-warning">Pending</span>';
-            } else if (arg.event.extendedProps.status_meet === 'approved') {
-                statusBadge = '<span class="badge badge-success">Approved</span>';
-            } else if (arg.event.extendedProps.status_meet === 'rejected') {
-                statusBadge = '<span class="badge badge-danger">Rejected</span>';
-            }
-
-            return {
-                html: `
-                    <div class="fc-content p-2" style="background-color: transparent; color: inherit;">
-                        <div class="fc-title"><strong>${arg.event.extendedProps.room_type}</strong></div>
-                        <div class="fc-description">Booked by: ${arg.event.extendedProps.name}</div>
-                        <div class="mt-1">${statusBadge}</div>
-                    </div>
-                `
-            };
-        },
-        eventDidMount: function(info) {
-            // Tetapkan warna secara eksplisit
-            $(info.el).css('background-color', info.event.backgroundColor);
-            $(info.el).css('border-color', info.event.borderColor);
-
-            // Tambahkan tooltip
-            $(info.el).tooltip({
-                title: `${info.event.extendedProps.room_type} - ${info.event.extendedProps.name}`,
-                placement: 'top',
-                trigger: 'hover',
-                container: 'body'
-            });
-        },
-        // Locale dan business hours
-        locale: 'en',
-        businessHours: {
-            daysOfWeek: [ 1, 2, 3, 4, 5 ], // Monday - Friday
-            startTime: '07:00',
-            endTime: '18:00',
-        }
-    });
-
-    calendar.render();
-
-    // Room Filter Handler
-    $('#roomFilter').on('change', function() {
-        selectedRoom = $(this).val();
-        calendar.refetchEvents();
-    });
-
-    // Function to show booking details
-    function showBookingDetails(event) {
-        let statusBadge = '';
-        if (event.extendedProps.status_meet === 'pending') {
-            statusBadge = '<span class="badge badge-warning">Pending</span>';
-        } else if (event.extendedProps.status_meet === 'approved') {
-            statusBadge = '<span class="badge badge-success">Approved</span>';
-        } else if (event.extendedProps.status_meet === 'rejected') {
-            statusBadge = '<span class="badge badge-danger">Rejected</span>';
-        }
-
-        Swal.fire({
-            title: 'Booking Details',
-            html: `
-                <div class="booking-details">
-                    <p><strong>Room:</strong> ${event.extendedProps.room_type}</p>
-                    <p><strong>Booked by:</strong> ${event.extendedProps.name}</p>
-                    <p><strong>Date:</strong> ${moment(event.start).format('DD MMMM YYYY')}</p>
-                    <p><strong>Time:</strong> ${moment(event.start).format('HH:mm')} - ${moment(event.end).format('HH:mm')}</p>
-                    <p><strong>Total Participants:</strong> ${event.extendedProps.total_numbers}</p>
-                    <p><strong>Purpose:</strong> ${event.extendedProps.message}</p>
-                    <p><strong>Status:</strong> ${statusBadge}</p>
-                </div>
-            `,
-            confirmButtonText: 'Close',
-            customClass: {
-                confirmButton: 'btn btn-primary'
-            }
         });
-    }
-});
-</script>
-
-<style>
-.fc {
-    background: white;
-}
-.fc-event {
-    cursor: pointer;
-    margin: 2px 0;
-    padding: 2px;
-    border-radius: 3px;
-    /* Tidak menetapkan background-color di sini */
-}
-.fc-event:hover {
-    opacity: 0.9;
-}
-.fc-event .badge {
-    font-size: 0.8em;
-}
-.booking-details {
-    text-align: left;
-    margin: 10px;
-}
-.booking-details p {
-    margin-bottom: 8px;
-}
-.fc-content {
-    font-size: 0.9em;
-    background-color: transparent; /* Pastikan transparan */
-    color: inherit; /* Warna teks inherit dari parent */
-}
-.badge {
-    padding: 3px 6px;
-    border-radius: 3px;
-    font-size: 11px;
-}
-.badge-warning {
-    background-color: #ffc107;
-    color: #000;
-}
-.badge-success {
-    background-color: #28a745;
-    color: #fff;
-}
-.badge-danger {
-    background-color: #dc3545;
-    color: #fff;
-}
-</style>
+    </script>
+    @endsection
 @endsection

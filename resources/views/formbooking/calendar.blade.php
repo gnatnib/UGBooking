@@ -41,11 +41,9 @@
         </div>
     </div>
 </div>
-
 @endsection
 
 @section('script')
-<!-- Add these in your master layout if not already present -->
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -65,6 +63,12 @@ document.addEventListener('DOMContentLoaded', function() {
         slotMinTime: '07:00:00',
         slotMaxTime: '18:00:00',
         allDaySlot: false,
+        slotDuration: '00:30:00',
+        slotLabelInterval: '01:00',
+        eventDisplay: 'block',
+        dayMaxEventRows: true,
+        eventOverlap: false,
+        slotEventOverlap: false,
         events: function(fetchInfo, successCallback, failureCallback) {
             $.ajax({
                 url: '{{ route("form/booking/events") }}',
@@ -78,6 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     successCallback(response);
                 },
                 error: function(error) {
+                    console.error('Error fetching events:', error);
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -91,67 +96,78 @@ document.addEventListener('DOMContentLoaded', function() {
             showBookingDetails(info.event);
         },
         eventContent: function(arg) {
-    // Tambahkan hanya elemen tambahan tanpa mengubah warna
-    let statusBadge = '';
-    if (arg.event.extendedProps.status_meet === 'pending') {
-        statusBadge = '<span class="badge badge-warning">Pending</span>';
-    } else if (arg.event.extendedProps.status_meet === 'approved') {
-        statusBadge = '<span class="badge badge-success">Approved</span>';
-    } else if (arg.event.extendedProps.status_meet === 'rejected') {
-        statusBadge = '<span class="badge badge-danger">Rejected</span>';
-    }
+            let statusBadge = '';
+            switch(arg.event.extendedProps.status_meet) {
+                case 'pending':
+                    statusBadge = '<span class="badge badge-warning">Pending</span>';
+                    break;
+                case 'approved':
+                    statusBadge = '<span class="badge badge-success">Approved</span>';
+                    break;
+                case 'rejected':
+                    statusBadge = '<span class="badge badge-danger">Rejected</span>';
+                    break;
+            }
 
-    return {
-        html: `
-            <div class="fc-content p-2">
-                <div class="fc-title"><strong>${arg.event.extendedProps.room_type}</strong></div>
-                <div class="fc-description">Booked by: ${arg.event.extendedProps.name}</div>
-                <div class="mt-1">${statusBadge}</div>
-            </div>
-        `
-    };
-},
-
-eventDidMount: function(info) {
-    // Tetapkan warna latar belakang dan border secara eksplisit
-    $(info.el).css('background-color', info.event.backgroundColor);
-    $(info.el).css('border-color', info.event.borderColor);
-
-    // Tambahkan tooltip
-    $(info.el).tooltip({
-        title: `${info.event.extendedProps.room_type} - ${info.event.extendedProps.name}`,
-        placement: 'top',
-        trigger: 'hover',
-        container: 'body'
-    });
-},
-
-        // Locale dan business hours
-        locale: 'en',
+            return {
+                html: `
+                    <div class="fc-content">
+                        <div class="event-title">${arg.event.extendedProps.room_type}</div>
+                        <div class="event-info">
+                            <span class="event-name">${arg.event.extendedProps.name}</span>
+                            <span class="event-time">${moment(arg.event.start).format('HH:mm')} - ${moment(arg.event.end).format('HH:mm')}</span>
+                        </div>
+                        <div class="event-status">${statusBadge}</div>
+                    </div>
+                `
+            };
+        },
+        eventDidMount: function(info) {
+            $(info.el).tooltip({
+                title: `
+                    Room: ${info.event.extendedProps.room_type}
+                    Booked by: ${info.event.extendedProps.name}
+                    Time: ${moment(info.event.start).format('HH:mm')} - ${moment(info.event.end).format('HH:mm')}
+                    Participants: ${info.event.extendedProps.total_numbers}
+                `,
+                placement: 'top',
+                trigger: 'hover',
+                html: true
+            });
+        },
+        nowIndicator: true,
         businessHours: {
-            daysOfWeek: [ 1, 2, 3, 4, 5 ], // Monday - Friday
+            daysOfWeek: [1, 2, 3, 4, 5],
             startTime: '07:00',
             endTime: '18:00',
-        }
+        },
+        scrollTime: '07:00:00',
+        height: 'auto',
+        expandRows: true,
+        stickyHeaderDates: true,
+        firstDay: 1,
+        locale: 'en',
     });
 
     calendar.render();
 
-    // Room Filter Handler
     $('#roomFilter').on('change', function() {
         selectedRoom = $(this).val();
         calendar.refetchEvents();
     });
 
-    // Function to show booking details
     function showBookingDetails(event) {
         let statusBadge = '';
-        if (event.extendedProps.status_meet === 'pending') {
-            statusBadge = '<span class="badge badge-warning">Pending</span>';
-        } else if (event.extendedProps.status_meet === 'approved') {
-            statusBadge = '<span class="badge badge-success">Approved</span>';
-        } else if (event.extendedProps.status_meet === 'rejected') {
-            statusBadge = '<span class="badge badge-danger">Rejected</span>';
+        switch(event.extendedProps.status_meet) {
+            case 'pending':
+                statusBadge = '<span class="badge badge-warning">Pending</span>';
+                break;
+            case 'approved':
+                statusBadge = '<span class="badge badge-success">Approved</span>';
+                break;
+            case 'rejected':
+                statusBadge = '<span class="badge badge-danger">Rejected</span>';
+                break;
         }
 
         Swal.fire({
@@ -177,50 +193,144 @@ eventDidMount: function(info) {
 </script>
 
 <style>
-    .fc {
-        background: white;
+.fc {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.fc-header-toolbar {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px 8px 0 0;
+}
+
+.fc-view-harness {
+    padding: 0.5rem;
+}
+
+/* Base event styling */
+.fc-event {
+    cursor: pointer;
+    border: none !important;
+    margin: 1px !important;
+    border-radius: 4px;
+    overflow: hidden;
+    width: calc(100% - 4px) !important;
+    background: transparent;
+}
+
+/* Event content container */
+.fc-content {
+    padding: 4px 6px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Event title styling */
+.event-title {
+    font-weight: 600;
+    font-size: 0.8rem;
+    margin-bottom: 2px;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Event info section */
+.event-info {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.event-name, .event-time {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Status badge styling */
+.event-status {
+    margin-top: 2px;
+}
+
+/* Time grid slots */
+.fc-timegrid-slot {
+    height: 3em !important;
+}
+
+/* Badge styling */
+.badge {
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    font-weight: normal;
+    border-radius: 3px;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.badge-success {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.badge-danger {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* Room-specific colors */
+.fc-event[data-room="Meeting Room A"] {
+    background: linear-gradient(to right, #4e73df, #3a5fc7);
+}
+
+.fc-event[data-room="Meeting Room B"] {
+    background: linear-gradient(to right, #1cc88a, #13a673);
+}
+
+.fc-event[data-room="Conference Room"] {
+    background: linear-gradient(to right, #f6c23e, #e5b53a);
+}
+
+.fc-event[data-room="Discussion Room"] {
+    background: linear-gradient(to right, #e74a3b, #d63a2d);
+}
+
+/* Hover effect */
+.fc-event:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+}
+
+/* Tooltip customization */
+.tooltip {
+    font-size: 0.75rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .fc-header-toolbar {
+        flex-direction: column;
     }
-    .fc-event {
-        cursor: pointer;
-        margin: 2px 0;
-        padding: 2px;
-        border-radius: 3px;
-        /* Jangan tetapkan background-color di sini */
-    }
-    .fc-event:hover {
-        opacity: 0.9;
-    }
-    .fc-event .badge {
-        font-size: 0.8em;
-    }
-    .booking-details {
-        text-align: left;
-        margin: 10px;
-    }
-    .booking-details p {
-        margin-bottom: 8px;
-    }
-    .fc-content {
-        font-size: 0.9em;
-        /* Hapus background-color dan color dari sini */
-    }
-    .badge {
-        padding: 3px 6px;
-        border-radius: 3px;
-        font-size: 11px;
-    }
-    .badge-warning {
-        background-color: #ffc107;
-        color: #000;
-    }
-    .badge-success {
-        background-color: #28a745;
-        color: #fff;
-    }
-    .badge-danger {
-        background-color: #dc3545;
-        color: #fff;
-    }
-    </style>
     
+    .fc-toolbar-chunk {
+        margin-bottom: 0.5rem;
+    }
+
+    .event-title {
+        font-size: 0.75rem;
+    }
+
+    .event-info {
+        font-size: 0.7rem;
+    }
+}
+</style>
 @endsection

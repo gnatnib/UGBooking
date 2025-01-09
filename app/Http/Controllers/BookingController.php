@@ -39,21 +39,23 @@ class BookingController extends Controller
     /** Page */
     public function bookingAdd()
     {
-        $user = Auth::user(); // Get current authenticated user
+        $currentUser = Auth::user(); // Mendapatkan pengguna yang sedang autentikasi
         
-        // If user is admin, show all bookings
-        if ($user->role_name === 'admin'|| $user->role_name === 'superadmin') {
+        // Jika pengguna adalah admin atau superadmin, tampilkan semua pengguna
+        if ($currentUser->role_name === 'admin' || $currentUser->role_name === 'superadmin') {
             $user = DB::table('users')->get();
         } else {
-            // If regular user, only show their bookings
+            // Jika pengguna biasa, hanya tampilkan data mereka sendiri
             $user = DB::table('users')
-                ->where('name', $user->name)
+                ->where('name', $currentUser->name)
                 ->get();
         }
+        
         $data = DB::table('rooms')->select('room_type')->where('status', 'Ready')->distinct()->get();
        
         return view('formbooking.bookingadd', compact('data', 'user'));
     }
+    
 
     /** View Record */
     public function bookingEdit($bkg_id)
@@ -93,7 +95,7 @@ class BookingController extends Controller
             'name'          => 'required|string|max:255',
             'room_type'     => 'required|string|max:255',
             'total_numbers' => 'required|string|max:255',
-            'date'          => 'required|date',
+            // 'date'          => 'required|date', // Tidak diperlukan jika menggunakan tanggal saat ini
             'time_start'    => 'required',
             'time_end'      => 'required|after:time_start',
             'email'         => 'required|email|max:255',
@@ -103,10 +105,13 @@ class BookingController extends Controller
 
         DB::beginTransaction();
         try {
+            // Gunakan tanggal saat ini
+            $currentDate = Carbon::now()->format('Y-m-d');
+
             // Check for time conflicts
             if ($this->hasTimeConflict(
                 $request->room_type,
-                $request->date,
+                $currentDate,
                 $request->time_start,
                 $request->time_end
             )) {
@@ -114,18 +119,15 @@ class BookingController extends Controller
                 return redirect()->back()->withInput();
             }
 
-           
-           
             $booking = new Booking;
             $booking->name = $request->name;
             $booking->room_type = $request->room_type;
             $booking->total_numbers = $request->total_numbers;
-            $booking->date = $request->date;
+            $booking->date = $currentDate; // Set tanggal saat ini
             $booking->time_start = $request->time_start;
             $booking->time_end = $request->time_end;
             $booking->email = $request->email;
             $booking->phone_number = $request->phone_number;
-            
             $booking->message = $request->message;
             $booking->status_meet = 'pending';
             $booking->save();
@@ -149,7 +151,7 @@ class BookingController extends Controller
             'name'          => 'required|string|max:255',
             'room_type'     => 'required|string|max:255',
             'total_numbers' => 'required|string|max:255',
-            'date'          => 'required|date',
+            // 'date'          => 'required|date', // Tidak diperlukan jika menggunakan tanggal saat ini
             'time_start'    => 'required',
             'time_end'      => 'required|after:time_start',
             'email'         => 'required|email|max:255',
@@ -165,10 +167,13 @@ class BookingController extends Controller
                 throw new \Exception('Booking not found');
             }
 
+            // Gunakan tanggal saat ini
+            $currentDate = Carbon::now()->format('Y-m-d');
+
             // Check for time conflicts
             if ($this->hasTimeConflict(
                 $request->room_type,
-                $request->date,
+                $currentDate,
                 $request->time_start,
                 $request->time_end,
                 $request->bkg_id
@@ -181,7 +186,7 @@ class BookingController extends Controller
             $booking->name = $request->name;
             $booking->room_type = $request->room_type;
             $booking->total_numbers = $request->total_numbers;
-            $booking->date = $request->date;
+            $booking->date = $currentDate; // Set tanggal saat ini
             $booking->time_start = $request->time_start;
             $booking->time_end = $request->time_end;
             $booking->email = $request->email;
@@ -304,3 +309,4 @@ class BookingController extends Controller
     }
 
 }
+ 
