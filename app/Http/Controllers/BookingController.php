@@ -5,10 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Booking;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Log; 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-
 use App\Models\User;
 
 class BookingController extends Controller
@@ -19,13 +18,18 @@ class BookingController extends Controller
     {
         $user = Auth::user(); // Get current authenticated user
         
-        // If user is admin, show all bookings
-        if ($user->role_name === 'admin'|| $user->role_name === 'superadmin') {
-            $allBookings = DB::table('bookings')->get();
+        // If user is superadmin or admin, show all bookings
+        if ($user->role_name === 'admin' || $user->role_name === 'superadmin') {
+            $allBookings = DB::table('bookings')
+                ->orderBy('date', 'desc')
+                ->orderBy('time_start', 'desc')
+                ->get();
         } else {
             // If regular user, only show their bookings
             $allBookings = DB::table('bookings')
-                ->where('name', $user->name)
+                ->where('email', $user->email)
+                ->orderBy('date', 'desc')
+                ->orderBy('time_start', 'desc')
                 ->get();
         }
         
@@ -55,7 +59,8 @@ class BookingController extends Controller
     public function bookingEdit($bkg_id)
     {
         $bookingEdit = DB::table('bookings')->where('bkg_id', $bkg_id)->first();
-        return view('formbooking.bookingedit', compact('bookingEdit'));
+        $data = DB::table('rooms')->select('room_type')->where('status', 'Ready')->distinct()->get();
+        return view('formbooking.bookingedit', compact('bookingEdit', 'data'));
     }
 
     /**
@@ -140,6 +145,7 @@ class BookingController extends Controller
     public function updateRecord(Request $request)
     {
         $request->validate([
+            'bkg_id'        => 'required',
             'name'          => 'required|string|max:255',
             'room_type'     => 'required|string|max:255',
             'total_numbers' => 'required|string|max:255',
@@ -148,13 +154,18 @@ class BookingController extends Controller
             'time_end'      => 'required|after:time_start',
             'email'         => 'required|email|max:255',
             'phone_number'  => 'required|string|max:255',
-            
             'message'       => 'required|string|max:255',
         ]);
 
         DB::beginTransaction();
         try {
-            // Check for time conflicts excluding current booking
+            // Check booking exists
+            $booking = Booking::where('bkg_id', $request->bkg_id)->first();
+            if (!$booking) {
+                throw new \Exception('Booking not found');
+            }
+
+            // Check for time conflicts
             if ($this->hasTimeConflict(
                 $request->room_type,
                 $request->date,
@@ -166,30 +177,33 @@ class BookingController extends Controller
                 return redirect()->back()->withInput();
             }
 
+            // Update booking
+            $booking->name = $request->name;
+            $booking->room_type = $request->room_type;
+            $booking->total_numbers = $request->total_numbers;
+            $booking->date = $request->date;
+            $booking->time_start = $request->time_start;
+            $booking->time_end = $request->time_end;
+            $booking->email = $request->email;
+            $booking->phone_number = $request->phone_number;
+            $booking->message = $request->message;
+
+            // Update status if admin/superadmin
+            if (Auth::user()->role_name == 'admin' || Auth::user()->role_name == 'superadmin') {
+                $booking->status_meet = $request->status_meet;
+            }
+
+            $booking->save();
             
-
-            $update = [
-                'name'          => $request->name,
-                'room_type'     => $request->room_type,
-                'total_numbers' => $request->total_numbers,
-                'date'          => $request->date,
-                'time_start'    => $request->time_start,
-                'time_end'      => $request->time_end,
-                'email'         => $request->email,
-                'phone_number'     => $request->phone_number,
-                'message'       => $request->message,
-            ];
-
-            Booking::where('bkg_id', $request->bkg_id)->update($update);
-        
             DB::commit();
-            flash()->success('Updated booking successfully :)');
-            return redirect()->back();
+            flash()->success('Booking updated successfully');
+            return redirect()->route('form/allbooking');
+
         } catch (\Exception $e) {
             DB::rollback();
-            flash()->error('Update booking fail :)');
-            Log::info($e->getMessage());
-            return redirect()->back();
+            Log::error('Booking update error: ' . $e->getMessage());
+            flash()->error('Failed to update booking: ' . $e->getMessage());
+            return redirect()->back()->withInput();
         }
     }
 
@@ -209,6 +223,84 @@ class BookingController extends Controller
             Log::info($e->getMessage());
             return redirect()->back();
         }
+    }
+
+    /** View Calendar Page */
+    public function calendar()
+    {
+        // Ambil semua room yang ready untuk filter
+        $data = DB::table('rooms')
+                ->where('status', 'Ready')
+                ->get();
+        
+        return view('formbooking.calendar', compact('data'));
+    }
+
+    /** Get Events for Calendar */
+    public function events(Request $request)
+    {
+        try {
+            $start = $request->input('start');
+            $end = $request->input('end');
+            $room = $request->input('room');
+
+            // Gunakan \Log langsung
+            Log::info('Fetching events with:', [
+                'start' => $start,
+                'end' => $end,
+                'room' => $room
+            ]);
+
+            $query = DB::table('bookings');
+
+            if ($room) {
+                $query->where('room_type', $room);
+            }
+
+            $bookings = $query->get();
+            $events = [];
+
+            foreach ($bookings as $booking) {
+                $events[] = [
+                    'id' => $booking->bkg_id,
+                    'title' => $booking->room_type,
+                    'start' => $booking->date . 'T' . $booking->time_start,
+                    'end' => $booking->date . 'T' . $booking->time_end,
+                    'color' => $this->getEventColor($booking->room_type), // Tambahkan warna di sini
+                    'extendedProps' => [
+                        'room_type' => $booking->room_type,
+                        'name' => $booking->name,
+                        'time_start' => $booking->time_start,
+                        'time_end' => $booking->time_end,
+                        'total_numbers' => $booking->total_numbers,
+                        'message' => $booking->message,
+                        'status_meet' => $booking->status_meet ?? 'pending'
+                    ]
+                ];
+            }
+            
+
+            Log::info('Returning events:', ['count' => count($events)]);
+            return response()->json($events);
+
+        } catch (\Exception $e) {
+            Log::error('Error in events method:', ['error' => $e->getMessage()]);
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    /** Get color for different room types */
+    private function getEventColor($roomType)
+    {
+        $colors = [
+            'Meeting Room A' => '#007bff',
+            'Meeting Room B' => '#28a745',
+            'Conference Room' => '#dc3545',
+            'Training Room' => '#ffc107',
+            'Board Room' => '#6610f2',
+            'Auditorium' => '#fd7e14'
+        ];
+
+        return $colors[$roomType] ?? '#6c757d';
     }
 
 }

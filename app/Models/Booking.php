@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Booking extends Model
 {
     use HasFactory;
+
+    protected $primaryKey = 'bkg_id';
+    public $incrementing = false;
+
     protected $fillable = [
         'bkg_id',
         'name',
@@ -19,23 +23,18 @@ class Booking extends Model
         'email',
         'phone_number',
         'message',
-        'status_meet',
+        'status_meet'
     ];
 
-    /** generate id */
     protected static function boot()
     {
         parent::boot();
-
-        self::creating(function ($model) {
-            $latestUser = self::orderBy('bkg_id', 'desc')->first();
-            $nextID = $latestUser ? intval(substr($latestUser->bkg_id, 3)) + 1 : 1;
-            $model->bkg_id = 'BK-' . sprintf("%04d", $nextID);
-
-            // Ensure the bkg_id is unique
-            while (self::where('bkg_id', $model->bkg_id)->exists()) {
-                $nextID++;
-                $model->bkg_id = 'BK-' . sprintf("%04d", $nextID);
+        
+        static::creating(function ($model) {
+            if (!$model->bkg_id) {
+                $latestBooking = static::latest()->first();
+                $number = $latestBooking ? intval(substr($latestBooking->bkg_id, 4)) + 1 : 1;
+                $model->bkg_id = 'BKG-' . str_pad($number, 5, '0', STR_PAD_LEFT);
             }
         });
     }
