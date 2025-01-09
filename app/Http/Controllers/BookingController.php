@@ -203,47 +203,47 @@ public function endMeeting(Request $request)
 
     /** Save Record */
     public function saveRecord(Request $request)
-    {
-        $request->validate([
-            'name'          => 'required|string|max:255',
-            'room_type'     => 'required|string|max:255',
-            'total_numbers' => 'required|string|max:255',
-            // 'date'          => 'required|date', // Tidak diperlukan jika menggunakan tanggal saat ini
-            'time_start'    => 'required',
-            'time_end'      => 'required|after:time_start',
-            'email'         => 'required|email|max:255',
-            'phone_number'  => 'required|string|max:255',
-            'message'       => 'required|string|max:255',
-        ]);
+{
+    $request->validate([
+        'name'          => 'required|string|max:255',
+        'room_type'     => 'required|string|max:255',
+        'total_numbers' => 'required|string|max:255',
+        'date' => 'required|date_format:Y-m-d',
+        'time_start'    => 'required',
+        'time_end'      => 'required|after:time_start',
+        'email'         => 'required|email|max:255',
+        'phone_number'  => 'required|string|max:255',
+        'message'       => 'required|string|max:255',
+    ]);
 
-        DB::beginTransaction();
-        try {
-            // Gunakan tanggal saat ini
-            $currentDate = Carbon::now()->format('Y-m-d');
+    DB::beginTransaction();
+    try {
+        // Ubah tanggal dari request menjadi format Y-m-d menggunakan Carbon
+        $formattedDate = Carbon::parse($request->date)->format('Y-m-d');
 
-            // Check for time conflicts
-            if ($this->hasTimeConflict(
-                $request->room_type,
-                $currentDate,
-                $request->time_start,
-                $request->time_end
-            )) {
-                flash()->error('This room is already booked for the selected time slot.');
-                return redirect()->back()->withInput();
-            }
+        // Check for time conflicts
+        if ($this->hasTimeConflict(
+            $request->room_type,
+            $formattedDate,
+            $request->time_start,
+            $request->time_end
+        )) {
+            flash()->error('This room is already booked for the selected time slot.');
+            return redirect()->back()->withInput();
+        }
 
-            $booking = new Booking;
-            $booking->name = $request->name;
-            $booking->room_type = $request->room_type;
-            $booking->total_numbers = $request->total_numbers;
-            $booking->date = $currentDate; // Set tanggal saat ini
-            $booking->time_start = $request->time_start;
-            $booking->time_end = $request->time_end;
-            $booking->email = $request->email;
-            $booking->phone_number = $request->phone_number;
-            $booking->message = $request->message;
-            $booking->status_meet = 'Booked';
-            $booking->save();
+        $booking = new Booking;
+        $booking->name = $request->name;
+        $booking->room_type = $request->room_type;
+        $booking->total_numbers = $request->total_numbers;
+        $booking->date = $formattedDate; // Gunakan tanggal yang telah diformat
+        $booking->time_start = $request->time_start;
+        $booking->time_end = $request->time_end;
+        $booking->email = $request->email;
+        $booking->phone_number = $request->phone_number;
+        $booking->message = $request->message;
+        $booking->status_meet = 'Booked';
+        $booking->save();
 
         DB::commit();
         flash()->success('Create new booking successfully :)');
