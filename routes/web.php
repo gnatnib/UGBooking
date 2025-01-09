@@ -74,12 +74,12 @@ Route::controller(BookingController::class)->group(function () {
     Route::post('form/booking/save', 'saveRecord')->middleware('auth')->name('form/booking/save');
     Route::post('form/booking/update', 'updateRecord')->middleware('auth')->name('form/booking/update');
     Route::post('form/booking/delete', 'deleteRecord')->middleware('auth')->name('form/booking/delete');
+    Route::post('form/booking/endMeeting', 'endMeeting')->middleware('auth')->name('form/booking/endMeeting'); // Route untuk end meeting
     
-    // Tambahkan routes untuk calendar
+    // Calendar routes
     Route::get('form/booking/calendar', 'calendar')->middleware('auth')->name('form/booking/calendar');
     Route::get('form/booking/events', 'events')->middleware('auth')->name('form/booking/events');
 });
-
 // ----------------------------- rooms -----------------------------//
 Route::controller(RoomsController::class)->group(function () {
     Route::get('form/allrooms/page', 'allrooms')->middleware('auth')->name('form/allrooms/page');

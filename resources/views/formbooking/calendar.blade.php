@@ -98,14 +98,14 @@ document.addEventListener('DOMContentLoaded', function() {
         eventContent: function(arg) {
             let statusBadge = '';
             switch(arg.event.extendedProps.status_meet) {
-                case 'pending':
-                    statusBadge = '<span class="badge badge-warning">Pending</span>';
+                case 'Booked':
+                    statusBadge = '<span class="badge badge-warning">Booked</span>';
                     break;
-                case 'approved':
-                    statusBadge = '<span class="badge badge-success">Approved</span>';
+                case 'In meeting':
+                    statusBadge = '<span class="badge badge-danger">In meeting</span>';
                     break;
-                case 'rejected':
-                    statusBadge = '<span class="badge badge-danger">Rejected</span>';
+                case 'Finished':
+                    statusBadge = '<span class="badge badge-success">Finished</span>';
                     break;
             }
 
@@ -159,14 +159,14 @@ document.addEventListener('DOMContentLoaded', function() {
     function showBookingDetails(event) {
         let statusBadge = '';
         switch(event.extendedProps.status_meet) {
-            case 'pending':
-                statusBadge = '<span class="badge badge-warning">Pending</span>';
+            case 'Booked':
+                statusBadge = '<span class="badge badge-warning">Booked</span>';
                 break;
-            case 'approved':
-                statusBadge = '<span class="badge badge-success">Approved</span>';
+            case 'In meeting':
+                statusBadge = '<span class="badge badge-danger">In meeting</span>';
                 break;
-            case 'rejected':
-                statusBadge = '<span class="badge badge-danger">Rejected</span>';
+            case 'Finished':
+                statusBadge = '<span class="badge badge-success">Finished</span>';
                 break;
         }
 
