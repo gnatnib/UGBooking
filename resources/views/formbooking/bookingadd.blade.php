@@ -18,7 +18,6 @@
             <form action="{{ route('form/booking/save') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
-                    {{-- Form Inputs --}}
                     <div class="col-lg-8">
                         <div class="row formtype">
                             <div class="col-md-6">
@@ -75,7 +74,7 @@
                                 <div class="form-group">
                                     <label>Date</label>
                                     <div class="cal-icon">
-                                        <input type="text" class="form-control datetimepicker @error('date') is-invalid @enderror" name="date" value="{{ old('date') }}" required>
+                                        <input type="date" class="form-control @error('date') is-invalid @enderror" name="date" value="{{ old('date') }}" pattern="\d{4}-\d{2}-\d{2}" required>
                                         @error('date')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -151,7 +150,6 @@
                         </div>
                     </div>
 
-                    {{-- Room Preview Card --}}
                     <div class="col-lg-4">
                         <div class="card room-preview d-none">
                             <div class="card-header">
@@ -191,7 +189,6 @@
     @section('script')
     <script>
         $(document).ready(function() {
-            // Time validation
             $('form').on('submit', function(e) {
                 var startTime = $('input[name="time_start"]').val();
                 var endTime = $('input[name="time_end"]').val();
@@ -203,7 +200,6 @@
                 }
             });
 
-            // Handle room type selection
             $('#roomTypeSelect').on('change', function() {
                 const selectedRoomType = $(this).val();
                 if (!selectedRoomType) {
@@ -211,25 +207,18 @@
                     return;
                 }
 
-                // Fetch room details using AJAX
                 $.ajax({
                     url: '/api/room-details/' + encodeURIComponent(selectedRoomType),
                     type: 'GET',
                     success: function(response) {
                         if (response.success) {
                             const room = response.room;
-
-                            // Update room preview
                             $('#room-image').attr('src', '/uploads/rooms/' + room.fileupload);
                             $('#room-type-display').text(room.room_type);
                             $('#room-capacity').text('Capacity: ' + room.capacity + ' participants');
-
-                            // Update facilities
                             $('#has-projector').toggleClass('d-none', !room.has_projector);
                             $('#has-sound').toggleClass('d-none', !room.has_sound_system);
                             $('#has-tv').toggleClass('d-none', !room.has_tv);
-
-                            // Show the preview card
                             $('.room-preview').removeClass('d-none');
                         }
                     },
@@ -239,18 +228,6 @@
                         $('.room-preview').addClass('d-none');
                     }
                 });
-            });
-
-            // Initialize datepicker
-            $('.datetimepicker').datetimepicker({
-                format: 'YYYY-MM-DD',
-                minDate: new Date(),
-                icons: {
-                    up: "fas fa-chevron-up",
-                    down: "fas fa-chevron-down",
-                    next: 'fas fa-chevron-right',
-                    previous: 'fas fa-chevron-left'
-                }
             });
         });
     </script>
