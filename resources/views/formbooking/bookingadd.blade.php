@@ -23,10 +23,12 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Name</label>
-                                    <select class="form-control @error('name') is-invalid @enderror" id="sel1" name="name" required>
+                                    <select class="form-control @error('name') is-invalid @enderror" id="sel1"
+                                        name="name" required>
                                         <option selected disabled> --Select Name-- </option>
                                         @foreach ($user as $users)
-                                            <option value="{{ $users->name }}" {{ old('name') == $users->name ? 'selected' : '' }}>
+                                            <option value="{{ $users->name }}"
+                                                {{ old('name') == $users->name ? 'selected' : '' }}>
                                                 {{ $users->name }}
                                             </option>
                                         @endforeach
@@ -42,10 +44,12 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Room Type</label>
-                                    <select class="form-control @error('room_type') is-invalid @enderror" id="roomTypeSelect" name="room_type" required>
+                                    <select class="form-control @error('room_type') is-invalid @enderror"
+                                        id="roomTypeSelect" name="room_type" required>
                                         <option selected disabled> --Select Room Type-- </option>
                                         @foreach ($data as $item)
-                                            <option value="{{ $item->room_type }}" {{ old('room_type') == $item->room_type ? 'selected' : '' }}>
+                                            <option value="{{ $item->room_type }}"
+                                                {{ old('room_type') == $item->room_type ? 'selected' : '' }}>
                                                 {{ $item->room_type }}
                                             </option>
                                         @endforeach
@@ -61,7 +65,8 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Total Members</label>
-                                    <input type="number" class="form-control @error('total_numbers') is-invalid @enderror" name="total_numbers" value="{{ old('total_numbers') }}" required>
+                                    <input type="number" class="form-control @error('total_numbers') is-invalid @enderror"
+                                        name="total_numbers" value="{{ old('total_numbers') }}" required>
                                     @error('total_numbers')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -74,7 +79,9 @@
                                 <div class="form-group">
                                     <label>Date</label>
                                     <div class="cal-icon">
-                                        <input type="date" class="form-control @error('date') is-invalid @enderror" name="date" value="{{ old('date') }}" pattern="\d{4}-\d{2}-\d{2}" required>
+                                        <input type="date" class="form-control @error('date') is-invalid @enderror"
+                                            name="date" value="{{ old('date') }}" pattern="\d{4}-\d{2}-\d{2}"
+                                            required>
                                         @error('date')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -88,7 +95,8 @@
                                 <div class="form-group">
                                     <label>Start Time</label>
                                     <div class="time-icon">
-                                        <input type="time" class="form-control @error('time_start') is-invalid @enderror" name="time_start" value="{{ old('time_start') }}" required>
+                                        <input type="time" class="form-control @error('time_start') is-invalid @enderror"
+                                            name="time_start" value="{{ old('time_start') }}" required>
                                         @error('time_start')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -102,7 +110,8 @@
                                 <div class="form-group">
                                     <label>End Time</label>
                                     <div class="time-icon">
-                                        <input type="time" class="form-control @error('time_end') is-invalid @enderror" name="time_end" value="{{ old('time_end') }}" required>
+                                        <input type="time" class="form-control @error('time_end') is-invalid @enderror"
+                                            name="time_end" value="{{ old('time_end') }}" required>
                                         @error('time_end')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -115,7 +124,8 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Email</label>
-                                    <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required>
+                                    <input type="email" class="form-control @error('email') is-invalid @enderror"
+                                        name="email" value="{{ old('email') }}" required>
                                     @error('email')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -127,7 +137,8 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Phone Number</label>
-                                    <input type="text" class="form-control @error('phone_number') is-invalid @enderror" name="phone_number" value="{{ old('phone_number') }}" required>
+                                    <input type="text" class="form-control @error('phone_number') is-invalid @enderror"
+                                        name="phone_number" value="{{ old('phone_number') }}" required>
                                     @error('phone_number')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -156,7 +167,8 @@
                                 <h5 class="card-title mb-0">Room Info</h5>
                             </div>
                             <div class="card-body">
-                                <img id="room-image" src="" alt="Room Image" class="img-fluid mb-3" style="width: 100%; height: 200px; object-fit: cover;">
+                                <img id="room-image" src="" alt="Room Image" class="img-fluid mb-3"
+                                    style="width: 100%; height: 200px; object-fit: cover;">
                                 <h5 id="room-type-display" class="card-title"></h5>
                                 <p id="room-capacity" class="card-text mb-3"></p>
                                 <div id="room-facilities">
@@ -186,7 +198,7 @@
         </div>
     </div>
 
-    @section('script')
+@section('script')
     <script>
         $(document).ready(function() {
             $('form').on('submit', function(e) {
@@ -215,7 +227,8 @@
                             const room = response.room;
                             $('#room-image').attr('src', '/uploads/rooms/' + room.fileupload);
                             $('#room-type-display').text(room.room_type);
-                            $('#room-capacity').text('Capacity: ' + room.capacity + ' participants');
+                            $('#room-capacity').text('Capacity: ' + room.capacity +
+                                ' participants');
                             $('#has-projector').toggleClass('d-none', !room.has_projector);
                             $('#has-sound').toggleClass('d-none', !room.has_sound_system);
                             $('#has-tv').toggleClass('d-none', !room.has_tv);
@@ -233,14 +246,45 @@
     </script>
 
     <style>
-        .room-preview {
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        .position-relative {
+            position: relative;
         }
+
+        .calendar-icon {
+            z-index: 1;
+        }
+
+        /* Ensure the date input is fully clickable */
+        input[type="date"] {
+            position: relative;
+            z-index: 2;
+            background: transparent;
+        }
+
+        /* Hide the default calendar icon in Webkit browsers */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 3;
+        }
+
+        .room-preview {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
         .facilities-list {
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
+
         .facility-item {
             display: flex;
             align-items: center;
@@ -249,9 +293,10 @@
             background-color: #f8f9fa;
             border-radius: 4px;
         }
+
         .facility-item i {
             font-size: 18px;
         }
     </style>
-    @endsection
+@endsection
 @endsection
