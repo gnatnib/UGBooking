@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Booking;
+/** Save Record */
+
+
 use App\Models\Room;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -83,59 +86,62 @@ class BookingController extends Controller
     }
 
     /** Save Record */
-    public function saveRecord(Request $request)
-    {
-        $request->validate([
-            'name'          => 'required|string|max:255',
-            'room_type'     => 'required|string|max:255',
-            'total_numbers' => 'required|string|max:255',
-            'date'          => 'required|date',
-            'time_start'    => 'required',
-            'time_end'      => 'required|after:time_start',
-            'email'         => 'required|email|max:255',
-            'phone_number'  => 'required|string|max:255',
-            'message'       => 'required|string|max:255',
-        ]);
+   
 
-        DB::beginTransaction();
-        try {
-            // Check for time conflicts
-            if ($this->hasTimeConflict(
-                $request->room_type,
-                $request->date,
-                $request->time_start,
-                $request->time_end
-            )) {
-                flash()->error('This room is already booked for the selected time slot.');
-                return redirect()->back()->withInput();
-            }
+public function saveRecord(Request $request)
+{
+    $request->validate([
+        'name'          => 'required|string|max:255',
+        'room_type'     => 'required|string|max:255',
+        'total_numbers' => 'required|string|max:255',
+        'date'          => 'required|date',
+        'time_start'    => 'required',
+        'time_end'      => 'required|after:time_start',
+        'email'         => 'required|email|max:255',
+        'phone_number'  => 'required|string|max:255',
+        'message'       => 'required|string|max:255',
+    ]);
 
-           
-           
-            $booking = new Booking;
-            $booking->name = $request->name;
-            $booking->room_type = $request->room_type;
-            $booking->total_numbers = $request->total_numbers;
-            $booking->date = $request->date;
-            $booking->time_start = $request->time_start;
-            $booking->time_end = $request->time_end;
-            $booking->email = $request->email;
-            $booking->phone_number = $request->phone_number;
-            
-            $booking->message = $request->message;
-            $booking->status_meet = 'pending';
-            $booking->save();
-
-            DB::commit();
-            flash()->success('Create new booking successfully :)');
-            return redirect()->back();
-        } catch (\Exception $e) {
-            DB::rollback();
-            flash()->error('Add Booking fail :)');
-            Log::info($e->getMessage());
-            return redirect()->back();
+    DB::beginTransaction();
+    try {
+        // Check for time conflicts
+        if ($this->hasTimeConflict(
+            $request->room_type,
+            $request->date,
+            $request->time_start,
+            $request->time_end
+        )) {
+            flash()->error('This room is already booked for the selected time slot.');
+            return redirect()->back()->withInput();
         }
+
+        $booking = new Booking;
+        $booking->name = $request->name;
+        $booking->room_type = $request->room_type;
+        $booking->total_numbers = $request->total_numbers;
+
+        // Format date to Y-m-d using Carbon
+        $booking->date = Carbon::parse($request->date)->format('Y-m-d');
+
+        $booking->time_start = $request->time_start;
+        $booking->time_end = $request->time_end;
+        $booking->email = $request->email;
+        $booking->phone_number = $request->phone_number;
+        $booking->message = $request->message;
+        $booking->status_meet = 'pending';
+        $booking->save();
+
+        DB::commit();
+        flash()->success('Create new booking successfully :)');
+        return redirect()->back();
+    } catch (\Exception $e) {
+        DB::rollback();
+        flash()->error('Add Booking fail :)');
+        Log::info($e->getMessage());
+        return redirect()->back();
     }
+}
+
 
     /** Update Record */
     public function updateRecord(Request $request)
