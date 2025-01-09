@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Booking;
+/** Save Record */
+
+
+use App\Models\Room;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log; 
 use Carbon\Carbon;
@@ -12,29 +16,138 @@ use App\Models\User;
 
 class BookingController extends Controller
 {
+
+    public function updateBookingStatus()
+{
+    try {
+        $now = Carbon::now();
+        $currentDate = $now->format('Y-m-d');
+        $currentTime = $now->format('H:i:s');
+
+        // Update bookings to 'Booked' if meeting has not started yet
+        Booking::where('date', $currentDate)
+            ->where('time_start', '>', $currentTime)
+            ->where('status_meet', '!=', 'Booked')
+            ->update(['status_meet' => 'Booked']);
+
+        // Update bookings that are currently in progress to 'In meeting'
+        Booking::where('date', $currentDate)
+            ->where('time_start', '<=', $currentTime)
+            ->where('time_end', '>', $currentTime)
+            ->where('status_meet', '!=', 'In meeting')
+            ->update(['status_meet' => 'In meeting']);
+
+        // Update bookings that have ended to 'Finished'
+        Booking::where(function ($query) use ($currentDate, $currentTime) {
+            $query->where('date', '<', $currentDate)
+                ->orWhere(function ($q) use ($currentDate, $currentTime) {
+                    $q->where('date', '=', $currentDate)
+                        ->where('time_end', '<=', $currentTime);
+                });
+        })
+        ->where('status_meet', '!=', 'Finished')
+        ->update(['status_meet' => 'Finished']);
+
+        return true;
+    } catch (\Exception $e) {
+        Log::error('Error updating booking statuses: ' . $e->getMessage());
+        return false;
+    }
+}
+public function endMeeting(Request $request)
+{
+    try {
+        DB::beginTransaction();
+        
+        // Log incoming request
+        Log::info('End Meeting request received:', [
+            'booking_id' => $request->id
+        ]);
+
+        // Find booking using model
+        $booking = Booking::where('bkg_id', $request->id)->first();
+        
+        if (!$booking) {
+            DB::rollBack();
+            Log::error('Booking not found:', ['id' => $request->id]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Booking not found'
+            ]);
+        }
+
+        // Get current time
+        $currentTime = Carbon::now();
+        
+        // Update both status and end time
+        $booking->status_meet = 'Finished';
+        $booking->time_end = $currentTime->format('H:i:s');
+        $result = $booking->save();
+
+        // Log after update
+        Log::info('Update attempt result:', [
+            'booking_id' => $booking->bkg_id,
+            'save_result' => $result,
+            'new_status' => $booking->status_meet,
+            'new_end_time' => $booking->time_end
+        ]);
+
+        if ($result) {
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Meeting ended successfully at ' . $currentTime->format('H:i'),
+                'debug_info' => [
+                    'booking_id' => $booking->bkg_id,
+                    'final_status' => $booking->status_meet,
+                    'end_time' => $booking->time_end
+                ]
+            ]);
+        } else {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update meeting status'
+            ]);
+        }
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('End Meeting Error:', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to end the meeting: ' . $e->getMessage()
+        ]);
+    }
+}
     
     /** View Page All */
     public function allbooking()
-    {
-        $user = Auth::user(); // Get current authenticated user
-        
-        // If user is superadmin or admin, show all bookings
-        if ($user->role_name === 'admin' || $user->role_name === 'superadmin') {
-            $allBookings = DB::table('bookings')
-                ->orderBy('date', 'desc')
-                ->orderBy('time_start', 'desc')
-                ->get();
-        } else {
-            // If regular user, only show their bookings
-            $allBookings = DB::table('bookings')
-                ->where('email', $user->email)
-                ->orderBy('date', 'desc')
-                ->orderBy('time_start', 'desc')
-                ->get();
-        }
-        
-        return view('formbooking.allbooking', compact('allBookings'));
+{
+    // Update booking statuses
+    $this->updateBookingStatus();
+    
+    $user = Auth::user();
+    
+    if ($user->role_name === 'admin' || $user->role_name === 'superadmin') {
+        $allBookings = DB::table('bookings')
+            ->orderBy('date', 'desc')
+            ->orderBy('time_start', 'desc')
+            ->get();
+    } else {
+        $allBookings = DB::table('bookings')
+            ->where('email', $user->email)
+            ->orderBy('date', 'desc')
+            ->orderBy('time_start', 'desc')
+            ->get();
     }
+    
+    return view('formbooking.allbooking', compact('allBookings'));
+}
 
     /** Page */
     public function bookingAdd()
@@ -68,25 +181,25 @@ class BookingController extends Controller
     /**
      * Check for booking time conflicts
      */
-    private function hasTimeConflict($room_type, $date, $time_start, $time_end, $excluding_bkg_id = null)
+     private function hasTimeConflict($room_type, $date, $time_start, $time_end, $excluding_bkg_id = null)
     {
         $query = Booking::where('room_type', $room_type)
             ->where('date', $date)
+            ->where('status_meet', '!=', 'Finished')  // Only check conflicts for non-finished meetings
             ->where(function($q) use ($time_start, $time_end) {
-                // Check if the new booking overlaps with any existing booking
                 $q->where(function($query) use ($time_start, $time_end) {
                     $query->where('time_start', '<', $time_end)
                           ->where('time_end', '>', $time_start);
                 });
             });
 
-        // Exclude current booking when updating
         if ($excluding_bkg_id) {
             $query->where('bkg_id', '!=', $excluding_bkg_id);
         }
 
         return $query->exists();
     }
+
 
     /** Save Record */
     public function saveRecord(Request $request)
@@ -129,19 +242,20 @@ class BookingController extends Controller
             $booking->email = $request->email;
             $booking->phone_number = $request->phone_number;
             $booking->message = $request->message;
-            $booking->status_meet = 'pending';
+            $booking->status_meet = 'Booked';
             $booking->save();
 
-            DB::commit();
-            flash()->success('Create new booking successfully :)');
-            return redirect()->back();
-        } catch (\Exception $e) {
-            DB::rollback();
-            flash()->error('Add Booking fail :)');
-            Log::info($e->getMessage());
-            return redirect()->back();
-        }
+        DB::commit();
+        flash()->success('Create new booking successfully :)');
+        return redirect()->back();
+    } catch (\Exception $e) {
+        DB::rollback();
+        flash()->error('Add Booking fail :)');
+        Log::info($e->getMessage());
+        return redirect()->back();
     }
+}
+
 
     /** Update Record */
     public function updateRecord(Request $request)
@@ -243,56 +357,57 @@ class BookingController extends Controller
 
     /** Get Events for Calendar */
     public function events(Request $request)
-    {
-        try {
-            $start = $request->input('start');
-            $end = $request->input('end');
-            $room = $request->input('room');
+{
+    try {
+        // Update booking statuses first
+        $this->updateBookingStatus();
 
-            // Gunakan \Log langsung
-            Log::info('Fetching events with:', [
-                'start' => $start,
-                'end' => $end,
-                'room' => $room
-            ]);
+        $start = $request->input('start');
+        $end = $request->input('end');
+        $room = $request->input('room');
 
-            $query = DB::table('bookings');
+        Log::info('Fetching events with:', [
+            'start' => $start,
+            'end' => $end,
+            'room' => $room
+        ]);
 
-            if ($room) {
-                $query->where('room_type', $room);
-            }
+        $query = DB::table('bookings');
 
-            $bookings = $query->get();
-            $events = [];
-
-            foreach ($bookings as $booking) {
-                $events[] = [
-                    'id' => $booking->bkg_id,
-                    'title' => $booking->room_type,
-                    'start' => $booking->date . 'T' . $booking->time_start,
-                    'end' => $booking->date . 'T' . $booking->time_end,
-                    'color' => $this->getEventColor($booking->room_type), // Tambahkan warna di sini
-                    'extendedProps' => [
-                        'room_type' => $booking->room_type,
-                        'name' => $booking->name,
-                        'time_start' => $booking->time_start,
-                        'time_end' => $booking->time_end,
-                        'total_numbers' => $booking->total_numbers,
-                        'message' => $booking->message,
-                        'status_meet' => $booking->status_meet ?? 'pending'
-                    ]
-                ];
-            }
-            
-
-            Log::info('Returning events:', ['count' => count($events)]);
-            return response()->json($events);
-
-        } catch (\Exception $e) {
-            Log::error('Error in events method:', ['error' => $e->getMessage()]);
-            return response()->json(['error' => $e->getMessage()], 500);
+        if ($room) {
+            $query->where('room_type', $room);
         }
+
+        $bookings = $query->get();
+        $events = [];
+
+        foreach ($bookings as $booking) {
+            $events[] = [
+                'id' => $booking->bkg_id,
+                'title' => $booking->room_type,
+                'start' => $booking->date . 'T' . $booking->time_start,
+                'end' => $booking->date . 'T' . $booking->time_end,
+                'color' => $this->getEventColor($booking->room_type),
+                'extendedProps' => [
+                    'room_type' => $booking->room_type,
+                    'name' => $booking->name,
+                    'time_start' => $booking->time_start,
+                    'time_end' => $booking->time_end,
+                    'total_numbers' => $booking->total_numbers,
+                    'message' => $booking->message,
+                    'status_meet' => $booking->status_meet
+                ]
+            ];
+        }
+
+        Log::info('Returning events:', ['count' => count($events)]);
+        return response()->json($events);
+
+    } catch (\Exception $e) {
+        Log::error('Error in events method:', ['error' => $e->getMessage()]);
+        return response()->json(['error' => $e->getMessage()], 500);
     }
+}
     /** Get color for different room types */
     private function getEventColor($roomType)
     {
