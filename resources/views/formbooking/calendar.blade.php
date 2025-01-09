@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
         slotMinTime: '07:00:00',
-        slotMaxTime: '18:00:00',
+        slotMaxTime: '22:00:00',
         allDaySlot: false,
         slotDuration: '00:30:00',
         slotLabelInterval: '01:00',
@@ -109,13 +109,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     break;
             }
 
+            // Format waktu tanpa AM/PM
+            const startTime = new Date(arg.event.start).toLocaleTimeString('en-GB', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            });
+            const endTime = new Date(arg.event.end).toLocaleTimeString('en-GB', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            });
+
             return {
                 html: `
                     <div class="fc-content">
                         <div class="event-title">${arg.event.extendedProps.room_type}</div>
                         <div class="event-info">
                             <span class="event-name">${arg.event.extendedProps.name}</span>
-                            <span class="event-time">${moment(arg.event.start).format('HH:mm')} - ${moment(arg.event.end).format('HH:mm')}</span>
+                            <span class="event-time">${startTime} - ${endTime}</span>
                         </div>
                         <div class="event-status">${statusBadge}</div>
                     </div>
@@ -123,11 +135,23 @@ document.addEventListener('DOMContentLoaded', function() {
             };
         },
         eventDidMount: function(info) {
+            // Format waktu tanpa AM/PM untuk tooltip
+            const startTime = new Date(info.event.start).toLocaleTimeString('en-GB', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            });
+            const endTime = new Date(info.event.end).toLocaleTimeString('en-GB', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            });
+
             $(info.el).tooltip({
                 title: `
                     Room: ${info.event.extendedProps.room_type}
                     Booked by: ${info.event.extendedProps.name}
-                    Time: ${moment(info.event.start).format('HH:mm')} - ${moment(info.event.end).format('HH:mm')}
+                    Time: ${startTime} - ${endTime}
                     Participants: ${info.event.extendedProps.total_numbers}
                 `,
                 placement: 'top',
@@ -135,11 +159,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 html: true
             });
         },
-        nowIndicator: true,
+        nowIndicator: false,
         businessHours: {
             daysOfWeek: [1, 2, 3, 4, 5],
             startTime: '07:00',
-            endTime: '18:00',
+            endTime: '22:00',
         },
         scrollTime: '07:00:00',
         height: 'auto',
@@ -147,6 +171,11 @@ document.addEventListener('DOMContentLoaded', function() {
         stickyHeaderDates: true,
         firstDay: 1,
         locale: 'en',
+        slotLabelFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        }
     });
 
     calendar.render();
@@ -170,14 +199,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
         }
 
+        // Format waktu tanpa AM/PM untuk detail booking
+        const startTime = new Date(event.start).toLocaleTimeString('en-GB', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: false 
+        });
+        const endTime = new Date(event.end).toLocaleTimeString('en-GB', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: false 
+        });
+        const dateStr = new Date(event.start).toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
+
         Swal.fire({
             title: 'Booking Details',
             html: `
                 <div class="booking-details">
                     <p><strong>Room:</strong> ${event.extendedProps.room_type}</p>
                     <p><strong>Booked by:</strong> ${event.extendedProps.name}</p>
-                    <p><strong>Date:</strong> ${moment(event.start).format('DD MMMM YYYY')}</p>
-                    <p><strong>Time:</strong> ${moment(event.start).format('HH:mm')} - ${moment(event.end).format('HH:mm')}</p>
+                    <p><strong>Date:</strong> ${dateStr}</p>
+                    <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
                     <p><strong>Total Participants:</strong> ${event.extendedProps.total_numbers}</p>
                     <p><strong>Purpose:</strong> ${event.extendedProps.message}</p>
                     <p><strong>Status:</strong> ${statusBadge}</p>
@@ -209,7 +255,6 @@ document.addEventListener('DOMContentLoaded', function() {
     padding: 0.5rem;
 }
 
-/* Base event styling */
 .fc-event {
     cursor: pointer;
     border: none !important;
@@ -220,14 +265,12 @@ document.addEventListener('DOMContentLoaded', function() {
     background: transparent;
 }
 
-/* Event content container */
 .fc-content {
     padding: 4px 6px;
     height: 100%;
     background: rgba(255, 255, 255, 0.1);
 }
 
-/* Event title styling */
 .event-title {
     font-weight: 600;
     font-size: 0.8rem;
@@ -238,7 +281,6 @@ document.addEventListener('DOMContentLoaded', function() {
     text-overflow: ellipsis;
 }
 
-/* Event info section */
 .event-info {
     display: flex;
     flex-direction: column;
@@ -252,17 +294,14 @@ document.addEventListener('DOMContentLoaded', function() {
     text-overflow: ellipsis;
 }
 
-/* Status badge styling */
 .event-status {
     margin-top: 2px;
 }
 
-/* Time grid slots */
 .fc-timegrid-slot {
     height: 3em !important;
 }
 
-/* Badge styling */
 .badge {
     padding: 2px 6px;
     font-size: 0.7rem;
@@ -302,19 +341,16 @@ document.addEventListener('DOMContentLoaded', function() {
     background: linear-gradient(to right, #e74a3b, #d63a2d);
 }
 
-/* Hover effect */
 .fc-event:hover {
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     transition: all 0.2s ease;
 }
 
-/* Tooltip customization */
 .tooltip {
     font-size: 0.75rem;
 }
 
-/* Mobile responsiveness */
 @media (max-width: 768px) {
     .fc-header-toolbar {
         flex-direction: column;
