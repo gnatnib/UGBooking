@@ -12,11 +12,11 @@ class Room extends Model
         'bkg_room_id',
         'room_type',
         'capacity',
-        'fileupload',
         'status',
         'has_projector',
         'has_sound_system',
-        'has_tv'
+        'has_tv',
+        'fileupload'
     ];
 
 
