@@ -8,7 +8,7 @@
                     <h3 class="page-title mt-5">Room Booking Calendar</h3>
                 </div>
                 <div class="col-auto">
-                    <a href="{{ route('form.booking.add') }}" class="btn btn-primary">
+                    <a href="{{ route('form/booking/add') }}" class="btn btn-primary">
                         <i class="fas fa-plus"></i> Book Now
                     </a>
                 </div>
@@ -49,12 +49,6 @@
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<!-- Tambahkan moment.js jika belum -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-<!-- Tambahkan jQuery dan Bootstrap untuk tooltip jika belum -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Pastikan Bootstrap JS sudah terpasang untuk tooltip -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -73,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
         allDaySlot: false,
         events: function(fetchInfo, successCallback, failureCallback) {
             $.ajax({
-                url: '{{ route("form.booking.events") }}',
+                url: '{{ route("form/booking/events") }}',
                 type: 'GET',
                 data: {
                     room: selectedRoom,
@@ -97,39 +91,41 @@ document.addEventListener('DOMContentLoaded', function() {
             showBookingDetails(info.event);
         },
         eventContent: function(arg) {
-            // Tentukan warna status
-            let statusBadge = '';
-            if (arg.event.extendedProps.status_meet === 'pending') {
-                statusBadge = '<span class="badge badge-warning">Pending</span>';
-            } else if (arg.event.extendedProps.status_meet === 'approved') {
-                statusBadge = '<span class="badge badge-success">Approved</span>';
-            } else if (arg.event.extendedProps.status_meet === 'rejected') {
-                statusBadge = '<span class="badge badge-danger">Rejected</span>';
-            }
+    // Tambahkan hanya elemen tambahan tanpa mengubah warna
+    let statusBadge = '';
+    if (arg.event.extendedProps.status_meet === 'pending') {
+        statusBadge = '<span class="badge badge-warning">Pending</span>';
+    } else if (arg.event.extendedProps.status_meet === 'approved') {
+        statusBadge = '<span class="badge badge-success">Approved</span>';
+    } else if (arg.event.extendedProps.status_meet === 'rejected') {
+        statusBadge = '<span class="badge badge-danger">Rejected</span>';
+    }
 
-            return {
-                html: `
-                    <div class="fc-content p-2" style="background-color: transparent; color: inherit;">
-                        <div class="fc-title"><strong>${arg.event.extendedProps.room_type}</strong></div>
-                        <div class="fc-description">Booked by: ${arg.event.extendedProps.name}</div>
-                        <div class="mt-1">${statusBadge}</div>
-                    </div>
-                `
-            };
-        },
-        eventDidMount: function(info) {
-            // Tetapkan warna secara eksplisit
-            $(info.el).css('background-color', info.event.backgroundColor);
-            $(info.el).css('border-color', info.event.borderColor);
+    return {
+        html: `
+            <div class="fc-content p-2">
+                <div class="fc-title"><strong>${arg.event.extendedProps.room_type}</strong></div>
+                <div class="fc-description">Booked by: ${arg.event.extendedProps.name}</div>
+                <div class="mt-1">${statusBadge}</div>
+            </div>
+        `
+    };
+},
 
-            // Tambahkan tooltip
-            $(info.el).tooltip({
-                title: `${info.event.extendedProps.room_type} - ${info.event.extendedProps.name}`,
-                placement: 'top',
-                trigger: 'hover',
-                container: 'body'
-            });
-        },
+eventDidMount: function(info) {
+    // Tetapkan warna latar belakang dan border secara eksplisit
+    $(info.el).css('background-color', info.event.backgroundColor);
+    $(info.el).css('border-color', info.event.borderColor);
+
+    // Tambahkan tooltip
+    $(info.el).tooltip({
+        title: `${info.event.extendedProps.room_type} - ${info.event.extendedProps.name}`,
+        placement: 'top',
+        trigger: 'hover',
+        container: 'body'
+    });
+},
+
         // Locale dan business hours
         locale: 'en',
         businessHours: {
@@ -181,50 +177,50 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
-.fc {
-    background: white;
-}
-.fc-event {
-    cursor: pointer;
-    margin: 2px 0;
-    padding: 2px;
-    border-radius: 3px;
-    /* Tidak menetapkan background-color di sini */
-}
-.fc-event:hover {
-    opacity: 0.9;
-}
-.fc-event .badge {
-    font-size: 0.8em;
-}
-.booking-details {
-    text-align: left;
-    margin: 10px;
-}
-.booking-details p {
-    margin-bottom: 8px;
-}
-.fc-content {
-    font-size: 0.9em;
-    background-color: transparent; /* Pastikan transparan */
-    color: inherit; /* Warna teks inherit dari parent */
-}
-.badge {
-    padding: 3px 6px;
-    border-radius: 3px;
-    font-size: 11px;
-}
-.badge-warning {
-    background-color: #ffc107;
-    color: #000;
-}
-.badge-success {
-    background-color: #28a745;
-    color: #fff;
-}
-.badge-danger {
-    background-color: #dc3545;
-    color: #fff;
-}
-</style>
+    .fc {
+        background: white;
+    }
+    .fc-event {
+        cursor: pointer;
+        margin: 2px 0;
+        padding: 2px;
+        border-radius: 3px;
+        /* Jangan tetapkan background-color di sini */
+    }
+    .fc-event:hover {
+        opacity: 0.9;
+    }
+    .fc-event .badge {
+        font-size: 0.8em;
+    }
+    .booking-details {
+        text-align: left;
+        margin: 10px;
+    }
+    .booking-details p {
+        margin-bottom: 8px;
+    }
+    .fc-content {
+        font-size: 0.9em;
+        /* Hapus background-color dan color dari sini */
+    }
+    .badge {
+        padding: 3px 6px;
+        border-radius: 3px;
+        font-size: 11px;
+    }
+    .badge-warning {
+        background-color: #ffc107;
+        color: #000;
+    }
+    .badge-success {
+        background-color: #28a745;
+        color: #fff;
+    }
+    .badge-danger {
+        background-color: #dc3545;
+        color: #fff;
+    }
+    </style>
+    
 @endsection

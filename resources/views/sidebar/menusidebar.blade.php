@@ -14,8 +14,8 @@
                             class="menu-arrow"></span></a>
                     <ul class="submenu_class" style="display: none;">
                         <li><a class="{{ set_active(['form/allbooking']) }}" href="{{ route('form/allbooking') }}">
-                                Booking List </a></li>
-                        <li><a class="{{ set_active(['form/booking/add']) }}" href="{{ route('form/booking/add') }}">
+                                Bookings List </a></li>
+                        <li><a class="{{ set_active(['form/booking/calendar']) }}" href="{{ route('form/booking/calendar') }}">
                                 Book Now </a></li>
                     </ul>
                 </li>
