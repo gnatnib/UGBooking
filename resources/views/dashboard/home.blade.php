@@ -102,70 +102,75 @@
                 </div>
             </div>
 
-            <!-- Third Row - Booking Table -->
-            <div class="row">
-                <div class="col-md-12 d-flex">
-                    <div class="card card-table flex-fill">
-                        <div class="card-header">
-                            <h4 class="card-title float-left mt-2">Booking</h4>
-                            <div class="float-right">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Search..." id="searchBooking">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">
-                                            <i class="fas fa-search"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-center" id="bookingTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Booking ID</th>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                            <th>Participant Number</th>
-                                            <th class="text-center">Room Type</th>
-                                            <th class="text-right">Phone Number</th>
-                                            <th class="text-center">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($allBookings as $booking)
-                                            <tr>
-                                                <td class="text-nowrap">
-                                                    <div>{{ $booking->bkg_id }}</div>
-                                                </td>
-                                                <td class="text-nowrap">{{ $booking->name }}</td>
-                                                <td><a href="mailto:{{ $booking->email }}">{{ $booking->email }}</a></td>
-                                                <td>{{ $booking->total_numbers }}</td>
-                                                <td class="text-center">{{ $booking->room_type }}</td>
-                                                <td class="text-right">
-                                                    <div>{{ $booking->phone_number }}</div>
-                                                </td>
-                                                <td class="text-center">
-                                                    @if($booking->status_meet == 'Booked')
-                                                        <span class="badge badge-warning">Booked</span>
-                                                    @elseif($booking->status_meet == 'In meeting')
-                                                        <span class="badge badge-danger">In Meeting</span>
-                                                    @else
-                                                        <span class="badge badge-succes">Finished</span>
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>                                                                                                           
-                                </table>
-                            </div>
+<!-- Third Row - Booking Table -->
+<div class="row">
+    <div class="col-md-12 d-flex">
+        <div class="card card-table flex-fill">
+            <!-- Bagian yang dimodifikasi -->
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">Booking</h4>
+                <div class="d-flex gap-3 align-items-center">
+                    @if(Auth::user()->role_name == 'admin' || Auth::user()->role_name == 'superadmin')
+                        <a href="{{ route('export.bookings') }}" class="btn btn-primary">
+                            <i class="fas fa-download mr-2"></i> Export Report
+                        </a>
+                    @endif
+                    <div class="input-group" style="width: 250px;">
+                        <input type="text" class="form-control" placeholder="Search..." id="searchBooking">
+                        <div class="input-group-append">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-center" id="bookingTable">
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Participant Number</th>
+                                <th class="text-center">Room Type</th>
+                                <th class="text-right">Phone Number</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($allBookings as $booking)
+                                <tr>
+                                    <td class="text-nowrap">
+                                        <div>{{ $booking->bkg_id }}</div>
+                                    </td>
+                                    <td class="text-nowrap">{{ $booking->name }}</td>
+                                    <td><a href="mailto:{{ $booking->email }}">{{ $booking->email }}</a></td>
+                                    <td>{{ $booking->total_numbers }}</td>
+                                    <td class="text-center">{{ $booking->room_type }}</td>
+                                    <td class="text-right">
+                                        <div>{{ $booking->phone_number }}</div>
+                                    </td>
+                                    <td class="text-center">
+                                        @if($booking->status_meet == 'Booked')
+                                            <span class="badge badge-warning">Booked</span>
+                                        @elseif($booking->status_meet == 'In meeting')
+                                            <span class="badge badge-danger">In Meeting</span>
+                                        @else
+                                            <span class="badge badge-success">Finished</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>                                                                                                           
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
     <!-- Modal for Today's Bookings -->
     <div class="modal fade" id="todayBookingsModal" tabindex="-1" role="dialog" aria-labelledby="todayBookingsModalLabel" aria-hidden="true">
@@ -396,6 +401,38 @@ small.text-muted {
     background-color: #e9ecef;
     border-color: #dee2e6;
     transform: translateY(-1px);
+}
+
+/* Export button style */
+.btn-primary {
+    background-color: #FFBF00;
+    border: none;
+    color: #000000;
+    padding: 8px 20px;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #FFB300;
+    color: #000000;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Card header layout */
+.card-header {
+    padding: 1rem 1.5rem;
+}
+
+.gap-3 {
+    gap: 1rem;
+}
+
+/* Search box width */
+.input-group {
+    width: 250px !important;
 }
 </style>
 @endpush

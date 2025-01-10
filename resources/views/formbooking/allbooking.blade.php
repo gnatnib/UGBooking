@@ -24,6 +24,7 @@
                                         <tr>
                                             <th>Booking ID</th>
                                             <th>Name</th>
+                                            
                                             <th>Room Type</th>
                                             <th>Total Numbers</th>
                                             <th>Date</th>
@@ -43,6 +44,7 @@
                                                     <a href="#">{{ $bookings->name }}</a>
                                                 </h2>
                                             </td>
+                                           
                                             <td>{{ $bookings->room_type }}</td>
                                             <td>{{ $bookings->total_numbers }} Person</td>
                                             <td>{{ \Carbon\Carbon::parse($bookings->date)->format('Y-m-d') }}</td>
