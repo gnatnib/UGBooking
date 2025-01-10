@@ -26,6 +26,12 @@ class Booking extends Model
         'status_meet'
     ];
 
+    // Di model Booking
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'name', 'name');
+    }
+
     protected static function boot()
     {
         parent::boot();
