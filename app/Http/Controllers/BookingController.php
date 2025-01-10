@@ -235,12 +235,12 @@ public function endMeeting(Request $request)
         $booking = new Booking;
         $booking->name = $request->name;
         $booking->room_type = $request->room_type;
-        $number = Room ::where('room_type',$booking->room_type);
-        
-        if($number>$booking->room_type){
-            flash()->error('Jumlah Orang melebihi Kapasitas Ruangan');
-            return redirect()->back()->withInput();
-        }
+        // $number = Room ::where('room_type',$booking->room_type);
+
+        // if($number>$booking->room_type){
+        //     flash()->error('Jumlah Orang melebihi Kapasitas Ruangan');
+        //     return redirect()->back()->withInput();
+        // }
 
         
         $booking->total_numbers = $request->total_numbers;

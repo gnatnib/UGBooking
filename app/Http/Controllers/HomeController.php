@@ -30,48 +30,70 @@ class HomeController extends Controller
     // home page
     
 
-public function index()
-{
-    // Dapatkan bulan dan tahun saat ini
-    $currentMonth = Carbon::now()->month;
-    $currentYear = Carbon::now()->year;
-    $user = Auth::user();
-    $today = Carbon::today();
+    public function index()
+    {
+        // Existing code...
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+        $user = Auth::user();
+        $today = Carbon::today();
+        $users = User::all();
+        $monthNames = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+        ];
+        $currentMonthName = $monthNames[$currentMonth];
 
-    $monthNames = [
-        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-        5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
-    ];
-    $currentMonthName = $monthNames[$currentMonth];
-    // Get today's bookings
-    $todayBookings = Booking::whereDate('date', $today)
+        // Update this code to join with users table
+        $divisionBookings = DB::table('bookings')
+            ->join('users', 'bookings.name', '=', 'users.name')
+            ->select('users.division', DB::raw('count(*) as total'))
+            ->whereMonth('bookings.date', $currentMonth)
+            ->whereYear('bookings.date', $currentYear)
+            ->groupBy('users.division')
+            ->get();
+
+        // Format the data for the donut chart
+        $divisionStats = [];
+        foreach ($divisionBookings as $booking) {
+            $divisionStats[] = [
+                'name' => $booking->division,
+                'value' => $booking->total
+            ];
+        }
+         $count = Booking::whereMonth('date', $currentMonth)
+                    ->whereYear('date', $currentYear)
+                    ->count();
+         // Ambil semua booking
+        if ($user->role_name === 'admin' || $user->role_name === 'superadmin') {
+            $allBookings = DB::table('bookings')
+                ->orderBy('date', 'desc')
+                ->orderBy('time_start', 'desc')
+                ->get();
+        } else {
+            $allBookings = DB::table('bookings')
+                ->where('email', $user->email)
+                ->orderBy('date', 'desc')
+                ->orderBy('time_start', 'desc')
+                ->get();
+        }
+        $divisionStatsJson = json_encode($divisionStats);
+        $todayBookings = Booking::whereDate('date', $today)
         ->orderBy('date', 'asc')  // Changed from start_time to date
         ->take(5)
         ->get();
     
-    $totalTodayBookings = Booking::whereDate('date', $today)->count();
-
-    // Ambil semua booking
-    if ($user->role_name === 'admin' || $user->role_name === 'superadmin') {
-        $allBookings = DB::table('bookings')
-            ->orderBy('date', 'desc')
-            ->orderBy('time_start', 'desc')
-            ->get();
-    } else {
-        $allBookings = DB::table('bookings')
-            ->where('email', $user->email)
-            ->orderBy('date', 'desc')
-            ->orderBy('time_start', 'desc')
-            ->get();
+        $totalTodayBookings = Booking::whereDate('date', $today)->count();
+        return view('dashboard.home', compact(
+            'allBookings', 
+            'count',
+            'currentMonthName',
+            'todayBookings', 
+            'totalTodayBookings',
+            'divisionStatsJson'
+        ));
     }
-    // Hitung jumlah booking untuk bulan ini
-    $count = Booking::whereMonth('date', $currentMonth)
-                    ->whereYear('date', $currentYear)
-                    ->count();
-
-    return view('dashboard.home', compact('allBookings', 'count','currentMonthName','todayBookings', 'totalTodayBookings'));
-}
 
     // profile
     public function profile()

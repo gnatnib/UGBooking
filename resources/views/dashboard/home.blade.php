@@ -397,6 +397,7 @@ small.text-muted {
 @push('scripts')
 <script>
 $(document).ready(function() {
+    // Existing search functionality
     $("#searchBooking").on("keyup", function() {
         var value = $(this).val().toLowerCase();
         $("#bookingTable tbody tr").filter(function() {
@@ -404,6 +405,47 @@ $(document).ready(function() {
             $(this).toggle(text.indexOf(value) > -1);
         });
     });
+
+    // Add this code for the donut chart
+    var divisionData = {!! $divisionStatsJson !!};
+    
+    var options = {
+        chart: {
+            type: 'donut',
+            height: 350
+        },
+        series: divisionData.map(item => item.value),
+        labels: divisionData.map(item => item.name),
+        colors: ['#00A36C', '#2E8B57', '#3CB371', '#66CDAA', '#8FBC8F', '#90EE90', '#98FB98'],
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '70%'
+                }
+            }
+        },
+        title: {
+            text: 'Room Bookings by Division',
+            align: 'center'
+        },
+        legend: {
+            position: 'bottom'
+        },
+        responsive: [{
+            breakpoint: 480,
+            options: {
+                chart: {
+                    width: 200
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }]
+    };
+
+    var chart = new ApexCharts(document.querySelector("#donut-chart"), options);
+    chart.render();
 
     // Refresh modal content every minute
     setInterval(function() {
@@ -413,6 +455,7 @@ $(document).ready(function() {
     }, 60000);
 });
 </script>
+
 @endpush
 
 @endsection
