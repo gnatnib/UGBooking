@@ -35,7 +35,7 @@ public function index()
     // Dapatkan bulan dan tahun saat ini
     $currentMonth = Carbon::now()->month;
     $currentYear = Carbon::now()->year;
-    
+    $user = Auth::user();
 
     $monthNames = [
         1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
@@ -45,8 +45,18 @@ public function index()
     $currentMonthName = $monthNames[$currentMonth];
 
     // Ambil semua booking
-    $allBookings = DB::table('bookings')->get();
-
+    if ($user->role_name === 'admin' || $user->role_name === 'superadmin') {
+        $allBookings = DB::table('bookings')
+            ->orderBy('date', 'desc')
+            ->orderBy('time_start', 'desc')
+            ->get();
+    } else {
+        $allBookings = DB::table('bookings')
+            ->where('email', $user->email)
+            ->orderBy('date', 'desc')
+            ->orderBy('time_start', 'desc')
+            ->get();
+    }
     // Hitung jumlah booking untuk bulan ini
     $count = Booking::whereMonth('date', $currentMonth)
                     ->whereYear('date', $currentYear)
