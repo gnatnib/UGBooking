@@ -394,4 +394,25 @@ small.text-muted {
 </style>
 @endpush
 
+@push('scripts')
+<script>
+$(document).ready(function() {
+    $("#searchBooking").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#bookingTable tbody tr").filter(function() {
+            var text = $(this).text().toLowerCase();
+            $(this).toggle(text.indexOf(value) > -1);
+        });
+    });
+
+    // Refresh modal content every minute
+    setInterval(function() {
+        if ($('#todayBookingsModal').is(':visible')) {
+            location.reload();
+        }
+    }, 60000);
+});
+</script>
+@endpush
+
 @endsection
