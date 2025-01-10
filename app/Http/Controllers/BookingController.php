@@ -140,7 +140,7 @@ public function endMeeting(Request $request)
             ->get();
     } else {
         $allBookings = DB::table('bookings')
-            ->where('email', $user->email)
+            ->where('name', $user->name)
             ->orderBy('date', 'desc')
             ->orderBy('time_start', 'desc')
             ->get();
@@ -220,7 +220,14 @@ public function endMeeting(Request $request)
     try {
         // Ubah tanggal dari request menjadi format Y-m-d menggunakan Carbon
         $formattedDate = Carbon::parse($request->date)->format('Y-m-d');
-
+        $room = Room::where('room_type', $request->room_type)->first();
+        if (!$room) {
+            throw new \Exception('Room type not found.');
+        }
+        if ($request->total_numbers > $room->capacity) {
+            flash()->error('Jumlah orang melebihi kapasitas ruangan.');
+            return redirect()->back()->withInput();
+        }
         // Check for time conflicts
         if ($this->hasTimeConflict(
             $request->room_type,
@@ -235,12 +242,7 @@ public function endMeeting(Request $request)
         $booking = new Booking;
         $booking->name = $request->name;
         $booking->room_type = $request->room_type;
-        // $number = Room ::where('room_type',$booking->room_type);
-
-        // if($number>$booking->room_type){
-        //     flash()->error('Jumlah Orang melebihi Kapasitas Ruangan');
-        //     return redirect()->back()->withInput();
-        // }
+        
 
         
         $booking->total_numbers = $request->total_numbers;
@@ -267,72 +269,79 @@ public function endMeeting(Request $request)
 
     /** Update Record */
     public function updateRecord(Request $request)
-    {
-        $request->validate([
-            'bkg_id'        => 'required',
-            'name'          => 'required|string|max:255',
-            'room_type'     => 'required|string|max:255',
-            'total_numbers' => 'required|string|max:255',
-            // 'date'          => 'required|date', // Tidak diperlukan jika menggunakan tanggal saat ini
-            'time_start'    => 'required',
-            'time_end'      => 'required|after:time_start',
-            'email'         => 'required|email|max:255',
-            'phone_number'  => 'required|string|max:255',
-            'message'       => 'required|string|max:255',
-        ]);
+{
+    $request->validate([
+        'bkg_id'        => 'required',
+        'name'          => 'required|string|max:255',
+        'room_type'     => 'required|string|max:255',
+        'total_numbers' => 'required|integer|min:1',
+        'date'          => 'required|date_format:Y-m-d',
+        'time_start'    => 'required',
+        'time_end'      => 'required|after:time_start',
+        'email'         => 'required|email|max:255',
+        'phone_number'  => 'required|string|max:255',
+        'message'       => 'required|string|max:255',
+    ]);
 
-        DB::beginTransaction();
-        try {
-            // Check booking exists
-            $booking = Booking::where('bkg_id', $request->bkg_id)->first();
-            if (!$booking) {
-                throw new \Exception('Booking not found');
-            }
+    DB::beginTransaction();
+    try {
+        $booking = Booking::where('bkg_id', $request->bkg_id)->first();
+        if (!$booking) {
+            throw new \Exception('Booking not found.');
+        }
 
-            // Gunakan tanggal saat ini
-            $currentDate = Carbon::now()->format('Y-m-d');
+        // Check kapasitas ruangan
+        $room = Room::where('room_type', $request->room_type)->first();
+        if (!$room) {
+            throw new \Exception('Room type not found.');
+        }
 
-            // Check for time conflicts
-            if ($this->hasTimeConflict(
-                $request->room_type,
-                $currentDate,
-                $request->time_start,
-                $request->time_end,
-                $request->bkg_id
-            )) {
-                flash()->error('This room is already booked for the selected time slot.');
-                return redirect()->back()->withInput();
-            }
-
-            // Update booking
-            $booking->name = $request->name;
-            $booking->room_type = $request->room_type;
-            $booking->total_numbers = $request->total_numbers;
-            $booking->date = $currentDate; // Set tanggal saat ini
-            $booking->time_start = $request->time_start;
-            $booking->time_end = $request->time_end;
-            $booking->email = $request->email;
-            $booking->phone_number = $request->phone_number;
-            $booking->message = $request->message;
-
-            // Update status if admin/superadmin
-            if (Auth::user()->role_name == 'admin' || Auth::user()->role_name == 'superadmin') {
-                $booking->status_meet = $request->status_meet;
-            }
-
-            $booking->save();
-            
-            DB::commit();
-            flash()->success('Booking updated successfully');
-            return redirect()->route('form/allbooking');
-
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error('Booking update error: ' . $e->getMessage());
-            flash()->error('Failed to update booking: ' . $e->getMessage());
+        if ($request->total_numbers > $room->capacity) {
+            flash()->error('Jumlah orang melebihi kapasitas ruangan.');
             return redirect()->back()->withInput();
         }
+
+        // Check for time conflicts
+        if ($this->hasTimeConflict(
+            $request->room_type,
+            $request->date,
+            $request->time_start,
+            $request->time_end,
+            $request->bkg_id
+        )) {
+            flash()->error('This room is already booked for the selected time slot.');
+            return redirect()->back()->withInput();
+        }
+
+        $booking->name = $request->name;
+        $booking->room_type = $request->room_type;
+        $booking->total_numbers = $request->total_numbers;
+        $booking->date = $request->date;
+        $booking->time_start = $request->time_start;
+        $booking->time_end = $request->time_end;
+        $booking->email = $request->email;
+        $booking->phone_number = $request->phone_number;
+        $booking->message = $request->message;
+
+        // Tetapkan status secara eksplisit
+        if (Carbon::parse($request->date)->isFuture()) {
+            $booking->status_meet = 'Booked';
+        } 
+
+        
+
+        $booking->save();
+        
+        DB::commit();
+        flash()->success('Booking updated successfully.');
+        return redirect()->route('form/allbooking');
+    } catch (\Exception $e) {
+        DB::rollback();
+        Log::error('Booking update error: ' . $e->getMessage());
+        flash()->error('Failed to update booking: ' . $e->getMessage());
+        return redirect()->back()->withInput();
     }
+}
 
     /** Delete Record */
     public function deleteRecord(Request $request)
