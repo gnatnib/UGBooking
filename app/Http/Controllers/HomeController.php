@@ -92,14 +92,14 @@ class HomeController extends Controller
             ->whereYear('date', $currentYear)
             ->count();
 
-        // Get all bookings based on user role
+        // Di HomeController, di method index()
         if ($user->role_name === 'admin' || $user->role_name === 'superadmin') {
-            $allBookings = DB::table('bookings')
+            $allBookings = Booking::with('user')
                 ->orderBy('date', 'desc')
                 ->orderBy('time_start', 'desc')
                 ->get();
         } else {
-            $allBookings = DB::table('bookings')
+            $allBookings = Booking::with('user')
                 ->where('name', $user->name)
                 ->orderBy('date', 'desc')
                 ->orderBy('time_start', 'desc')

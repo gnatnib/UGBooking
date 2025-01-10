@@ -134,6 +134,7 @@
                                         <tr>
                                             <th>Booking ID</th>
                                             <th>Name</th>
+                                            <th>Division</th>  <!-- Kolom baru -->
                                             <th>Email</th>
                                             <th>Participant Number</th>
                                             <th class="text-center">Room Type</th>
@@ -148,6 +149,7 @@
                                                     <div>{{ $booking->bkg_id }}</div>
                                                 </td>
                                                 <td class="text-nowrap">{{ $booking->name }}</td>
+                                                <td class="text-nowrap">{{ $booking->user->division ?? 'N/A' }}</td>  <!-- Kolom baru -->
                                                 <td><a href="mailto:{{ $booking->email }}">{{ $booking->email }}</a></td>
                                                 <td>{{ $booking->total_numbers }}</td>
                                                 <td class="text-center">{{ $booking->room_type }}</td>
@@ -155,7 +157,7 @@
                                                     <div>{{ $booking->phone_number }}</div>
                                                 </td>
                                                 <td class="text-center">
-                                                    @if ($booking->status_meet == 'Booked')
+                                                    @if($booking->status_meet == 'Booked')
                                                         <span class="badge badge-warning">Booked</span>
                                                     @elseif($booking->status_meet == 'In meeting')
                                                         <span class="badge badge-danger">In Meeting</span>
@@ -165,7 +167,7 @@
                                                 </td>
                                             </tr>
                                         @endforeach
-                                    </tbody>
+                                    </tbody>                                                                                                           
                                 </table>
                             </div>
                         </div>
