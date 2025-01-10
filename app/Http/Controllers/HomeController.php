@@ -36,6 +36,7 @@ public function index()
     $currentMonth = Carbon::now()->month;
     $currentYear = Carbon::now()->year;
     $user = Auth::user();
+    $today = Carbon::today();
 
     $monthNames = [
         1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
@@ -43,6 +44,13 @@ public function index()
         9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
     ];
     $currentMonthName = $monthNames[$currentMonth];
+    // Get today's bookings
+    $todayBookings = Booking::whereDate('date', $today)
+        ->orderBy('date', 'asc')  // Changed from start_time to date
+        ->take(5)
+        ->get();
+    
+    $totalTodayBookings = Booking::whereDate('date', $today)->count();
 
     // Ambil semua booking
     if ($user->role_name === 'admin' || $user->role_name === 'superadmin') {
@@ -62,7 +70,7 @@ public function index()
                     ->whereYear('date', $currentYear)
                     ->count();
 
-    return view('dashboard.home', compact('allBookings', 'count','currentMonthName'));
+    return view('dashboard.home', compact('allBookings', 'count','currentMonthName','todayBookings', 'totalTodayBookings'));
 }
 
     // profile
