@@ -39,7 +39,7 @@
                             <div class="dash-widget-header">
                                 <div>
                                     <h3 class="card_widget_header">{{ $count }}</h3>
-                                    <h6 class="text-muted">Total Booking diBulan {{ $currentMonthName }} </h6>
+                                    <h6 class="text-muted">Total Bookings for {{ $currentMonthName }} </h6>
                                 </div>
                                 <div class="ml-auto mt-md-3 mt-lg-0"> 
                                     <span class="opacity-7 text-muted">
@@ -134,24 +134,30 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($allBookings as $bookings)
+                                        @foreach ($allBookings as $booking)
                                             <tr>
                                                 <td class="text-nowrap">
-                                                    <div>{{ $bookings->bkg_id }}</div>
+                                                    <div>{{ $booking->bkg_id }}</div>
                                                 </td>
-                                                <td class="text-nowrap">{{ $bookings->name }}</td>
-                                                <td><a href="#" class="__cf_email__">{{ $bookings->email }}</a></td>
-                                                <td>{{ $bookings->total_numbers }}</td>
-                                                <td class="text-center">{{ $bookings->room_type }}</td>
+                                                <td class="text-nowrap">{{ $booking->name }}</td>
+                                                <td><a href="mailto:{{ $booking->email }}">{{ $booking->email }}</a></td>
+                                                <td>{{ $booking->total_numbers }}</td>
+                                                <td class="text-center">{{ $booking->room_type }}</td>
                                                 <td class="text-right">
-                                                    <div>{{ $bookings->phone_number }}</div>
+                                                    <div>{{ $booking->phone_number }}</div>
                                                 </td>
                                                 <td class="text-center">
-                                                    <span class="badge badge-pill bg-success inv-badge">INACTIVE</span>
+                                                    @if($booking->status_meet == 'Booked')
+                                                        <span class="badge badge-warning">Booked</span>
+                                                    @elseif($booking->status_meet == 'In meeting')
+                                                        <span class="badge badge-danger">In Meeting</span>
+                                                    @else
+                                                        <span class="badge badge-succes">Finished</span>
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @endforeach
-                                    </tbody>
+                                    </tbody>                                                                                                           
                                 </table>
                             </div>
                         </div>
