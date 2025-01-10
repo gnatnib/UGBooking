@@ -54,7 +54,7 @@ class User extends Authenticatable
     }
     public function User()
     {
-        return $this->name ;
+        return $this->name;
     }
     /**
      * Generate ID hanya jika user_id tidak diset
@@ -110,5 +110,13 @@ class User extends Authenticatable
                 $model->user_id = $divisionPrefix . sprintf("%02d", $nextNumber);
             }
         });
+    }
+
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->avatar) {
+            return asset('storage/avatars/' . $this->avatar);
+        }
+        return asset('assets/img/profiles/avatar-11.jpg');
     }
 }
