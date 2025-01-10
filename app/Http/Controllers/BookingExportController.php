@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
-use App\Models\User;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -32,9 +30,9 @@ class BookingExportController extends Controller
             'bookings.total_numbers',
             'users.division'
         )
-        ->leftJoin('users', 'bookings.name', '=', 'users.name')  // Join berdasarkan nama
-        ->orderBy('bookings.time_start', 'desc')
-        ->get();
+            ->leftJoin('users', 'bookings.name', '=', 'users.name')  // Join berdasarkan nama
+            ->orderBy('bookings.time_start', 'desc')
+            ->get();
 
         // Get division summary juga menggunakan nama
         $divisionSummary = DB::table('bookings')
@@ -61,16 +59,16 @@ class BookingExportController extends Controller
             "Expires" => "0"
         ];
 
-        $callback = function() use ($bookings, $divisionSummary, $roomTypeSummary) {
+        $callback = function () use ($bookings, $divisionSummary, $roomTypeSummary) {
             $file = fopen('php://output', 'w');
-            
+
             fputcsv($file, ['Booking Report - ' . Carbon::now()->format('F Y')]);
             fputcsv($file, []);
-            
+
             // Booking Details
             fputcsv($file, ['BOOKING DETAILS']);
             fputcsv($file, ['Booking ID', 'Name', 'Division', 'Phone Number', 'Start Time', 'End Time', 'Room Type', 'Status', 'Participant Number']);
-            
+
             foreach ($bookings as $booking) {
                 fputcsv($file, [
                     $booking->bkg_id,
@@ -84,14 +82,14 @@ class BookingExportController extends Controller
                     $booking->total_numbers
                 ]);
             }
-            
+
             fputcsv($file, []);
             fputcsv($file, []);
-            
+
             // Division Summary
             fputcsv($file, ['DIVISION SUMMARY - ' . Carbon::now()->format('F Y')]);
             fputcsv($file, ['Division', 'Total Bookings']);
-            
+
             foreach ($divisionSummary as $summary) {
                 fputcsv($file, [
                     $summary->division,
@@ -101,18 +99,18 @@ class BookingExportController extends Controller
 
             fputcsv($file, []);
             fputcsv($file, []);
-            
+
             // Room Type Summary
             fputcsv($file, ['ROOM TYPE SUMMARY - ' . Carbon::now()->format('F Y')]);
             fputcsv($file, ['Room Type', 'Total Bookings']);
-            
+
             foreach ($roomTypeSummary as $summary) {
                 fputcsv($file, [
                     $summary->room_type,
                     $summary->total_bookings
                 ]);
             }
-            
+
             fclose($file);
         };
 
