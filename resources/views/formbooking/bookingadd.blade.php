@@ -302,30 +302,35 @@
             font-size: 18px;
         }
 
+        /* Update the time-icon related styles in your style section */
         .time-icon {
             position: relative;
         }
 
+        /* Remove the pointer cursor from the input */
         .time-icon input {
-            cursor: pointer;
+            cursor: text;
         }
 
+        /* Style only the clock icon */
         .time-icon i {
             color: #999;
             cursor: pointer;
+            pointer-events: all;
+            /* Ensures the icon is clickable */
         }
 
         .time-icon:hover i {
             color: #666;
         }
 
+        /* Keep the time picker clickable but don't affect input cursor */
         input[type="time"]::-webkit-calendar-picker-indicator {
             position: absolute;
             top: 0;
-            left: 0;
             right: 0;
-            bottom: 0;
-            width: 100%;
+            width: 2.5rem;
+            /* Limit clickable area to just the icon area */
             height: 100%;
             opacity: 0;
             cursor: pointer;
