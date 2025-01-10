@@ -95,6 +95,8 @@
                                 <div class="form-group">
                                     <label>Start Time</label>
                                     <div class="time-icon">
+                                        <i class="far fa-clock position-absolute"
+                                            style="top: 50%; transform: translateY(-50%); right: 10px; z-index: 2;"></i>
                                         <input type="time" class="form-control @error('time_start') is-invalid @enderror"
                                             name="time_start" value="{{ old('time_start') }}" required>
                                         @error('time_start')
@@ -110,6 +112,8 @@
                                 <div class="form-group">
                                     <label>End Time</label>
                                     <div class="time-icon">
+                                        <i class="far fa-clock position-absolute"
+                                            style="top: 50%; transform: translateY(-50%); right: 10px; z-index: 2;"></i>
                                         <input type="time" class="form-control @error('time_end') is-invalid @enderror"
                                             name="time_end" value="{{ old('time_end') }}" required>
                                         @error('time_end')
@@ -296,6 +300,36 @@
 
         .facility-item i {
             font-size: 18px;
+        }
+
+        .time-icon {
+            position: relative;
+        }
+
+        .time-icon input {
+            cursor: pointer;
+        }
+
+        .time-icon i {
+            color: #999;
+            cursor: pointer;
+        }
+
+        .time-icon:hover i {
+            color: #666;
+        }
+
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 3;
         }
     </style>
 @endsection
