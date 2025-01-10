@@ -46,10 +46,10 @@
                                 <a href="#">
                                     @if (Auth::user()->avatar)
                                         <img class="rounded-circle" alt="User Image"
-                                            src="{{ URL::to('assets/img/profiles/' . Auth::user()->avatar) }}">
+                                            src="{{ asset('uploads/avatar/' . Auth::user()->avatar) }}">
                                     @else
                                         <img class="rounded-circle" alt="User Image"
-                                            src="{{ URL::to('assets/img/profiles/avatar-11.jpg') }}">
+                                            src="{{ asset('assets/img/profiles/avatar-11.jpg') }}">
                                     @endif
                                 </a>
                             </div>

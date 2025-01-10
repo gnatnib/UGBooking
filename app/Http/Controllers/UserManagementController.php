@@ -29,7 +29,7 @@ class UserManagementController extends Controller
         try {
             // Validasi input
             $request->validate([
-                'user_id' => 'required|string|max:20|unique:users,user_id', 
+                'user_id' => 'required|string|max:20|unique:users,user_id',
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:8|confirmed',
@@ -39,18 +39,19 @@ class UserManagementController extends Controller
                 'department' => 'required|string|max:50',
                 'profile' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
             ]);
-    
+
             // Handle file upload
             $avatarName = null;
             if ($request->hasFile('profile')) {
                 $avatar = $request->file('profile');
                 $avatarName = time() . '.' . $avatar->getClientOriginalExtension();
+                // Store directly in public/uploads/avatar directory
                 $avatar->move(public_path('uploads/avatar'), $avatarName);
             }
-    
+
             // Create new user
             User::create([
-                'user_id' => $request->user_id, // Gunakan user_id dari input form
+                'user_id' => $request->user_id,
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
@@ -62,11 +63,10 @@ class UserManagementController extends Controller
                 'status' => 'Active',
                 'join_date' => now()->format('Y-m-d'),
             ]);
-    
+
             DB::commit();
             flash()->success('User added successfully :)');
             return redirect()->route('user/list');
-    
         } catch (\Exception $e) {
             DB::rollback();
             flash()->error('Failed to add user: ' . $e->getMessage());
@@ -112,14 +112,14 @@ class UserManagementController extends Controller
     {
         try {
             $user = User::find($id);
-            
+
             if (!$user) {
                 return redirect()->back()->with('error', 'User not found!');
             }
-    
+
             // Simpan nama user untuk pesan
             $userName = $user->name;
-    
+
             $user->delete();
             return redirect()->back()->with('success', "User '{$userName}' has been deleted successfully.");
         } catch (\Exception $e) {
@@ -138,15 +138,15 @@ class UserManagementController extends Controller
         $columnName_arr = $request->get('columns');
         $order_arr = $request->get('order');
         $search_arr = $request->get('search');
-    
+
         $columnIndex = $columnIndex_arr[0]['column'];
         $columnName = $columnName_arr[$columnIndex]['data'];
         $columnSortOrder = $order_arr[0]['dir'];
         $searchValue = $search_arr['value'];
-    
+
         $users = DB::table('users');
         $totalRecords = $users->count();
-    
+
         $totalRecordsWithFilter = $users->where(function ($query) use ($searchValue) {
             $query->where('name', 'like', '%' . $searchValue . '%');
             $query->orWhere('email', 'like', '%' . $searchValue . '%');
@@ -155,7 +155,7 @@ class UserManagementController extends Controller
             $query->orWhere('phone_number', 'like', '%' . $searchValue . '%');
             $query->orWhere('status', 'like', '%' . $searchValue . '%');
         })->count();
-    
+
         $records = $users->orderBy($columnName, $columnSortOrder)
             ->where(function ($query) use ($searchValue) {
                 $query->where('name', 'like', '%' . $searchValue . '%');
@@ -168,9 +168,9 @@ class UserManagementController extends Controller
             ->skip($start)
             ->take($rowPerPage)
             ->get();
-    
+
         $data_arr = [];
-    
+
         foreach ($records as $key => $record) {
             $modify = '
                 <td class="text-right">
@@ -189,7 +189,7 @@ class UserManagementController extends Controller
                     </div>
                 </td>
             ';
-            
+
             $data_arr[] = [
                 "user_id"      => $record->user_id,
                 "name"         => $record->name,
@@ -201,14 +201,14 @@ class UserManagementController extends Controller
                 "modify"       => $modify,
             ];
         }
-    
+
         $response = [
             "draw"                 => intval($draw),
             "iTotalRecords"        => $totalRecords,
             "iTotalDisplayRecords" => $totalRecordsWithFilter,
             "aaData"              => $data_arr
         ];
-        
+
         return response()->json($response);
     }
 }

@@ -38,15 +38,25 @@
                 <li class="nav-item dropdown has-arrow">
                     <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
                         <span class="user-img">
-                            <img class="rounded-circle" src="{{ URL::to('assets/img/profiles/avatar-11.jpg') }}"
-                                width="31" alt="{{ Auth::user()->name }}">
+                            @if (Auth::user()->avatar)
+                                <img class="rounded-circle" src="{{ asset('uploads/avatar/' . Auth::user()->avatar) }}"
+                                    width="31" alt="{{ Auth::user()->name }}">
+                            @else
+                                <img class="rounded-circle" src="{{ URL::to('assets/img/profiles/avatar-11.jpg') }}"
+                                    width="31" alt="{{ Auth::user()->name }}">
+                            @endif
                         </span>
                     </a>
                     <div class="dropdown-menu">
                         <div class="user-header">
                             <div class="avatar avatar-sm">
-                                <img src="{{ URL::to('assets/img/profiles/avatar-11.jpg') }}" alt="User Image"
-                                    class="avatar-img rounded-circle">
+                                @if (Auth::user()->avatar)
+                                    <img src="{{ asset('uploads/avatar/' . Auth::user()->avatar) }}" alt="User Image"
+                                        class="avatar-img rounded-circle">
+                                @else
+                                    <img src="{{ URL::to('assets/img/profiles/avatar-11.jpg') }}" alt="User Image"
+                                        class="avatar-img rounded-circle">
+                                @endif
                             </div>
                             <div class="user-text">
                                 <h6>{{ Auth::user()->name }}</h6>
