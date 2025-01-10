@@ -87,8 +87,8 @@ public function index()
             'new_password' => 'required|min:8|confirmed',
         ]);
 
-        $user = Auth::user(); // instance of \Illuminate\Contracts\Auth\Authenticatable
-        $user = User::find($user->id); // cast to User model
+        $user = Auth::user(); 
+        $user = User::find($user->id); 
 
         // Check if current password matches
         if (!Hash::check($request->current_password, $user->password)) {
