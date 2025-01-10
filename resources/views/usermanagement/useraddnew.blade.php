@@ -158,8 +158,8 @@
                             </div>
 
                             <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Profile Image</label>
+                                <div class="form-group mb-4">
+                                    <label class="mb-2">Profile Image</label>
                                     <div class="custom-file">
                                         <input type="file" class="custom-file-input @error('profile') is-invalid @enderror" 
                                             id="customFile" name="profile">
@@ -171,28 +171,128 @@
                                         @enderror
                                     </div>
                                 </div>
+
+                                <div class="action-buttons mt-3">
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-create flex-grow-1">Create New User</button>
+                                        <a href="{{ route('user/list') }}" class="btn btn-cancel flex-grow-1">Cancel</a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="mt-4">
-                    <button type="submit" class="btn btn-primary">Create New User</button>
-                    <a href="{{ route('user/list') }}" class="btn btn-link">Cancel</a>
                 </div>
             </form>
         </div>
     </div>
 
     @section('script')
+    <style>
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-control {
+            border-radius: 0.5rem;
+            padding: 0.625rem 1rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.1);
+        }
+
+        .custom-file {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-file-label {
+            border-radius: 0.5rem;
+            padding: 0.625rem 1rem;
+            background-color: #fff;
+            border: 1px solid #e2e8f0;
+        }
+
+        .custom-file-input:focus ~ .custom-file-label {
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.1);
+        }
+
+        .action-buttons {
+            width: 100%;
+        }
+
+        .gap-2 {
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.625rem 1.25rem;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .btn-create {
+            background-color: #fbbf24;
+            color: white;
+        }
+
+        .btn-create:hover {
+            background-color: #f59e0b;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn-cancel {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background-color: #dc2626;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .flex-grow-1 {
+            flex-grow: 1;
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons .d-flex {
+                flex-direction: column;
+            }
+            
+            .gap-2 {
+                gap: 0.5rem;
+            }
+
+            .btn {
+                width: 100%;
+                margin-bottom: 0.25rem;
+            }
+        }
+    </style>
+
     <script>
-        // Update custom file label with selected filename
         $('.custom-file-input').on('change', function() {
             let fileName = $(this).val().split('\\').pop();
             $(this).next('.custom-file-label').addClass("selected").html(fileName);
         });
 
-        // Auto-dismiss alerts
         window.setTimeout(function() {
             $(".alert").fadeTo(500, 0).slideUp(500, function(){
                 $(this).remove(); 

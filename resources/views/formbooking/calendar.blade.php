@@ -147,20 +147,20 @@
                         hour12: false
                     });
 
-            $(info.el).tooltip({
-                title: `
-                    <div style="display: flex; flex-direction: column; text-align: center;">
-                        <strong>Room:</strong> ${info.event.extendedProps.room_type}<br>
-                        <strong>Booked by:</strong> ${info.event.extendedProps.name}<br>
-                        <strong>Time:</strong> ${moment(info.event.start).format('HH:mm')} - ${moment(info.event.end).format('HH:mm')}<br>
-                        <strong>Participants:</strong> ${info.event.extendedProps.total_numbers}
-                    </div>
-                `,
-                placement: 'top',
-                trigger: 'hover',
-                html: true,
-                container: 'body'
-            });
+                $(info.el).tooltip({
+                    title: `
+                        <div style="display: flex; flex-direction: column; text-align: center;">
+                            <strong>Room:</strong> ${info.event.extendedProps.room_type}<br>
+                            <strong>Booked by:</strong> ${info.event.extendedProps.name}<br>
+                            <strong>Time:</strong> ${moment(info.event.start).format('HH:mm')} - ${moment(info.event.end).format('HH:mm')}<br>
+                            <strong>Participants:</strong> ${info.event.extendedProps.total_numbers}
+                        </div>
+                    `,
+                    placement: 'top',
+                    trigger: 'hover',
+                    html: true,
+                    container: 'body'
+                });
         },
         nowIndicator: false,
         businessHours: {
