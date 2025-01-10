@@ -140,7 +140,7 @@ public function endMeeting(Request $request)
             ->get();
     } else {
         $allBookings = DB::table('bookings')
-            ->where('email', $user->email)
+            ->where('name', $user->name)
             ->orderBy('date', 'desc')
             ->orderBy('time_start', 'desc')
             ->get();
