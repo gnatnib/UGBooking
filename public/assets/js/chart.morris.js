@@ -9,24 +9,19 @@ $(document).ready(function () {
     });
 });
 function lineChart() {
-    window.lineChart = Morris.Line({
+    window.lineChart = Morris.Bar({
         element: "line-chart",
-        data: [
-            { y: "2006", a: 100, b: 90 },
-            { y: "2007", a: 75, b: 65 },
-            { y: "2008", a: 50, b: 40 },
-            { y: "2009", a: 75, b: 65 },
-            { y: "2010", a: 50, b: 40 },
-            { y: "2011", a: 75, b: 65 },
-            { y: "2012", a: 100, b: 90 },
-        ],
+        data: JSON.parse(roomStatsJson),
         xkey: "y",
-        ykeys: ["a", "b"],
-        labels: ["Series A", "Series B"],
-        lineColors: ["#009688", "#cdc6c6"],
-        lineWidth: "3px",
+        ykeys: ["a"],
+        labels: ["Total Bookings"],
+        barColors: ["#FFBF00"],
+        hideHover: "auto",
+        gridLineColor: "#eef0f2",
         resize: true,
-        redraw: true,
+        barSizeRatio: 0.4,
+        xLabelAngle: 35,
+        gridTextSize: 10,
     });
 }
 function pieChart() {
