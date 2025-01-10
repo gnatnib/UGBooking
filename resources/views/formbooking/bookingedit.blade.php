@@ -75,15 +75,17 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Date</label>
                                     <div class="cal-icon">
-                                        <input type="text"
-                                            class="form-control datetimepicker @error('date') is-invalid @enderror"
-                                            name="date" value="{{ old('date', $bookingEdit->date) }}">
+                                        <input type="date" class="form-control @error('date') is-invalid @enderror"
+                                            name="date" value="{{ old('date') }}" pattern="\d{4}-\d{2}-\d{2}"
+                                            required>
                                         @error('date')
-                                            <span class="invalid-feedback">{{ $message }}</span>
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
                                         @enderror
                                     </div>
                                 </div>
@@ -147,31 +149,7 @@
                                 </div>
                             </div>
 
-                            @if (Auth::user()->role_name == 'admin' || Auth::user()->role_name == 'superadmin')
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Status</label>
-                                        <select class="form-control @error('status_meet') is-invalid @enderror"
-                                            name="status_meet">
-                                            <option value="pending"
-                                                {{ old('status_meet', $bookingEdit->status_meet) == 'pending' ? 'selected' : '' }}>
-                                                Pending
-                                            </option>
-                                            <option value="approved"
-                                                {{ old('status_meet', $bookingEdit->status_meet) == 'approved' ? 'selected' : '' }}>
-                                                Approved
-                                            </option>
-                                            <option value="rejected"
-                                                {{ old('status_meet', $bookingEdit->status_meet) == 'rejected' ? 'selected' : '' }}>
-                                                Rejected
-                                            </option>
-                                        </select>
-                                        @error('status_meet')
-                                            <span class="invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                            @endif
+                          
                         </div>
                     </div>
                 </div>
@@ -196,5 +174,93 @@
             });
         });
     </script>
+    <style>
+        .position-relative {
+            position: relative;
+        }
+
+        .calendar-icon {
+            z-index: 1;
+        }
+
+        /* Ensure the date input is fully clickable */
+        input[type="date"] {
+            position: relative;
+            z-index: 2;
+            background: transparent;
+        }
+
+        /* Hide the default calendar icon in Webkit browsers */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 3;
+        }
+
+        .room-preview {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .facilities-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .facility-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .facility-item i {
+            font-size: 18px;
+        }
+
+        /* Update the time-icon related styles in your style section */
+        .time-icon {
+            position: relative;
+        }
+
+        /* Remove the pointer cursor from the input */
+        .time-icon input {
+            cursor: text;
+        }
+
+        /* Style only the clock icon */
+        .time-icon i {
+            color: #999;
+            cursor: pointer;
+            pointer-events: all;
+            /* Ensures the icon is clickable */
+        }
+
+        .time-icon:hover i {
+            color: #666;
+        }
+
+        /* Keep the time picker clickable but don't affect input cursor */
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 2.5rem;
+            /* Limit clickable area to just the icon area */
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 3;
+        }
+    </style>
 @endsection
 @endsection
