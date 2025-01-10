@@ -30,30 +30,38 @@ class HomeController extends Controller
     // home page
     
 
-public function index()
-{
-    // Dapatkan bulan dan tahun saat ini
-    $currentMonth = Carbon::now()->month;
-    $currentYear = Carbon::now()->year;
+    public function index()
+    {
+        // Dapatkan bulan dan tahun saat ini
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+        $today = Carbon::today();
     
-
-    $monthNames = [
-        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-        5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
-    ];
-    $currentMonthName = $monthNames[$currentMonth];
-
-    // Ambil semua booking
-    $allBookings = DB::table('bookings')->get();
-
-    // Hitung jumlah booking untuk bulan ini
-    $count = Booking::whereMonth('date', $currentMonth)
-                    ->whereYear('date', $currentYear)
-                    ->count();
-
-    return view('dashboard.home', compact('allBookings', 'count','currentMonthName'));
-}
+        $monthNames = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+        ];
+        $currentMonthName = $monthNames[$currentMonth];
+    
+        // Get today's bookings
+        $todayBookings = Booking::whereDate('date', $today)
+            ->orderBy('date', 'asc')  // Changed from start_time to date
+            ->take(5)
+            ->get();
+        
+        $totalTodayBookings = Booking::whereDate('date', $today)->count();
+    
+        // Ambil semua booking
+        $allBookings = DB::table('bookings')->get();
+    
+        // Hitung jumlah booking untuk bulan ini
+        $count = Booking::whereMonth('date', $currentMonth)
+                        ->whereYear('date', $currentYear)
+                        ->count();
+    
+        return view('dashboard.home', compact('allBookings', 'count', 'currentMonthName', 'todayBookings', 'totalTodayBookings'));
+    }
 
     // profile
     public function profile()
