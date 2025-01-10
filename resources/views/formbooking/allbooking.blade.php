@@ -67,17 +67,21 @@
                                                             <i class="fas fa-ellipsis-v ellipse_color"></i>
                                                         </a>
                                                         <div class="dropdown-menu dropdown-menu-right">
-                                                            <a class="dropdown-item" href="{{ url('form/booking/edit/'.$bookings->bkg_id) }}">
-                                                                <i class="fas fa-pencil-alt m-r-5"></i> Edit
-                                                            </a>
+                                                            @if ($bookings->status_meet != 'Finished')   
+                                                                <a class="dropdown-item" href="{{ url('form/booking/edit/'.$bookings->bkg_id) }}">
+                                                                    <i class="fas fa-pencil-alt m-r-5"></i> Edit
+                                                                </a>
+                                                            @endif
                                                             @if($bookings->status_meet == 'In meeting')
                                                                 <a class="dropdown-item endMeeting" href="javascript:void(0);" data-id="{{ $bookings->bkg_id }}">
                                                                     <i class="fas fa-stop-circle m-r-5"></i> End Meeting
                                                                 </a>
                                                             @endif
-                                                            <a class="dropdown-item bookingDelete" data-toggle="modal" data-target="#delete_asset" data-id="{{ $bookings->bkg_id }}">
-                                                                <i class="fas fa-trash-alt m-r-5"></i> Delete
-                                                            </a>
+                                                            @if ($bookings->status_meet != 'Finished'||Auth::user()->role_name == 'superadmin')   
+                                                                <a class="dropdown-item bookingDelete" data-toggle="modal" data-target="#delete_asset" data-id="{{ $bookings->bkg_id }}">
+                                                                    <i class="fas fa-trash-alt m-r-5"></i> Delete
+                                                                </a>
+                                                            @endif
                                                         </div>
                                                     </div>
                                                 @endif
