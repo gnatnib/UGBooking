@@ -147,8 +147,8 @@
                         hour12: false
                     });
 
-                $(info.el).tooltip({
-                    title: `
+                    $(info.el).tooltip({
+                        title: `
                         <div style="display: flex; flex-direction: column; text-align: center;">
                             <strong>Room:</strong> ${info.event.extendedProps.room_type}<br>
                             <strong>Booked by:</strong> ${info.event.extendedProps.name}<br>
@@ -156,30 +156,30 @@
                             <strong>Participants:</strong> ${info.event.extendedProps.total_numbers}
                         </div>
                     `,
-                    placement: 'top',
-                    trigger: 'hover',
-                    html: true,
-                    container: 'body'
-                });
-        },
-        nowIndicator: false,
-        businessHours: {
-            daysOfWeek: [1, 2, 3, 4, 5],
-            startTime: '07:00',
-            endTime: '22:00',
-        },
-        scrollTime: '07:00:00',
-        height: 'auto',
-        expandRows: true,
-        stickyHeaderDates: true,
-        firstDay: 1,
-        locale: 'en',
-        slotLabelFormat: {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-        }
-    });
+                        placement: 'top',
+                        trigger: 'hover',
+                        html: true,
+                        container: 'body'
+                    });
+                },
+                nowIndicator: true,
+                businessHours: {
+                    daysOfWeek: [1, 2, 3, 4, 5],
+                    startTime: '07:00',
+                    endTime: '22:00',
+                },
+                scrollTime: '07:00:00',
+                height: 'auto',
+                expandRows: true,
+                stickyHeaderDates: true,
+                firstDay: 1,
+                locale: 'en',
+                slotLabelFormat: {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                }
+            });
 
             calendar.render();
 
@@ -351,21 +351,22 @@
             transition: all 0.2s ease;
         }
 
-/* Tooltip customization */
-.tooltip {
-    font-size: 0.85rem;
-    text-align: center;
-    background-color: #333;
-    color: #fff;
-    border-radius: 4px;
-    padding: 8px;
-    line-height: 1.5;
-}
+        /* Tooltip customization */
+        .tooltip {
+            font-size: 0.85rem;
+            text-align: center;
+            background-color: #333;
+            color: #fff;
+            border-radius: 4px;
+            padding: 8px;
+            line-height: 1.5;
+        }
 
-.tooltip .tooltip-inner {
-    max-width: 200px; /* Limit width to ensure readability */
-    white-space: normal;
-}
+        .tooltip .tooltip-inner {
+            max-width: 200px;
+            /* Limit width to ensure readability */
+            white-space: normal;
+        }
 
 
         @media (max-width: 768px) {
