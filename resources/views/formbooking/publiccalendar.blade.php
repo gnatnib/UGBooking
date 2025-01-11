@@ -10,36 +10,157 @@
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
     
     <style>
+        .fc {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .fc-header-toolbar {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .fc-view-harness {
+            padding: 0.5rem;
+        }
+
         .fc-event {
             cursor: pointer;
+            border: none !important;
+            margin: 1px !important;
+            border-radius: 4px;
+            overflow: hidden;
+            width: calc(100% - 4px) !important;
+            background: transparent;
         }
+
+        .fc-content {
+            padding: 4px 6px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
         .event-title {
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 0.8rem;
             margin-bottom: 2px;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
         }
+
         .event-info {
-            font-size: 0.9em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.9);
         }
-        .badge {
+
+        .event-name,
+        .event-time {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .event-status {
             margin-top: 2px;
         }
-        .page-wrapper {
-            padding: 20px;
+
+        .fc-timegrid-slot {
+            height: 3em !important;
         }
-        .card {
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+
+        .badge {
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            font-weight: normal;
+            border-radius: 3px;
         }
+
         .badge-warning {
             background-color: #ffc107;
             color: #000;
         }
+
+        .badge-success {
+            background-color: #28a745;
+            color: #fff;
+        }
+
         .badge-danger {
             background-color: #dc3545;
             color: #fff;
         }
-        .badge-success {
-            background-color: #28a745;
+
+        /* Room-specific colors */
+        .fc-event[data-room="Meeting Room A"] {
+            background: linear-gradient(to right, #4e73df, #3a5fc7);
+        }
+
+        .fc-event[data-room="Meeting Room B"] {
+            background: linear-gradient(to right, #1cc88a, #13a673);
+        }
+
+        .fc-event[data-room="Conference Room"] {
+            background: linear-gradient(to right, #f6c23e, #e5b53a);
+        }
+
+        .fc-event[data-room="Discussion Room"] {
+            background: linear-gradient(to right, #e74a3b, #d63a2d);
+        }
+
+        .fc-event:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .tooltip {
+            font-size: 0.85rem;
+            text-align: center;
+            background-color: #333;
             color: #fff;
+            border-radius: 4px;
+            padding: 8px;
+            line-height: 1.5;
+        }
+
+        .tooltip .tooltip-inner {
+            max-width: 200px;
+            white-space: normal;
+        }
+
+        .page-wrapper {
+            padding: 20px;
+        }
+
+        .card {
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .fc-header-toolbar {
+                flex-direction: column;
+            }
+
+            .fc-toolbar-chunk {
+                margin-bottom: 0.5rem;
+            }
+
+            .event-title {
+                font-size: 0.75rem;
+            }
+
+            .event-info {
+                font-size: 0.7rem;
+            }
         }
     </style>
 </head>
@@ -152,18 +273,47 @@
                             break;
                     }
 
+                    const startTime = new Date(arg.event.start).toLocaleTimeString('en-GB', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    });
+                    const endTime = new Date(arg.event.end).toLocaleTimeString('en-GB', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    });
+
                     return {
                         html: `
                         <div class="fc-content">
                             <div class="event-title">${arg.event.extendedProps.room_type}</div>
                             <div class="event-info">
                                 <span class="event-name">${arg.event.extendedProps.name}</span>
-                                <span class="event-time">${moment(arg.event.start).format('HH:mm')} - ${moment(arg.event.end).format('HH:mm')}</span>
+                                <span class="event-time">${startTime} - ${endTime}</span>
                             </div>
                             <div class="event-status">${statusBadge}</div>
                         </div>
-                    `
+                        `
                     };
+                },
+                eventDidMount: function(info) {
+                    info.el.setAttribute('data-room', info.event.extendedProps.room_type);
+                    
+                    $(info.el).tooltip({
+                        title: `
+                        <div style="display: flex; flex-direction: column; text-align: center;">
+                            <strong>Room:</strong> ${info.event.extendedProps.room_type}<br>
+                            <strong>Booked by:</strong> ${info.event.extendedProps.name}<br>
+                            <strong>Time:</strong> ${moment(info.event.start).format('HH:mm')} - ${moment(info.event.end).format('HH:mm')}<br>
+                            <strong>Participants:</strong> ${info.event.extendedProps.total_numbers}
+                        </div>
+                        `,
+                        placement: 'top',
+                        trigger: 'hover',
+                        html: true,
+                        container: 'body'
+                    });
                 },
                 nowIndicator: true,
                 businessHours: {
@@ -175,7 +325,13 @@
                 height: 'auto',
                 expandRows: true,
                 stickyHeaderDates: true,
-                firstDay: 1
+                firstDay: 1,
+                locale: 'en',
+                slotLabelFormat: {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                }
             });
 
             calendar.render();
@@ -186,20 +342,52 @@
             });
 
             function showBookingDetails(event) {
+                const startTime = new Date(event.start).toLocaleTimeString('en-GB', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+                const endTime = new Date(event.end).toLocaleTimeString('en-GB', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+                const dateStr = new Date(event.start).toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                });
+
+                let statusBadge = '';
+                switch (event.extendedProps.status_meet) {
+                    case 'Booked':
+                        statusBadge = '<span class="badge badge-warning">Booked</span>';
+                        break;
+                    case 'In meeting':
+                        statusBadge = '<span class="badge badge-danger">In meeting</span>';
+                        break;
+                    case 'Finished':
+                        statusBadge = '<span class="badge badge-success">Finished</span>';
+                        break;
+                }
+
                 Swal.fire({
                     title: 'Booking Details',
                     html: `
                         <div class="booking-details">
                             <p><strong>Room:</strong> ${event.extendedProps.room_type}</p>
                             <p><strong>Booked by:</strong> ${event.extendedProps.name}</p>
-                            <p><strong>Date:</strong> ${moment(event.start).format('DD MMMM YYYY')}</p>
-                            <p><strong>Time:</strong> ${moment(event.start).format('HH:mm')} - ${moment(event.end).format('HH:mm')}</p>
+                            <p><strong>Date:</strong> ${dateStr}</p>
+                            <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
                             <p><strong>Total Participants:</strong> ${event.extendedProps.total_numbers}</p>
                             <p><strong>Purpose:</strong> ${event.extendedProps.message}</p>
-                            <p><strong>Status:</strong> ${event.extendedProps.status_meet}</p>
+                            <p><strong>Status:</strong> ${statusBadge}</p>
                         </div>
                     `,
-                    confirmButtonText: 'Close'
+                    confirmButtonText: 'Close',
+                    customClass: {
+                        confirmButton: 'btn btn-primary'
+                    }
                 });
             }
         });
