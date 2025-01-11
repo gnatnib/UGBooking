@@ -134,7 +134,6 @@
                                         <tr>
                                             <th>Booking ID</th>
                                             <th>Name</th>
-                                            <th>Division</th>  <!-- Kolom baru -->
                                             <th>Email</th>
                                             <th>Participant Number</th>
                                             <th class="text-center">Room Type</th>
@@ -149,7 +148,6 @@
                                                     <div>{{ $booking->bkg_id }}</div>
                                                 </td>
                                                 <td class="text-nowrap">{{ $booking->name }}</td>
-                                                <td class="text-nowrap">{{ $booking->user->division ?? 'N/A' }}</td>  <!-- Kolom baru -->
                                                 <td><a href="mailto:{{ $booking->email }}">{{ $booking->email }}</a></td>
                                                 <td>{{ $booking->total_numbers }}</td>
                                                 <td class="text-center">{{ $booking->room_type }}</td>
@@ -157,7 +155,7 @@
                                                     <div>{{ $booking->phone_number }}</div>
                                                 </td>
                                                 <td class="text-center">
-                                                    @if($booking->status_meet == 'Booked')
+                                                    @if ($booking->status_meet == 'Booked')
                                                         <span class="badge badge-warning">Booked</span>
                                                     @elseif($booking->status_meet == 'In meeting')
                                                         <span class="badge badge-danger">In Meeting</span>
@@ -167,7 +165,7 @@
                                                 </td>
                                             </tr>
                                         @endforeach
-                                    </tbody>                                                                                                           
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -448,7 +446,8 @@
                 <script>
                     var roomStatsJson = {!! $roomStatsJson !!};
                     $(document).ready(function() {
-                        // Initialize the bar chart
+
+                        // bar chart
                         window.barChart = Morris.Bar({
                             element: 'line-chart',
                             data: roomStatsJson,
@@ -459,9 +458,21 @@
                             hideHover: 'auto',
                             gridLineColor: '#eef0f2',
                             resize: true,
-                            barSizeRatio: 0.4,
-                            xLabelAngle: 35,
-                            gridTextSize: 10
+                            barSizeRatio: 0.42,
+                            xLabelAngle: 0,
+                            gridTextSize: 10,
+                            ymin: 0,
+                            ymax: Math.ceil(Math.max(...roomStatsJson.map(item => item.a))),
+                            parseTime: false,
+                            goals: [0],
+                            goalLineColors: ['#eef0f2'],
+                            yLabelFormat: function(y) {
+                                return Math.round(y);
+                            },
+                            // Add these properties to control y-axis steps
+                            numLines: Math.ceil(Math.max(...roomStatsJson.map(item => item.a))) + 1,
+                            grid: true,
+                            gridSteps: 1
                         });
 
                         // Initialize donut chart
