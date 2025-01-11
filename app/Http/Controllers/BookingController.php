@@ -132,17 +132,21 @@ public function endMeeting(Request $request)
     $this->updateBookingStatus();
     
     $user = Auth::user();
-    
+
     if ($user->role_name === 'admin' || $user->role_name === 'superadmin') {
         $allBookings = DB::table('bookings')
-            ->orderBy('date', 'desc')
-            ->orderBy('time_start', 'desc')
+            ->leftJoin('users', 'bookings.name', '=', 'users.name')
+            ->select('bookings.*', 'users.division')
+            ->orderBy('bookings.date', 'desc')
+            ->orderBy('bookings.time_start', 'desc')
             ->get();
     } else {
         $allBookings = DB::table('bookings')
-            ->where('name', $user->name)
-            ->orderBy('date', 'desc')
-            ->orderBy('time_start', 'desc')
+            ->leftJoin('users', 'bookings.name', '=', 'users.name')
+            ->select('bookings.*', 'users.division')
+            ->where('bookings.name', $user->name)
+            ->orderBy('bookings.date', 'desc')
+            ->orderBy('bookings.time_start', 'desc')
             ->get();
     }
     
@@ -441,4 +445,3 @@ public function endMeeting(Request $request)
     }
 
 }
- 

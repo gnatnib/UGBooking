@@ -12,6 +12,8 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\RoomsController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\BookingExportController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -114,4 +116,9 @@ Route::controller(UserManagementController::class)->group(function () {
     Route::get('user/add/new', [UserManagementController::class, 'userAddNew'])->name('user/add/new');
     Route::post('user/save', [UserManagementController::class, 'saveUser'])->name('user/save');
     Route::post('user/save', [UserManagementController::class, 'saveUser'])->name('user/save');
+});
+
+// ----------------------- booking management -------------------------//
+Route::controller(BookingExportController::class)->group(function () {
+    Route::get('export/bookings', 'export')->middleware('auth')->name('export.bookings');
 });

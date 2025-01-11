@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+
 class HomeController extends Controller
 {
     /**
@@ -26,26 +27,49 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-
-    // home page
-    
-
     public function index()
     {
-        // Existing code...
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
         $user = Auth::user();
         $today = Carbon::today();
-        $users = User::all();
+
+        // Get room booking statistics for bar chart
+        $roomBookings = DB::table('bookings')
+            ->select('room_type', DB::raw('count(*) as total'))
+            ->whereMonth('date', $currentMonth)
+            ->whereYear('date', $currentYear)
+            ->groupBy('room_type')
+            ->get();
+
+        // Format data for Morris Bar chart
+        $roomStats = [];
+        foreach ($roomBookings as $booking) {
+            $roomStats[] = [
+                'y' => $booking->room_type,
+                'a' => $booking->total
+            ];
+        }
+        $roomStatsJson = json_encode($roomStats);
+
+        // Month names in Indonesian
         $monthNames = [
-            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+            1 => 'Januari',
+            2 => 'Februari',
+            3 => 'Maret',
+            4 => 'April',
+            5 => 'Mei',
+            6 => 'Juni',
+            7 => 'Juli',
+            8 => 'Agustus',
+            9 => 'September',
+            10 => 'Oktober',
+            11 => 'November',
+            12 => 'Desember'
         ];
         $currentMonthName = $monthNames[$currentMonth];
 
-        // Update this code to join with users table
+        // Get division statistics for donut chart
         $divisionBookings = DB::table('bookings')
             ->join('users', 'bookings.name', '=', 'users.name')
             ->select('users.division', DB::raw('count(*) as total'))
@@ -62,45 +86,58 @@ class HomeController extends Controller
                 'value' => $booking->total
             ];
         }
-         $count = Booking::whereMonth('date', $currentMonth)
-                    ->whereYear('date', $currentYear)
-                    ->count();
-         // Ambil semua booking
+
+        // Get total bookings for current month
+        $count = Booking::whereMonth('date', $currentMonth)
+            ->whereYear('date', $currentYear)
+            ->count();
+
+        // Di HomeController, di method index()
         if ($user->role_name === 'admin' || $user->role_name === 'superadmin') {
-            $allBookings = DB::table('bookings')
+            $allBookings = Booking::with('user')
                 ->orderBy('date', 'desc')
                 ->orderBy('time_start', 'desc')
                 ->get();
         } else {
-            $allBookings = DB::table('bookings')
-                ->where('email', $user->email)
+            $allBookings = Booking::with('user')
+                ->where('name', $user->name)
                 ->orderBy('date', 'desc')
                 ->orderBy('time_start', 'desc')
                 ->get();
         }
+
         $divisionStatsJson = json_encode($divisionStats);
+
+        // Get today's bookings
         $todayBookings = Booking::whereDate('date', $today)
-        ->orderBy('date', 'asc')  // Changed from start_time to date
-        ->take(5)
-        ->get();
-    
+            ->orderBy('date', 'asc')
+            ->orderBy('time_start', 'asc')
+            ->get();
+
         $totalTodayBookings = Booking::whereDate('date', $today)->count();
+
         return view('dashboard.home', compact(
-            'allBookings', 
+            'allBookings',
             'count',
             'currentMonthName',
-            'todayBookings', 
+            'todayBookings',
             'totalTodayBookings',
-            'divisionStatsJson'
+            'divisionStatsJson',
+            'roomStatsJson'
         ));
     }
 
-    // profile
+    /**
+     * Show the user profile page
+     */
     public function profile()
     {
         return view('profile');
     }
 
+    /**
+     * Update user password
+     */
     public function updatePassword(Request $request)
     {
         // Validate request
@@ -109,8 +146,8 @@ class HomeController extends Controller
             'new_password' => 'required|min:8|confirmed',
         ]);
 
-        $user = Auth::user(); 
-        $user = User::find($user->id); 
+        $user = Auth::user();
+        $user = User::find($user->id);
 
         // Check if current password matches
         if (!Hash::check($request->current_password, $user->password)) {
@@ -124,6 +161,9 @@ class HomeController extends Controller
         return back()->with('success', 'Password updated successfully');
     }
 
+    /**
+     * Update user profile
+     */
     public function updateProfile(Request $request)
     {
         $user = User::find(Auth::id());
