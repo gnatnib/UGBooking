@@ -22,6 +22,9 @@
                                 <div class="form-group">
                                     <button class="btn btn-primary btn-block" type="submit">Login</button>
                                 </div>
+                                <a href="{{ route('publiccalendar') }}" class="btn btn-light-blue my-4 center">
+                                    <i class="fas fa-calendar mr-2"></i> View Booking Schedule
+                                </a>
                             </form>
                         </div>
                     </div>

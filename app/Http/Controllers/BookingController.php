@@ -429,7 +429,6 @@ public function endMeeting(Request $request)
         return response()->json(['error' => $e->getMessage()], 500);
     }
 }
-    /** Get color for different room types */
     private function getEventColor($roomType)
     {
         $colors = [

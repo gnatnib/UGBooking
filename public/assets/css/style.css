@@ -90,6 +90,11 @@ textarea.form-control {
 .navbar-nav > li {
     float: left;
 }
+.center {
+    display: block;
+    margin: 0 auto;
+    /* Pusatkan horizontal dengan margin auto */
+}
 .form-group {
     margin-bottom: 1.25rem;
 }
