@@ -112,11 +112,11 @@
                             <h4 class="card-title mb-0">Booking</h4>
                             <div class="d-flex gap-3 align-items-center">
                                 @if (Auth::user()->role_name == 'admin' || Auth::user()->role_name == 'superadmin')
-                                    <a href="{{ route('export.bookings') }}" class="btn btn-primary">
+                                    <a href="{{ route('export.bookings') }}" class="btn btn-success">
                                         <i class="fas fa-download mr-2"></i> Export to CSV
                                     </a>
                                 @endif
-                                <div class="input-group" style="width: 250px;">
+                                <div class="input-group mx-3" style="width: 250px;">
                                     <input type="text" class="form-control" placeholder="Search..." id="searchBooking">
                                     <div class="input-group-append">
                                         <span class="input-group-text">
@@ -129,6 +129,7 @@
 
                         <div class="card-body">
                             <div class="table-responsive">
+                                
                                 <table class="table table-hover table-center" id="bookingTable">
                                     <thead>
                                         <tr>

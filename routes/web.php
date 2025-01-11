@@ -13,6 +13,7 @@ use App\Http\Controllers\RoomsController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\BookingExportController;
+use App\Http\Controllers\view;
 
 /*
 |--------------------------------------------------------------------------
@@ -121,4 +122,10 @@ Route::controller(UserManagementController::class)->group(function () {
 // ----------------------- booking management -------------------------//
 Route::controller(BookingExportController::class)->group(function () {
     Route::get('export/bookings', 'export')->middleware('auth')->name('export.bookings');
+});
+
+// Public routes (no authentication required)
+Route::controller(view::class)->group(function () {
+    Route::get('/publiccalendar', 'publicCalendar')->name('publiccalendar');
+    Route::get('/publiccalendar/events', 'publicEvents')->name('publiccalendar.events');
 });

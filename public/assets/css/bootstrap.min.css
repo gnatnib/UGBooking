@@ -2436,6 +2436,15 @@ a.btn.disabled,
 fieldset:disabled a.btn {
     pointer-events: none;
 }
+.btn-light-blue {
+    background-color: #0069d9;
+    color: #fff;
+    border-color: #0069d9;
+}
+.btn-light-blue:hover {
+    background-color: #87ceeb; 
+    border-color: #87ceeb;
+}
 .btn-primary {
     color: #fff;
     background-color: #007bff;
