@@ -348,6 +348,10 @@ button.bg-primary:hover {
 .badge-success {
     background-color: #6376e9 !important;
 }
+.badge-green {
+    background-color: #28a745 !important;
+    color: #ffffff !important;
+}
 a.bg-success:focus,
 a.bg-success:hover,
 button.bg-success:focus,
