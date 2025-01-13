@@ -52,7 +52,7 @@ class BookingSeeder extends Seeder
                 'date' => Carbon::now()->addDays(2)->format('Y-m-d'),
                 'time_start' => '10:00',
                 'time_end' => '12:00',
-                'email' => 'mayaputri@example.com',
+                'email' => 'budisantoso@example.com',
                 'phone_number' => '081234567808',
                 'message' => 'Department Meeting',
                 'status_meet' => 'Booked',
