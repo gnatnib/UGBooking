@@ -456,56 +456,61 @@ class BookingController extends Controller
 
     /** Get Events for Calendar */
     public function events(Request $request)
-    {
-        try {
-            // Update booking statuses first
-            $this->updateBookingStatus();
+{
+    try {
+        // Update booking statuses first
+        $this->updateBookingStatus();
 
-            $start = $request->input('start');
-            $end = $request->input('end');
-            $room = $request->input('room');
+        $start = $request->input('start');
+        $end = $request->input('end');
+        $room = $request->input('room');
 
-            Log::info('Fetching events with:', [
-                'start' => $start,
-                'end' => $end,
-                'room' => $room
-            ]);
+        Log::info('Fetching events with:', [
+            'start' => $start,
+            'end' => $end,
+            'room' => $room
+        ]);
 
-            $query = DB::table('bookings');
+        $query = DB::table('bookings');
 
-            if ($room) {
-                $query->where('room_type', $room);
-            }
-
-            $bookings = $query->get();
-            $events = [];
-
-            foreach ($bookings as $booking) {
-                $events[] = [
-                    'id' => $booking->bkg_id,
-                    'title' => $booking->room_type,
-                    'start' => $booking->date . 'T' . $booking->time_start,
-                    'end' => $booking->date . 'T' . $booking->time_end,
-                    'color' => $this->getEventColor($booking->room_type),
-                    'extendedProps' => [
-                        'room_type' => $booking->room_type,
-                        'name' => $booking->name,
-                        'time_start' => $booking->time_start,
-                        'time_end' => $booking->time_end,
-                        'total_numbers' => $booking->total_numbers,
-                        'message' => $booking->message,
-                        'status_meet' => $booking->status_meet
-                    ]
-                ];
-            }
-
-            Log::info('Returning events:', ['count' => count($events)]);
-            return response()->json($events);
-        } catch (\Exception $e) {
-            Log::error('Error in events method:', ['error' => $e->getMessage()]);
-            return response()->json(['error' => $e->getMessage()], 500);
+        // Filter by room if provided
+        if ($room) {
+            $query->where('room_type', $room);
         }
+
+        // Add filter to exclude 'cancel' bookings
+        $query->where('status_meet', '!=', 'cancel');
+
+        $bookings = $query->get();
+        $events = [];
+
+        foreach ($bookings as $booking) {
+            $events[] = [
+                'id' => $booking->bkg_id,
+                'title' => $booking->room_type,
+                'start' => $booking->date . 'T' . $booking->time_start,
+                'end' => $booking->date . 'T' . $booking->time_end,
+                'color' => $this->getEventColor($booking->room_type),
+                'extendedProps' => [
+                    'room_type' => $booking->room_type,
+                    'name' => $booking->name,
+                    'time_start' => $booking->time_start,
+                    'time_end' => $booking->time_end,
+                    'total_numbers' => $booking->total_numbers,
+                    'message' => $booking->message,
+                    'status_meet' => $booking->status_meet
+                ]
+            ];
+        }
+
+        Log::info('Returning events:', ['count' => count($events)]);
+        return response()->json($events);
+    } catch (\Exception $e) {
+        Log::error('Error in events method:', ['error' => $e->getMessage()]);
+        return response()->json(['error' => $e->getMessage()], 500);
     }
+}
+
     private function getEventColor($roomType)
     {
         $colors = [

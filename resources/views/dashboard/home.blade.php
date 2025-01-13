@@ -179,11 +179,11 @@
                                                     @if ($booking->status_meet == 'Booked')
                                                         <span class="badge badge-warning">Booked</span>
                                                     @elseif($booking->status_meet == 'In meeting')
-                                                        <span class="badge badge-danger">In Meeting</span>
+                                                        <span class="badge badge-success">In Meeting</span>
                                                     @elseif ($booking->status_meet == 'Finished')
-                                                        <span class="badge badge-success">Finished</span>
+                                                        <span class="badge badge-green">Finished</span>
                                                     @elseif($booking->status_meet == 'cancel')
-                                                        <span class="badge badge-danger">cancel</span>
+                                                        <span class="badge badge-danger">Cancel</span>
                                                     @endif
                                                 </td>
                                             </tr>
