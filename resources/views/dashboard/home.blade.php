@@ -135,6 +135,7 @@
                                         <tr>
                                             <th>Booking ID</th>
                                             <th>Name</th>
+                                            <th>Division</th>
                                             <th>Email</th>
                                             <th>Participant Number</th>
                                             <th class="text-center">Room Type</th>
@@ -149,6 +150,7 @@
                                                     <div>{{ $booking->bkg_id }}</div>
                                                 </td>
                                                 <td class="text-nowrap">{{ $booking->name }}</td>
+                                                <td class="text-nowrap">{{ $booking->user->division }}</td>
                                                 <td><a href="mailto:{{ $booking->email }}">{{ $booking->email }}</a></td>
                                                 <td>{{ $booking->total_numbers }}</td>
                                                 <td class="text-center">{{ $booking->room_type }}</td>
@@ -229,8 +231,6 @@
                                 </div>
                             @else
                                 <div class="text-center py-5">
-                                    <img src="/assets/img/no-meetings.svg" alt="No Meetings"
-                                        style="width: 150px; opacity: 0.5;">
                                     <h5 class="text-muted mt-3">No meetings scheduled for today</h5>
                                 </div>
                             @endif
