@@ -78,7 +78,8 @@ Route::controller(BookingController::class)->group(function () {
     Route::post('form/booking/update', 'updateRecord')->middleware('auth')->name('form/booking/update');
     Route::post('form/booking/delete', 'deleteRecord')->middleware('auth')->name('form/booking/delete');
     Route::post('form/booking/endMeeting', 'endMeeting')->middleware('auth')->name('form/booking/endMeeting'); // Route untuk end meeting
-    
+    Route::post('form/booking/cancel', 'cancelRecord')->middleware('auth')->name('form.booking.cancel');
+
     // Calendar routes
     Route::get('form/booking/calendar', 'calendar')->middleware('auth')->name('form/booking/calendar');
     Route::get('form/booking/events', 'events')->middleware('auth')->name('form/booking/events');

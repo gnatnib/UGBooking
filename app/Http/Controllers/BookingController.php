@@ -19,42 +19,46 @@ class BookingController extends Controller
 {
 
     public function updateBookingStatus()
-    {
-        try {
-            $now = Carbon::now();
-            $currentDate = $now->format('Y-m-d');
-            $currentTime = $now->format('H:i:s');
+{
+    try {
+        $now = Carbon::now();
+        $currentDate = $now->format('Y-m-d');
+        $currentTime = $now->format('H:i:s');
 
-            // Update bookings to 'Booked' if meeting has not started yet
-            Booking::where('date', $currentDate)
-                ->where('time_start', '>', $currentTime)
-                ->where('status_meet', '!=', 'Booked')
-                ->update(['status_meet' => 'Booked']);
+        // Update bookings to 'Booked' if meeting has not started yet and status is not 'cancel'
+        Booking::where('date', $currentDate)
+            ->where('time_start', '>', $currentTime)
+            ->where('status_meet', '!=', 'Booked')
+            ->where('status_meet', '!=', 'cancel')
+            ->update(['status_meet' => 'Booked']);
 
-            // Update bookings that are currently in progress to 'In meeting'
-            Booking::where('date', $currentDate)
-                ->where('time_start', '<=', $currentTime)
-                ->where('time_end', '>', $currentTime)
-                ->where('status_meet', '!=', 'In meeting')
-                ->update(['status_meet' => 'In meeting']);
+        // Update bookings that are currently in progress to 'In meeting' and status is not 'cancel'
+        Booking::where('date', $currentDate)
+            ->where('time_start', '<=', $currentTime)
+            ->where('time_end', '>', $currentTime)
+            ->where('status_meet', '!=', 'In meeting')
+            ->where('status_meet', '!=', 'cancel')
+            ->update(['status_meet' => 'In meeting']);
 
-            // Update bookings that have ended to 'Finished'
-            Booking::where(function ($query) use ($currentDate, $currentTime) {
-                $query->where('date', '<', $currentDate)
-                    ->orWhere(function ($q) use ($currentDate, $currentTime) {
-                        $q->where('date', '=', $currentDate)
-                            ->where('time_end', '<=', $currentTime);
-                    });
-            })
-                ->where('status_meet', '!=', 'Finished')
-                ->update(['status_meet' => 'Finished']);
+        // Update bookings that have ended to 'Finished' and status is not 'cancel'
+        Booking::where(function ($query) use ($currentDate, $currentTime) {
+            $query->where('date', '<', $currentDate)
+                ->orWhere(function ($q) use ($currentDate, $currentTime) {
+                    $q->where('date', '=', $currentDate)
+                        ->where('time_end', '<=', $currentTime);
+                });
+        })
+            ->where('status_meet', '!=', 'Finished')
+            ->where('status_meet', '!=', 'cancel')
+            ->update(['status_meet' => 'Finished']);
 
-            return true;
-        } catch (\Exception $e) {
-            Log::error('Error updating booking statuses: ' . $e->getMessage());
-            return false;
-        }
+        return true;
+    } catch (\Exception $e) {
+        Log::error('Error updating booking statuses: ' . $e->getMessage());
+        return false;
     }
+}
+
     public function endMeeting(Request $request)
     {
         try {
@@ -178,23 +182,23 @@ class BookingController extends Controller
     }
 
     /** Page */
-    public function bookingAdd()
+        public function bookingAdd()
     {
-        $currentUser = Auth::user(); // Mendapatkan pengguna yang sedang autentikasi
+        $currentUser = Auth::user();
 
-        // Jika pengguna adalah admin atau superadmin, tampilkan semua pengguna
+        // If user is admin or superadmin, show all users
         if ($currentUser->role_name === 'admin' || $currentUser->role_name === 'superadmin') {
-            $user = DB::table('users')->get();
+            $users = DB::table('users')->get();  // Changed variable name from $user to $users
         } else {
-            // Jika pengguna biasa, hanya tampilkan data mereka sendiri
-            $user = DB::table('users')
+            // If regular user, only show their own data
+            $users = DB::table('users')          // Changed variable name from $user to $users
                 ->where('name', $currentUser->name)
                 ->get();
         }
 
         $data = DB::table('rooms')->select('room_type')->where('status', 'Ready')->distinct()->get();
 
-        return view('formbooking.bookingadd', compact('data', 'user'));
+        return view('formbooking.bookingadd', compact('data', 'users')); // Changed 'user' to 'users' in compact
     }
 
 
@@ -213,20 +217,21 @@ class BookingController extends Controller
     {
         $query = Booking::where('room_type', $room_type)
             ->where('date', $date)
-            ->where('status_meet', '!=', 'Finished')  // Only check conflicts for non-finished meetings
+            ->whereNotIn('status_meet', ['Finished', 'cancel']) // Abaikan status 'Finished' dan 'cancel'
             ->where(function ($q) use ($time_start, $time_end) {
-                $q->where(function ($query) use ($time_start, $time_end) {
-                    $query->where('time_start', '<', $time_end)
-                        ->where('time_end', '>', $time_start);
-                });
+                $q->whereBetween('time_start', [$time_start, $time_end])
+                ->orWhereBetween('time_end', [$time_start, $time_end])
+                ->orWhereRaw('? BETWEEN time_start AND time_end', [$time_start])
+                ->orWhereRaw('? BETWEEN time_start AND time_end', [$time_end]);
             });
 
         if ($excluding_bkg_id) {
-            $query->where('bkg_id', '!=', $excluding_bkg_id);
+            $query->where('bkg_id', '!=', $excluding_bkg_id); // Abaikan booking yang sedang diperbarui
         }
 
         return $query->exists();
     }
+
 
 
     /** Save Record */
@@ -235,14 +240,22 @@ class BookingController extends Controller
         $request->validate([
             'name'          => 'required|string|max:255',
             'room_type'     => 'required|string|max:255',
-            'total_numbers' => 'required|string|max:255',
-            'date' => 'required|date_format:Y-m-d',
-            'time_start'    => 'required',
+            'total_numbers' => 'required|integer|min:1',
+            'date'          => ['required', 'date_format:Y-m-d', 'after_or_equal:today'],
+            'time_start'    => ['required', 'date_format:H:i', function ($attribute, $value, $fail) use ($request) {
+                $currentDateTime = Carbon::now();
+                $selectedDateTime = Carbon::parse($request->date . ' ' . $value);
+
+                if ($selectedDateTime->isPast()) {
+                    $fail('The selected time must be greater than or equal to the current time.');
+                }
+            }],
             'time_end'      => 'required|after:time_start',
             'email'         => 'required|email|max:255',
             'phone_number'  => 'required|string|max:255',
             'message'       => 'required|string|max:255',
         ]);
+
 
         DB::beginTransaction();
         try {
@@ -298,18 +311,26 @@ class BookingController extends Controller
     /** Update Record */
     public function updateRecord(Request $request)
     {
-        $request->validate([
-            'bkg_id'        => 'required',
-            'name'          => 'required|string|max:255',
-            'room_type'     => 'required|string|max:255',
-            'total_numbers' => 'required|integer|min:1',
-            'date'          => 'required|date_format:Y-m-d',
-            'time_start'    => 'required',
-            'time_end'      => 'required|after:time_start',
-            'email'         => 'required|email|max:255',
-            'phone_number'  => 'required|string|max:255',
-            'message'       => 'required|string|max:255',
-        ]);
+       $request->validate([
+        'bkg_id'        => 'required',
+        'name'          => 'required|string|max:255',
+        'room_type'     => 'required|string|max:255',
+        'total_numbers' => 'required|integer|min:1',
+        'date'          => ['required', 'date_format:Y-m-d', 'after_or_equal:today'],
+        'time_start'    => ['required', 'date_format:H:i', function ($attribute, $value, $fail) use ($request) {
+            $currentDateTime = Carbon::now();
+            $selectedDateTime = Carbon::parse($request->date . ' ' . $value);
+
+            if ($selectedDateTime->isPast()) {
+                $fail('The selected time must be greater than or equal to the current time.');
+            }
+        }],
+        'time_end'      => 'required|after:time_start',
+        'email'         => 'required|email|max:255',
+        'phone_number'  => 'required|string|max:255',
+        'message'       => 'required|string|max:255',
+    ]);
+
 
         DB::beginTransaction();
         try {
@@ -388,6 +409,39 @@ class BookingController extends Controller
             return redirect()->back();
         }
     }
+
+        public function cancelRecord(Request $request)
+{
+    DB::beginTransaction();
+    try {
+        // Validasi input
+        $validated = $request->validate([
+            'id' => 'required|exists:bookings,bkg_id', // Pastikan ID valid dan ada di tabel
+        ]);
+
+        // Cari booking berdasarkan ID
+        $booking = Booking::where('bkg_id', $validated['id'])->firstOrFail();
+
+        // Ubah status_meet menjadi 'cancel'
+        $booking->status_meet = 'cancel';
+        $booking->save();
+
+        DB::commit();
+        return response()->json([
+            'success' => true,
+            'message' => 'Booking successfully canceled',
+        ]);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Cancel booking error: ' . $e->getMessage());
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to cancel booking',
+        ], 500);
+    }
+}
+
 
     /** View Calendar Page */
     public function calendar()

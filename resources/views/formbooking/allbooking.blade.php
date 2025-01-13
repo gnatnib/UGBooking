@@ -93,8 +93,10 @@
                                                         <span class="badge badge-warning">Booked</span>
                                                     @elseif($bookings->status_meet == 'In meeting')
                                                         <span class="badge badge-danger">In meeting</span>
-                                                    @else
+                                                    @elseif($bookings->status_meet == 'Finished')
                                                         <span class="badge badge-success">Finished</span>
+                                                    @else
+                                                        <span class="badge badge-danger">Cancel</span>
                                                     @endif
                                                 </td>
 
@@ -109,12 +111,21 @@
                                                                     <i class="fas fa-ellipsis-v ellipse_color"></i>
                                                                 </a>
                                                                 <div class="dropdown-menu dropdown-menu-right">
-                                                                    @if ($bookings->status_meet != 'Finished')
+                                                                    @if ($bookings->status_meet != 'Finished' && $bookings->status_meet != 'cancel')
                                                                         <a class="dropdown-item"
                                                                             href="{{ url('form/booking/edit/' . $bookings->bkg_id) }}">
                                                                             <i class="fas fa-pencil-alt m-r-5"></i> Edit
                                                                         </a>
                                                                     @endif
+                                                                    @if ($bookings->status_meet == 'Booked')
+                                                                        <a class="dropdown-item cancelBooking"
+                                                                        href="javascript:void(0);"
+                                                                        data-id="{{ $bookings->bkg_id }}">
+                                                                            <i class="fas fa-times-circle m-r-5"></i> Cancel
+                                                                        </a>
+                                                                    @endif
+
+
                                                                     @if ($bookings->status_meet == 'In meeting')
                                                                         <a class="dropdown-item endMeeting"
                                                                             href="javascript:void(0);"
@@ -228,6 +239,58 @@
                     }
                 });
             });
+            $(document).on('click', '.cancelBooking', function() {
+                var bookingId = $(this).data('id');
+
+                Swal.fire({
+                    title: 'Cancel Booking Confirmation',
+                    text: "Are you sure you want to cancel this booking?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, cancel it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '{{ route('form.booking.cancel') }}',
+                            type: 'POST',
+                            data: {
+                                id: bookingId,
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        title: 'Booking Canceled!',
+                                        text: response.message,
+                                        icon: 'success',
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    }).then(() => {
+                                        window.location.reload();
+                                    });
+                                } else {
+                                    Swal.fire(
+                                        'Error!',
+                                        response.message || 'Failed to cancel booking',
+                                        'error'
+                                    );
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                Swal.fire(
+                                    'Error!',
+                                    'Failed to communicate with server',
+                                    'error'
+                                );
+                            }
+                        });
+                    }
+                });
+            });
+
+
 
             // Booking details modal handler 
             $(document).on('click', '.booking-row', function(e) {

@@ -162,8 +162,10 @@
                                                         <span class="badge badge-warning">Booked</span>
                                                     @elseif($booking->status_meet == 'In meeting')
                                                         <span class="badge badge-danger">In Meeting</span>
-                                                    @else
+                                                    @elseif ($booking->status_meet == 'Finished')
                                                         <span class="badge badge-success">Finished</span>
+                                                    @elseif($booking->status_meet == 'cancel')
+                                                        <span class="badge badge-danger">cancel</span>
                                                     @endif
                                                 </td>
                                             </tr>
