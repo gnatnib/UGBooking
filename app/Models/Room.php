@@ -13,12 +13,15 @@ class Room extends Model
         'room_type',
         'capacity',
         'status',
-        'has_projector',
-        'has_sound_system',
-        'has_tv',
-        'fileupload'
+        'fileupload',
+        'images',
+        'facilities'
     ];
 
+    protected $casts = [
+        'images' => 'array',
+        'facilities' => 'array'
+    ];
 
     /** generate id */
     protected static function boot()
