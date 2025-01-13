@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -20,10 +19,8 @@ class CreateRoomsTable extends Migration
             $table->integer('capacity');
             $table->string('fileupload')->nullable();
             $table->string('status')->nullable();
-            // Adding room facilities as boolean fields
-            $table->boolean('has_projector')->default(false);
-            $table->boolean('has_sound_system')->default(false);
-            $table->boolean('has_tv')->default(false);
+            $table->json('images')->nullable();
+            $table->json('facilities')->nullable();
             $table->timestamps();
         });
     }

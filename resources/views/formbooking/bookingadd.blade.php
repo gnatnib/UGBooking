@@ -224,25 +224,31 @@
                                 <h5 class="card-title mb-0">Room Info</h5>
                             </div>
                             <div class="card-body">
-                                <img id="room-image" src="" alt="Room Image" class="img-fluid mb-3"
-                                    style="width: 100%; height: 200px; object-fit: cover;">
+                                <!-- Image Carousel -->
+                                <div id="room-images-carousel" class="carousel slide mb-3" data-ride="carousel">
+                                    <div class="carousel-inner">
+                                        <!-- Will be populated by JavaScript -->
+                                    </div>
+                                    <a class="carousel-control-prev" href="#room-images-carousel" role="button" data-slide="prev">
+                                        <span class="carousel-control-prev-icon"></span>
+                                    </a>
+                                    <a class="carousel-control-next" href="#room-images-carousel" role="button" data-slide="next">
+                                        <span class="carousel-control-next-icon"></span>
+                                    </a>
+                                    <ol class="carousel-indicators">
+                                        <!-- Will be populated by JavaScript -->
+                                    </ol>
+                                </div>
+
+                                <!-- Room Info -->
                                 <h5 id="room-type-display" class="card-title"></h5>
                                 <p id="room-capacity" class="card-text mb-3"></p>
+
+                                <!-- Facilities -->
                                 <div id="room-facilities">
                                     <h6 class="mb-2">Room Facilities:</h6>
                                     <div class="facilities-list">
-                                        <div id="has-projector" class="facility-item d-none">
-                                            <i class="fas fa-tv text-primary"></i>
-                                            <span>LCD Projector</span>
-                                        </div>
-                                        <div id="has-sound" class="facility-item d-none">
-                                            <i class="fas fa-volume-up text-primary"></i>
-                                            <span>Sound System</span>
-                                        </div>
-                                        <div id="has-tv" class="facility-item d-none">
-                                            <i class="fas fa-desktop text-primary"></i>
-                                            <span>TV</span>
-                                        </div>
+                                        <!-- Will be populated by JavaScript -->
                                     </div>
                                 </div>
                             </div>
@@ -257,68 +263,115 @@
 
 @section('script')
     <script>
-        $(document).ready(function() {
-            // Form submission validation
-            $('form').on('submit', function(e) {
-                var startTime = $('input[name="time_start"]').val();
-                var endTime = $('input[name="time_end"]').val();
+    $(document).ready(function() {
+        // Form validation for time
+        $('form').on('submit', function(e) {
+            var startTime = $('input[name="time_start"]').val();
+            var endTime = $('input[name="time_end"]').val();
 
-                if (startTime && endTime && startTime >= endTime) {
-                    e.preventDefault();
-                    alert('End time must be after start time');
-                    return false;
-                }
-            });
-
-            // Room type selection handler
-            $('#roomTypeSelect').on('change', function() {
-                const selectedRoomType = $(this).val();
-                if (!selectedRoomType) {
-                    $('.room-preview').addClass('d-none');
-                    return;
-                }
-
-                $.ajax({
-                    url: '/api/room-details/' + encodeURIComponent(selectedRoomType),
-                    type: 'GET',
-                    success: function(response) {
-                        if (response.success) {
-                            const room = response.room;
-                            $('#room-image').attr('src', '/uploads/rooms/' + room.fileupload);
-                            $('#room-type-display').text(room.room_type);
-                            $('#room-capacity').text('Capacity: ' + room.capacity + ' participants');
-                            $('#has-projector').toggleClass('d-none', !room.has_projector);
-                            $('#has-sound').toggleClass('d-none', !room.has_sound_system);
-                            $('#has-tv').toggleClass('d-none', !room.has_tv);
-                            $('.room-preview').removeClass('d-none');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('AJAX Error:', error);
-                        alert('Failed to fetch room details');
-                        $('.room-preview').addClass('d-none');
-                    }
-                });
-            });
-
-            // User dropdown handler
-            const userDropdown = document.getElementById('userDropdown');
-            if (userDropdown) {
-                userDropdown.addEventListener('change', function() {
-                    const selectedOption = userDropdown.options[userDropdown.selectedIndex];
-                    const phone = selectedOption.getAttribute('data-phone');
-                    const email = selectedOption.getAttribute('data-email');
-                    const name = selectedOption.getAttribute('data-name');
-                    const division = selectedOption.getAttribute('data-division');
-
-                    document.getElementById('phoneInput').value = phone || '';
-                    document.getElementById('emailInput').value = email || '';
-                    document.getElementById('hiddenNameInput').value = name || '';
-                    document.getElementById('hiddenDivisionInput').value = division || '';
-                });
+            if (startTime && endTime && startTime >= endTime) {
+                e.preventDefault();
+                alert('End time must be after start time');
+                return false;
             }
         });
-    </script>
+
+        // Room type selection handling
+        $('#roomTypeSelect').on('change', function() {
+            const selectedRoomType = $(this).val();
+            if (!selectedRoomType) {
+                $('.room-preview').addClass('d-none');
+                return;
+            }
+
+            $.ajax({
+                url: '/api/room-details/' + encodeURIComponent(selectedRoomType),
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        const room = response.room;
+                        
+                        // Update images carousel
+                        const carouselInner = $('.carousel-inner');
+                        const carouselIndicators = $('.carousel-indicators');
+                        carouselInner.empty();
+                        carouselIndicators.empty();
+                        
+                        const images = JSON.parse(room.images);
+                        images.forEach((image, index) => {
+                            // Add carousel item
+                            carouselInner.append(`
+                                <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                                    <img src="/uploads/rooms/${image}" 
+                                        class="d-block w-100" 
+                                        alt="Room Image ${index + 1}">
+                                </div>
+                            `);
+
+                            // Add indicator
+                            carouselIndicators.append(`
+                                <li data-target="#room-images-carousel" 
+                                    data-slide-to="${index}" 
+                                    class="${index === 0 ? 'active' : ''}">
+                                </li>
+                            `);
+                        });
+
+                        // Show/hide carousel controls based on number of images
+                        if (images.length <= 1) {
+                            $('.carousel-control-prev, .carousel-control-next, .carousel-indicators').hide();
+                        } else {
+                            $('.carousel-control-prev, .carousel-control-next, .carousel-indicators').show();
+                        }
+
+                        // Update room info
+                        $('#room-type-display').text(room.room_type);
+                        $('#room-capacity').text(`Capacity: ${room.capacity} participants`);
+
+                        // Update facilities
+                        const facilitiesList = $('.facilities-list');
+                        facilitiesList.empty();
+                        
+                        const facilities = JSON.parse(room.facilities);
+                        facilities.forEach(facility => {
+                            facilitiesList.append(`
+                                <div class="facility-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>${facility}</span>
+                                </div>
+                            `);
+                        });
+
+                        $('.room-preview').removeClass('d-none');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', error);
+                    alert('Failed to fetch room details');
+                    $('.room-preview').addClass('d-none');
+                }
+            });
+        });
+
+        // User dropdown handler
+        const userDropdown = document.getElementById('userDropdown');
+        if (userDropdown) {
+            userDropdown.addEventListener('change', function() {
+                const selectedOption = userDropdown.options[userDropdown.selectedIndex];
+                const phone = selectedOption.getAttribute('data-phone');
+                const email = selectedOption.getAttribute('data-email');
+                const name = selectedOption.getAttribute('data-name');
+                const division = selectedOption.getAttribute('data-division');
+
+                document.getElementById('phoneInput').value = phone || '';
+                document.getElementById('emailInput').value = email || '';
+                document.getElementById('hiddenNameInput').value = name || '';
+                document.getElementById('hiddenDivisionInput').value = division || '';
+            });
+        }
+    });
+</script>
+
 
     <style>
         .position-relative {
