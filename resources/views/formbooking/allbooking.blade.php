@@ -87,16 +87,8 @@
                                                 </td>
                                                 <td>{{ $bookings->division }}</td>
                                                 <td>{{ $bookings->room_type }}</td>
-                                                <td class="text-center">
-                                                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $bookings->phone_number) }}?text={{ urlencode(
-                                                        $bookings->status_meet === 'cancel'
-                                                            ? 'Booking ruangan anda pada tanggal ' .
-                                                                \Carbon\Carbon::parse($bookings->date)->format('d-m-Y') .
-                                                                ', jam ' .
-                                                                $bookings->time_start .
-                                                                ' telah di cancel. Mohon segera lakukan reschedule.'
-                                                            : '',
-                                                    ) }}"
+                                                <td>
+                                                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $bookings->phone_number) }}"
                                                         target="_blank" class="whatsapp-link" title="Chat on WhatsApp">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24"
                                                             height="24" viewBox="0 0 48 48" class="whatsapp-icon">
