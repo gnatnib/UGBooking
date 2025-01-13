@@ -20,26 +20,45 @@
                 <div class="row">
                     <div class="col-lg-8">
                         <div class="row formtype">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Name</label>
-                                    <select class="form-control @error('name') is-invalid @enderror" id="sel1"
-                                        name="name" required>
-                                        <option selected disabled> --Select Name-- </option>
-                                        @foreach ($user as $users)
-                                            <option value="{{ $users->name }}"
-                                                {{ old('name') == $users->name ? 'selected' : '' }}>
-                                                {{ $users->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('name')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
+                            @if (Auth::user()->role_name == 'user')
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Name</label>
+                                        <input class="form-control @error('name') is-invalid @enderror" type="text"
+                                            name="name" value="{{ old('name', Auth::user()->name ?? '') }}" readonly>
+                                        <input type="hidden" name="division" value="{{ Auth::user()->division ?? '' }}">
+                                        @error('name')
+                                            <span class="invalid-feedback">{{ $message }}</span>
+                                        @enderror
+                                    </div>
                                 </div>
-                            </div>
+                            @else
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Name</label>
+                                        <select class="form-control @error('name') is-invalid @enderror" id="userDropdown"
+                                            name="user_id" required>
+                                            <option selected disabled>-- Select Name --</option>
+                                            @foreach ($users as $user)
+                                                <option value="{{ $user->id }}" 
+                                                    data-name="{{ $user->name }}"
+                                                    data-division="{{ $user->division }}"
+                                                    data-phone="{{ $user->phone_number }}"
+                                                    data-email="{{ $user->email }}">
+                                                    {{ $user->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <input type="hidden" name="name" id="hiddenNameInput">
+                                        <input type="hidden" name="division" id="hiddenDivisionInput">
+                                        @error('name')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            @endif
 
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -125,31 +144,65 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Email</label>
-                                    <input type="email" class="form-control @error('email') is-invalid @enderror"
-                                        name="email" value="{{ old('email') }}" required>
-                                    @error('email')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
+                            @if (Auth::user()->role_name == 'superadmin' || Auth::user()->role_name == 'admin')
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Email</label>
+                                        <input type="email" id="emailInput"
+                                            class="form-control @error('email') is-invalid @enderror" name="email"
+                                            value="{{ old('email') }}" required>
+                                        @error('email')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
                                 </div>
-                            </div>
+                            @else
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Email</label>
+                                        <input type="email" class="form-control @error('email') is-invalid @enderror"
+                                            name="email" value="{{ old('email', Auth::user()->email ?? '') }}" readonly>
+                                        @error('email')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            @endif
 
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Phone Number</label>
-                                    <input type="text" class="form-control @error('phone_number') is-invalid @enderror"
-                                        name="phone_number" value="{{ old('phone_number') }}" required>
-                                    @error('phone_number')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
+                            @if (Auth::user()->role_name == 'superadmin' || Auth::user()->role_name == 'admin')
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Phone Number</label>
+                                        <input type="text" id="phoneInput"
+                                            class="form-control @error('phone_number') is-invalid @enderror"
+                                            name="phone_number" value="{{ old('phone_number') }}" required>
+                                        @error('phone_number')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
                                 </div>
-                            </div>
+                            @else
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Phone Number</label>
+                                        <input type="text"
+                                            class="form-control @error('phone_number') is-invalid @enderror"
+                                            name="phone_number"
+                                            value="{{ old('phone_number', Auth::user()->phone_number ?? '') }}" readonly>
+                                        @error('phone_number')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            @endif
 
                             <div class="col-md-12">
                                 <div class="form-group">
@@ -205,6 +258,7 @@
 @section('script')
     <script>
         $(document).ready(function() {
+            // Form submission validation
             $('form').on('submit', function(e) {
                 var startTime = $('input[name="time_start"]').val();
                 var endTime = $('input[name="time_end"]').val();
@@ -216,6 +270,7 @@
                 }
             });
 
+            // Room type selection handler
             $('#roomTypeSelect').on('change', function() {
                 const selectedRoomType = $(this).val();
                 if (!selectedRoomType) {
@@ -231,8 +286,7 @@
                             const room = response.room;
                             $('#room-image').attr('src', '/uploads/rooms/' + room.fileupload);
                             $('#room-type-display').text(room.room_type);
-                            $('#room-capacity').text('Capacity: ' + room.capacity +
-                                ' participants');
+                            $('#room-capacity').text('Capacity: ' + room.capacity + ' participants');
                             $('#has-projector').toggleClass('d-none', !room.has_projector);
                             $('#has-sound').toggleClass('d-none', !room.has_sound_system);
                             $('#has-tv').toggleClass('d-none', !room.has_tv);
@@ -246,6 +300,23 @@
                     }
                 });
             });
+
+            // User dropdown handler
+            const userDropdown = document.getElementById('userDropdown');
+            if (userDropdown) {
+                userDropdown.addEventListener('change', function() {
+                    const selectedOption = userDropdown.options[userDropdown.selectedIndex];
+                    const phone = selectedOption.getAttribute('data-phone');
+                    const email = selectedOption.getAttribute('data-email');
+                    const name = selectedOption.getAttribute('data-name');
+                    const division = selectedOption.getAttribute('data-division');
+
+                    document.getElementById('phoneInput').value = phone || '';
+                    document.getElementById('emailInput').value = email || '';
+                    document.getElementById('hiddenNameInput').value = name || '';
+                    document.getElementById('hiddenDivisionInput').value = division || '';
+                });
+            }
         });
     </script>
 
@@ -258,14 +329,12 @@
             z-index: 1;
         }
 
-        /* Ensure the date input is fully clickable */
         input[type="date"] {
             position: relative;
             z-index: 2;
             background: transparent;
         }
 
-        /* Hide the default calendar icon in Webkit browsers */
         input[type="date"]::-webkit-calendar-picker-indicator {
             position: absolute;
             top: 0;
