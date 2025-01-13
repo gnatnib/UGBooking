@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Room Booking Calendar</title>
-    
+
     <!-- CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
-    
+
     <style>
         .fc {
             background: white;
@@ -142,7 +143,7 @@
         }
 
         .card {
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         @media (max-width: 768px) {
@@ -164,6 +165,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="page-wrapper">
         <div class="container-fluid">
@@ -299,7 +301,7 @@
                 },
                 eventDidMount: function(info) {
                     info.el.setAttribute('data-room', info.event.extendedProps.room_type);
-                    
+
                     $(info.el).tooltip({
                         title: `
                         <div style="display: flex; flex-direction: column; text-align: center;">
@@ -393,4 +395,5 @@
         });
     </script>
 </body>
+
 </html>
