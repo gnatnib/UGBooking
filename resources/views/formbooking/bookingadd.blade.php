@@ -20,27 +20,39 @@
                 <div class="row">
                     <div class="col-lg-8">
                         <div class="row formtype">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Name</label>
-                                    <select class="form-control @error('name') is-invalid @enderror" id="sel1"
-                                        name="name" required>
-                                        <option selected disabled> --Select Name-- </option>
-                                        @foreach ($user as $users)
-                                            <option value="{{ $users->name }}"
-                                                {{ old('name') == $users->name ? 'selected' : '' }}>
-                                                {{ $users->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('name')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
+                            @if (Auth::user()->role_name == 'user')
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Name</label>
+                                        <input class="form-control @error('name') is-invalid @enderror" type="text"
+                                            name="name" value="{{ old('name', Auth::user()->name ?? '') }}">
+                                        @error('name')
+                                            <span class="invalid-feedback">{{ $message }}</span>
+                                        @enderror
+                                    </div>
                                 </div>
-                            </div>
-
+                            @else
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Name</label>
+                                        <select class="form-control @error('name') is-invalid @enderror" id="userDropdown"
+                                            name="name" required>
+                                            <option selected disabled>-- Select Name --</option>
+                                            @foreach ($user as $user)
+                                                <option value="{{ $user->id }}" data-phone="{{ $user->phone_number }}"
+                                                    data-email="{{ $user->email }}">
+                                                    {{ $user->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('name')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            @endif
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Room Type</label>
@@ -124,33 +136,64 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Email</label>
-                                    <input type="email" class="form-control @error('email') is-invalid @enderror"
-                                        name="email" value="{{ old('email') }}" required>
-                                    @error('email')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
+                            @if (Auth::user()->role_name == 'superadmin' || Auth::user()->role_name == 'admin')
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Email</label>
+                                        <input type="email" id="emailInput"
+                                            class="form-control @error('email') is-invalid @enderror" name="email"
+                                            value="{{ old('email') }}" required>
+                                        @error('email')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Phone Number</label>
-                                    <input type="text" class="form-control @error('phone_number') is-invalid @enderror"
-                                        name="phone_number" value="{{ old('phone_number') }}" required>
-                                    @error('phone_number')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
+                            @else
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Email</label>
+                                        <input type="email" class="form-control @error('email') is-invalid @enderror"
+                                            name="email" value="{{ old('email', Auth::user()->email ?? '') }}" required>
+                                        @error('email')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
                                 </div>
-                            </div>
-
+                            @endif
+                            @if (Auth::user()->role_name == 'superadmin' || Auth::user()->role_name == 'admin')
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Phone Number</label>
+                                        <input type="text" id="phoneInput"
+                                            class="form-control @error('phone_number') is-invalid @enderror"
+                                            name="phone_number" value="{{ old('phone_number') }}" required>
+                                        @error('phone_number')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            @else
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Phone Number</label>
+                                        <input type="text"
+                                            class="form-control @error('phone_number') is-invalid @enderror"
+                                            name="phone_number"
+                                            value="{{ old('phone_number', Auth::user()->phone_number ?? '') }}" required>
+                                        @error('phone_number')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            @endif
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label>Purpose</label>
@@ -245,6 +288,22 @@
                         $('.room-preview').addClass('d-none');
                     }
                 });
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userDropdown = document.getElementById('userDropdown');
+            const phoneInput = document.getElementById('phoneInput');
+            const emailInput = document.getElementById('emailInput');
+
+            userDropdown.addEventListener('change', function() {
+                const selectedOption = userDropdown.options[userDropdown.selectedIndex];
+                const phone = selectedOption.getAttribute('data-phone');
+                const email = selectedOption.getAttribute('data-email');
+
+                phoneInput.value = phone || '';
+                emailInput.value = email || '';
             });
         });
     </script>
