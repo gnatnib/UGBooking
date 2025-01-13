@@ -87,7 +87,12 @@
                                                 </td>
                                                 <td>{{ $bookings->division }}</td>
                                                 <td>{{ $bookings->room_type }}</td>
-                                                <td>{{ $bookings->phone_number }}</td>
+                                                <td>
+                                                    <a href="https://wa.me/{{ $bookings->phone_number }}?text={{ urlencode('Halo booking ruangan ' . $bookings->room_type . ' room for ' . $bookings->name .'dicancel') }}" target="_blank">
+                                                        {{ $bookings->phone_number }}
+                                                    </a>
+                                                </td>
+
                                                 <td>
                                                     @if ($bookings->status_meet == 'Booked')
                                                         <span class="badge badge-warning">Booked</span>
