@@ -114,10 +114,9 @@
                                 <div class="form-group">
                                     <label>Start Time</label>
                                     <div class="time-icon">
-                                        <i class="far fa-clock position-absolute"
-                                            style="top: 50%; transform: translateY(-50%); right: 10px; z-index: 2;"></i>
                                         <input type="time" class="form-control @error('time_start') is-invalid @enderror"
                                             name="time_start" value="{{ old('time_start') }}" required>
+                                        <i class="far fa-clock"></i>
                                         @error('time_start')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -131,10 +130,9 @@
                                 <div class="form-group">
                                     <label>End Time</label>
                                     <div class="time-icon">
-                                        <i class="far fa-clock position-absolute"
-                                            style="top: 50%; transform: translateY(-50%); right: 10px; z-index: 2;"></i>
                                         <input type="time" class="form-control @error('time_end') is-invalid @enderror"
                                             name="time_end" value="{{ old('time_end') }}" required>
+                                        <i class="far fa-clock"></i>
                                         @error('time_end')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -224,25 +222,31 @@
                                 <h5 class="card-title mb-0">Room Info</h5>
                             </div>
                             <div class="card-body">
-                                <img id="room-image" src="" alt="Room Image" class="img-fluid mb-3"
-                                    style="width: 100%; height: 200px; object-fit: cover;">
+                                <!-- Image Carousel -->
+                                <div id="room-images-carousel" class="carousel slide mb-3" data-ride="carousel">
+                                    <div class="carousel-inner">
+                                        <!-- Will be populated by JavaScript -->
+                                    </div>
+                                    <a class="carousel-control-prev" href="#room-images-carousel" role="button" data-slide="prev">
+                                        <span class="carousel-control-prev-icon"></span>
+                                    </a>
+                                    <a class="carousel-control-next" href="#room-images-carousel" role="button" data-slide="next">
+                                        <span class="carousel-control-next-icon"></span>
+                                    </a>
+                                    <ol class="carousel-indicators">
+                                        <!-- Will be populated by JavaScript -->
+                                    </ol>
+                                </div>
+
+                                <!-- Room Info -->
                                 <h5 id="room-type-display" class="card-title"></h5>
                                 <p id="room-capacity" class="card-text mb-3"></p>
+
+                                <!-- Facilities -->
                                 <div id="room-facilities">
                                     <h6 class="mb-2">Room Facilities:</h6>
                                     <div class="facilities-list">
-                                        <div id="has-projector" class="facility-item d-none">
-                                            <i class="fas fa-tv text-primary"></i>
-                                            <span>LCD Projector</span>
-                                        </div>
-                                        <div id="has-sound" class="facility-item d-none">
-                                            <i class="fas fa-volume-up text-primary"></i>
-                                            <span>Sound System</span>
-                                        </div>
-                                        <div id="has-tv" class="facility-item d-none">
-                                            <i class="fas fa-desktop text-primary"></i>
-                                            <span>TV</span>
-                                        </div>
+                                        <!-- Will be populated by JavaScript -->
                                     </div>
                                 </div>
                             </div>
@@ -255,10 +259,10 @@
         </div>
     </div>
 
-@section('script')
+    @section('script')
     <script>
         $(document).ready(function() {
-            // Form submission validation
+            // Form validation for time
             $('form').on('submit', function(e) {
                 var startTime = $('input[name="time_start"]').val();
                 var endTime = $('input[name="time_end"]').val();
@@ -284,8 +288,58 @@
                     success: function(response) {
                         if (response.success) {
                             const room = response.room;
-                            $('#room-image').attr('src', '/uploads/rooms/' + room.fileupload);
+                            
+                            // Update images carousel
+                            const carouselInner = $('.carousel-inner');
+                            const carouselIndicators = $('.carousel-indicators');
+                            carouselInner.empty();
+                            carouselIndicators.empty();
+                            
+                            const images = JSON.parse(room.images);
+                            images.forEach((image, index) => {
+                                // Add carousel item
+                                carouselInner.append(`
+                                    <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                                        <img src="/uploads/rooms/${image}" 
+                                             class="d-block w-100" 
+                                             alt="Room Image ${index + 1}">
+                                    </div>
+                                `);
+
+                                // Add indicator
+                                carouselIndicators.append(`
+                                    <li data-target="#room-images-carousel" 
+                                        data-slide-to="${index}" 
+                                        class="${index === 0 ? 'active' : ''}">
+                                    </li>
+                                `);
+                            });
+
+                            // Show/hide carousel controls based on number of images
+                            if (images.length <= 1) {
+                                $('.carousel-control-prev, .carousel-control-next, .carousel-indicators').hide();
+                            } else {
+                                $('.carousel-control-prev, .carousel-control-next, .carousel-indicators').show();
+                            }
+
+                            // Update room info
                             $('#room-type-display').text(room.room_type);
+                            $('#room-capacity').text(`Capacity: ${room.capacity} participants`);
+
+                            // Update facilities
+                            const facilitiesList = $('.facilities-list');
+                            facilitiesList.empty();
+                            
+                            const facilities = JSON.parse(room.facilities);
+                            facilities.forEach(facility => {
+                                facilitiesList.append(`
+                                    <div class="facility-item">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>${facility}</span>
+                                    </div>
+                                `);
+                            });
+
                             $('#room-capacity').text('Capacity: ' + room.capacity + ' participants');
                             $('#has-projector').toggleClass('d-none', !room.has_projector);
                             $('#has-sound').toggleClass('d-none', !room.has_sound_system);
@@ -301,6 +355,11 @@
                 });
             });
 
+            // User dropdown handling
+            const userDropdown = document.getElementById('userDropdown');
+            const phoneInput = document.getElementById('phoneInput');
+            const emailInput = document.getElementById('emailInput');
+
             // User dropdown handler
             const userDropdown = document.getElementById('userDropdown');
             if (userDropdown) {
@@ -308,6 +367,16 @@
                     const selectedOption = userDropdown.options[userDropdown.selectedIndex];
                     const phone = selectedOption.getAttribute('data-phone');
                     const email = selectedOption.getAttribute('data-email');
+
+                    if (phoneInput) phoneInput.value = phone || '';
+                    if (emailInput) emailInput.value = email || '';
+                });
+            }
+
+            // Initialize carousel
+            $('#room-images-carousel').carousel({
+                interval: false // Disable auto-sliding
+            });
                     const name = selectedOption.getAttribute('data-name');
                     const division = selectedOption.getAttribute('data-division');
 
@@ -350,61 +419,119 @@
 
         .room-preview {
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .room-preview .carousel-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
         }
 
         .facilities-list {
             display: flex;
-            flex-direction: column;
+            flex-wrap: wrap;
             gap: 10px;
         }
 
         .facility-item {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 8px 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 8px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .facility-item:hover {
+            background-color: #e9ecef;
         }
 
         .facility-item i {
-            font-size: 18px;
+            color: #007bff;
+            font-size: 16px;
         }
 
-        /* Update the time-icon related styles in your style section */
+        .room-preview .carousel-control-prev,
+        .room-preview .carousel-control-next {
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .room-preview:hover .carousel-control-prev,
+        .room-preview:hover .carousel-control-next {
+            opacity: 1;
+        }
+
+        .room-preview .carousel-control-prev {
+            left: 10px;
+        }
+
+        .room-preview .carousel-control-next {
+            right: 10px;
+        }
+
+        .room-preview .carousel-indicators {
+            bottom: -10px;
+        }
+
+        .room-preview .carousel-indicators li {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #ccc;
+            margin: 0 4px;
+            transition: all 0.3s ease;
+        }
+
+        .room-preview .carousel-indicators li.active {
+            background-color: #007bff;
+            width: 10px;
+            height: 10px;
+        }
+
+        /* Time input styling */
         .time-icon {
             position: relative;
         }
 
-        /* Remove the pointer cursor from the input */
-        .time-icon input {
-            cursor: text;
+        .time-icon input[type="time"] {
+            padding-right: 35px;
         }
 
-        /* Style only the clock icon */
         .time-icon i {
-            color: #999;
-            cursor: pointer;
-            pointer-events: all;
-            /* Ensures the icon is clickable */
-        }
-
-        .time-icon:hover i {
-            color: #666;
-        }
-
-        /* Keep the time picker clickable but don't affect input cursor */
-        input[type="time"]::-webkit-calendar-picker-indicator {
             position: absolute;
-            top: 0;
-            right: 0;
-            width: 2.5rem;
-            /* Limit clickable area to just the icon area */
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-            z-index: 3;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            pointer-events: none;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .room-preview .carousel-item img {
+                height: 200px;
+            }
+
+            .facility-item {
+                padding: 6px 10px;
+                font-size: 14px;
+            }
+
+            .room-preview .carousel-control-prev,
+            .room-preview .carousel-control-next {
+                width: 30px;
+                height: 30px;
+            }
         }
     </style>
-@endsection
 @endsection
