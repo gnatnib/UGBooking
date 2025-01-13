@@ -25,7 +25,8 @@
                                     <div class="form-group">
                                         <label>Name</label>
                                         <input class="form-control @error('name') is-invalid @enderror" type="text"
-                                            name="name" value="{{ old('name', Auth::user()->name ?? '') }}">
+                                            name="name" value="{{ old('name', Auth::user()->name ?? '') }}" readonly>
+                                        <input type="hidden" name="division" value="{{ Auth::user()->division ?? '' }}">
                                         @error('name')
                                             <span class="invalid-feedback">{{ $message }}</span>
                                         @enderror
@@ -36,15 +37,20 @@
                                     <div class="form-group">
                                         <label>Name</label>
                                         <select class="form-control @error('name') is-invalid @enderror" id="userDropdown"
-                                            name="name" required>
+                                            name="user_id" required>
                                             <option selected disabled>-- Select Name --</option>
-                                            @foreach ($user as $user)
-                                                <option value="{{ $user->id }}" data-phone="{{ $user->phone_number }}"
+                                            @foreach ($users as $user)
+                                                <option value="{{ $user->id }}" 
+                                                    data-name="{{ $user->name }}"
+                                                    data-division="{{ $user->division }}"
+                                                    data-phone="{{ $user->phone_number }}"
                                                     data-email="{{ $user->email }}">
                                                     {{ $user->name }}
                                                 </option>
                                             @endforeach
                                         </select>
+                                        <input type="hidden" name="name" id="hiddenNameInput">
+                                        <input type="hidden" name="division" id="hiddenDivisionInput">
                                         @error('name')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -53,6 +59,7 @@
                                     </div>
                                 </div>
                             @endif
+
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Room Type</label>
@@ -134,6 +141,7 @@
                                     </div>
                                 </div>
                             </div>
+
                             @if (Auth::user()->role_name == 'superadmin' || Auth::user()->role_name == 'admin')
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -153,7 +161,7 @@
                                     <div class="form-group">
                                         <label>Email</label>
                                         <input type="email" class="form-control @error('email') is-invalid @enderror"
-                                            name="email" value="{{ old('email', Auth::user()->email ?? '') }}" required>
+                                            name="email" value="{{ old('email', Auth::user()->email ?? '') }}" readonly>
                                         @error('email')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -162,6 +170,7 @@
                                     </div>
                                 </div>
                             @endif
+
                             @if (Auth::user()->role_name == 'superadmin' || Auth::user()->role_name == 'admin')
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -183,7 +192,7 @@
                                         <input type="text"
                                             class="form-control @error('phone_number') is-invalid @enderror"
                                             name="phone_number"
-                                            value="{{ old('phone_number', Auth::user()->phone_number ?? '') }}" required>
+                                            value="{{ old('phone_number', Auth::user()->phone_number ?? '') }}" readonly>
                                         @error('phone_number')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -192,6 +201,7 @@
                                     </div>
                                 </div>
                             @endif
+
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label>Purpose</label>
@@ -264,7 +274,7 @@
                 }
             });
 
-            // Room type selection handling
+            // Room type selection handler
             $('#roomTypeSelect').on('change', function() {
                 const selectedRoomType = $(this).val();
                 if (!selectedRoomType) {
@@ -330,6 +340,10 @@
                                 `);
                             });
 
+                            $('#room-capacity').text('Capacity: ' + room.capacity + ' participants');
+                            $('#has-projector').toggleClass('d-none', !room.has_projector);
+                            $('#has-sound').toggleClass('d-none', !room.has_sound_system);
+                            $('#has-tv').toggleClass('d-none', !room.has_tv);
                             $('.room-preview').removeClass('d-none');
                         }
                     },
@@ -346,6 +360,8 @@
             const phoneInput = document.getElementById('phoneInput');
             const emailInput = document.getElementById('emailInput');
 
+            // User dropdown handler
+            const userDropdown = document.getElementById('userDropdown');
             if (userDropdown) {
                 userDropdown.addEventListener('change', function() {
                     const selectedOption = userDropdown.options[userDropdown.selectedIndex];
@@ -361,6 +377,15 @@
             $('#room-images-carousel').carousel({
                 interval: false // Disable auto-sliding
             });
+                    const name = selectedOption.getAttribute('data-name');
+                    const division = selectedOption.getAttribute('data-division');
+
+                    document.getElementById('phoneInput').value = phone || '';
+                    document.getElementById('emailInput').value = email || '';
+                    document.getElementById('hiddenNameInput').value = name || '';
+                    document.getElementById('hiddenDivisionInput').value = division || '';
+                });
+            }
         });
     </script>
 
@@ -373,14 +398,12 @@
             z-index: 1;
         }
 
-        /* Ensure the date input is fully clickable */
         input[type="date"] {
             position: relative;
             z-index: 2;
             background: transparent;
         }
 
-        /* Hide the default calendar icon in Webkit browsers */
         input[type="date"]::-webkit-calendar-picker-indicator {
             position: absolute;
             top: 0;
