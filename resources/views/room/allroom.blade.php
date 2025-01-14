@@ -40,10 +40,9 @@
                                 <table class="datatable table table-stripped table table-hover table-center mb-0">
                                     <thead>
                                         <tr>
-                                            <th>Booking ID</th>
                                             <th>Room Type</th>
-                                            <th>Capacity</th>
                                             <th>Images</th>
+                                            <th>Capacity</th>
                                             <th>Facilities</th>
                                             <th>Status</th>
                                             <th class="text-right">Actions</th>
@@ -53,9 +52,7 @@
                                         @foreach ($allRooms as $rooms)
                                             <tr>
                                                 <td hidden class="id">{{ $rooms->id }}</td>
-                                                <td>{{ $rooms->bkg_room_id }}</td>
                                                 <td>{{ $rooms->room_type }}</td>
-                                                <td>{{ $rooms->capacity }}</td>
                                                 <td>
                                                     @if ($rooms->images)
                                                         <div class="room-carousel">
@@ -90,6 +87,7 @@
                                                         No Images
                                                     @endif
                                                 </td>
+                                                <td>{{ $rooms->capacity }}</td>
                                                 <td>
                                                     @if ($rooms->facilities)
                                                         <div class="d-flex flex-wrap gap-1">
@@ -333,8 +331,25 @@
             cursor: default;
         }
 
+        .datatable thead th {
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+
+        .datatable tbody td {
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+
+        /* Keep right alignment for action column */
+        .datatable th.text-right,
+        .datatable td.text-right {
+            text-align: right !important;
+        }
+
         .room-carousel {
             width: 150px;
+            margin: 0 auto;
         }
 
         .room-carousel .carousel-item img {
