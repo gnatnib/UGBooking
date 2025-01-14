@@ -10,7 +10,7 @@ A modern and efficient room booking system built with Laravel 11 and PHP, design
 
 - **User Authentication & Authorization**
   - Secure login and registration system
-  - Role-based access control (Admin, Staff, Users)
+  - Role-based access control (SuperAdmin, Admin, Users)
   - Protected routes and middleware implementation
 
 - **Room Management**
@@ -25,11 +25,9 @@ A modern and efficient room booking system built with Laravel 11 and PHP, design
   - Conflict prevention system
   - Booking history and status tracking
 
-- **Admin Dashboard**
+- **Dashboard**
   - Complete booking oversight
-  - User management
-  - Room management
-  - Analytics and reporting
+  - Analytics and reporting with chart visualization
 
 ## 🚀 Installation
 
