@@ -185,31 +185,37 @@ $(document).ready(function() {
             return;
         }
 
+        // Ambil semua fasilitas dari data attribute
+        const allFacilities = $(this).find('.facility-badge:first')
+            .data('facilities')
+            .split(', ')
+            .join(', ');
+
+        // Ambil status dengan cara yang benar
+        const statusBtn = $(this).find('td .actions .btn').first();
+        const status = statusBtn.text();
+        const statusClass = statusBtn.hasClass('bg-success-light') ? 'bg-success-light' : 'bg-danger-light';
+
         const roomDetails = {
             id: $(this).find('.id').text().trim(),
             roomType: $(this).find('td:nth-child(3)').text().trim(),
             capacity: $(this).find('td:nth-child(4)').text().trim(),
-            facilities: $(this).find('.facility-badge').map(function() {
-                return $(this).text().trim();
-            }).get().join(', '),
-            images: $(this).find('.room-carousel .carousel-item img').map(function() {
-                return $(this).attr('src');
-            }).get()
+            facilities: allFacilities,
+            status: status,
+            statusClass: statusClass
         };
 
-        
-
         Swal.fire({
-            title: `Room Details - ${roomDetails.roomType}`,
+            title: `Detail Ruangan - ${roomDetails.roomType}`,
             html: `
                 <div class="room-details">
-                    <p><strong>Room Type:</strong> ${roomDetails.roomType}</p>
-                    <p><strong>Capacity:</strong> ${roomDetails.capacity} people</p>
-                    <p><strong>Facilities:</strong> ${roomDetails.facilities || 'No facilities listed'}</p>
-                    
+                    <p><strong>Tipe Ruangan:</strong> ${roomDetails.roomType}</p>
+                    <p><strong>Kapasitas:</strong> ${roomDetails.capacity} orang</p>
+                    <p><strong>Fasilitas:</strong> ${roomDetails.facilities || 'Tidak ada fasilitas'}</p>
+                    <p><strong>Status:</strong> <span class="btn btn-sm ${roomDetails.statusClass} mr-2">${roomDetails.status}</span></p>
                 </div>
             `,
-            confirmButtonText: 'Close',
+            confirmButtonText: 'Tutup',
             customClass: {
                 confirmButton: 'btn btn-primary'
             }
