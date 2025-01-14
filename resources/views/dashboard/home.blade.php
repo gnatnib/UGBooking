@@ -69,7 +69,8 @@
                                     <h6 class="text-muted">Today's Booked Meeting Rooms</h6>
                                 </div>
                                 <div class="ml-auto mt-md-3 mt-lg-0">
-                                    <button class="btn badge-view text-white" data-toggle="modal" data-target="#todayBookingsModal">
+                                    <button class="btn badge-view text-white" data-toggle="modal"
+                                        data-target="#todayBookingsModal">
                                         View
                                     </button>
                                 </div>
@@ -145,19 +146,17 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($allBookings as $booking)
-                                            <tr class="booking-row cursor-pointer" data-toggle="modal" 
-                                                data-booking-id="{{ $booking->bkg_id }}"
-                                                data-name="{{ $booking->name }}"
+                                            <tr class="booking-row cursor-pointer" data-toggle="modal"
+                                                data-booking-id="{{ $booking->bkg_id }}" data-name="{{ $booking->name }}"
                                                 data-division="{{ $booking->user->division }}"
                                                 data-email="{{ $booking->email }}"
                                                 data-total-numbers="{{ $booking->total_numbers }}"
                                                 data-room-type="{{ $booking->room_type }}"
                                                 data-phone="{{ $booking->phone_number }}"
-                                                data-status="{{ $booking->status_meet }}"
-                                                data-date="{{ $booking->date }}"
+                                                data-status="{{ $booking->status_meet }}" data-date="{{ $booking->date }}"
                                                 data-time-start="{{ $booking->time_start }}"
                                                 data-time-end="{{ $booking->time_end }}">
-                                            
+
                                                 <td class="text-nowrap">
                                                     <div>{{ $booking->bkg_id }}</div>
                                                 </td>
@@ -366,6 +365,7 @@
                     .booking-info {
                         padding: 15px;
                     }
+
                     /* Card & Button Styles */
                     .cursor-pointer {
                         cursor: pointer;
@@ -590,7 +590,7 @@
                     var roomStatsJson = {!! $roomStatsJson !!};
                     $(document).ready(function() {
 
-                        // bar chart
+                        // bar chart dashboard
                         window.barChart = Morris.Bar({
                             element: 'line-chart',
                             data: roomStatsJson,
@@ -612,13 +612,12 @@
                             yLabelFormat: function(y) {
                                 return Math.round(y);
                             },
-                            // Add these properties to control y-axis steps
                             numLines: Math.ceil(Math.max(...roomStatsJson.map(item => item.a))) + 1,
                             grid: true,
                             gridSteps: 1
                         });
 
-                        // Initialize donut chart
+                        // Donut chart
                         var divisionData = {!! $divisionStatsJson !!};
                         var options = {
                             chart: {
@@ -627,7 +626,7 @@
                             },
                             series: divisionData.map(item => item.value),
                             labels: divisionData.map(item => item.name),
-                            colors: ['#00A36C', '#2E8B57', '#3CB371', '#66CDAA', '#8FBC8F', '#90EE90', '#98FB98'],
+                            colors: ['#1D5B79', '#FAD02E', '#2E97A7', '#F7B801', '#468B97', '#EFD345', '#78C1CD'],
                             plotOptions: {
                                 pie: {
                                     donut: {
@@ -688,7 +687,7 @@
                         if ($(e.target).closest('.whatsapp-link').length) {
                             return;
                         }
-                        
+
                         const bookingId = $(this).data('booking-id');
                         const name = $(this).data('name');
                         const division = $(this).data('division');
@@ -703,7 +702,7 @@
 
                         // Format status badge
                         let statusBadge;
-                        switch(status) {
+                        switch (status) {
                             case 'Booked':
                                 statusBadge = '<span class="badge badge-warning">Booked</span>';
                                 break;
