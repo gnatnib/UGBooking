@@ -53,7 +53,7 @@ class RoomSeeder extends Seeder
                 'bkg_room_id' => 'RD-01',
                 'capacity' => 4,
                 'status' => 'Ready',
-                'images' => ['diskusi_1.jpg', 'diskusi_2.jpg', 'diskusi.jpg'],
+                'images' => ['ruangdiskusi_1.jpg', 'ruangdiskusi_2.jpg', 'ruangdiskusi.jpg'],
                 'base_image' => 'diskusi.jpg',
                 'facilities' => [
                     'TV',
