@@ -196,42 +196,36 @@
 @section('script')
     <script>
         $(document).ready(function() {
-            // Event listener untuk baris tabel (kecuali kolom gambar dan aksi)
             $('.datatable tbody').on('click', 'tr', function(e) {
-                // Pastikan kolom gambar dan aksi tidak memicu event
                 if ($(e.target).closest('.room-carousel, .dropdown-action').length) {
                     return;
                 }
 
-                // Ambil semua fasilitas dari data attribute
                 const allFacilities = $(this).find('.facility-badge:first')
                     .data('facilities')
                     .split(', ')
                     .join(', ');
 
-                // Ambil status dengan cara yang benar
                 const statusBtn = $(this).find('td .actions .btn').first();
-                const status = statusBtn.text();
-                const statusClass = statusBtn.hasClass('bg-success-light') ? 'bg-success-light' :
-                    'bg-danger-light';
+                const status = statusBtn.text().trim();
+                // Use bg-success-light to match the table's green status style
+                const statusClass = status === 'Ready' ? 'bg-success-light' : 'bg-danger-light';
 
                 const roomDetails = {
-                    id: $(this).find('.id').text().trim(),
                     roomType: $(this).find('td:nth-child(3)').text().trim(),
                     capacity: $(this).find('td:nth-child(4)').text().trim(),
                     facilities: allFacilities,
-                    status: status,
-                    statusClass: statusClass
+                    status: status
                 };
 
                 Swal.fire({
                     title: `Detail Ruangan - ${roomDetails.roomType}`,
                     html: `
                 <div class="room-details">
-                    <p><strong>Tipe Ruangan:</strong> ${roomDetails.roomType}</p>
-                    <p><strong>Kapasitas:</strong> ${roomDetails.capacity} orang</p>
-                    <p><strong>Fasilitas:</strong> ${roomDetails.facilities || 'Tidak ada fasilitas'}</p>
-                    <p><strong>Status:</strong> <span class="btn btn-sm ${roomDetails.statusClass} mr-2">${roomDetails.status}</span></p>
+                    <p><strong>Tipe Ruangan:</strong> <span>${roomDetails.roomType}</span></p>
+                    <p><strong>Kapasitas:</strong> <span>${roomDetails.capacity} orang</span></p>
+                    <p class="facilities-row"><strong>Fasilitas:</strong> <span>${roomDetails.facilities || 'Tidak ada fasilitas'}</span></p>
+                    <p><strong>Status:</strong> <span><span class="btn ${statusClass}">${roomDetails.status}</span></span></p>
                 </div>
             `,
                     confirmButtonText: 'Tutup',
@@ -246,6 +240,89 @@
 
     <style>
         /* Make table rows appear clickable */
+
+        .room-details {
+            text-align: left;
+            padding: 1rem;
+        }
+
+        .room-details p.facilities-row {
+            align-items: flex-start;
+        }
+
+        .room-details p.facilities-row span {
+            text-align: right;
+            word-wrap: break-word;
+            max-width: 60%;
+        }
+
+        .room-details p {
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 2rem;
+            padding: 0.25rem 0;
+        }
+
+        .room-details p strong {
+            color: #555;
+            min-width: 140px;
+            flex-shrink: 0;
+        }
+
+        .room-details p .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .room-details p .badge-success,
+        .room-details p .bg-success-light {
+            background-color: #e8f5e9;
+            color: #28a745;
+        }
+
+        .room-details p .badge-danger,
+        .room-details p .bg-danger-light {
+            background-color: #ffebee;
+            color: #dc3545;
+        }
+
+        /* Consistent modal styling */
+        .swal2-popup {
+            padding: 1.5rem !important;
+        }
+
+        .swal2-title {
+            font-size: 1.5rem !important;
+            margin-bottom: 1.5rem !important;
+            padding: 0 !important;
+        }
+
+        .swal2-html-container {
+            margin: 0 !important;
+            padding: 0 1rem !important;
+        }
+
+        .room-details .btn {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            display: inline-block;
+        }
+
+        /* Match status button styling */
+        .room-details .bg-success-light {
+            background-color: #e8f5e9;
+            color: #28a745;
+        }
+
+        .room-details .bg-danger-light {
+            background-color: #ffebee;
+            color: #dc3545;
+        }
+
         .datatable tbody tr {
             cursor: pointer;
         }
