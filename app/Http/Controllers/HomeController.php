@@ -46,11 +46,11 @@ class HomeController extends Controller
         $roomStats = [];
         foreach ($roomBookings as $booking) {
             $roomStats[] = [
-                'y' => $booking->room_type,
-                'a' => $booking->total
+                'y' => strval($booking->room_type), // Convert to string explicitly
+                'a' => intval($booking->total)      // Convert to integer explicitly
             ];
         }
-        $roomStatsJson = json_encode($roomStats);
+        $roomStatsJson = json_encode($roomStats, JSON_HEX_APOS | JSON_HEX_QUOT);
 
         // Month names in Indonesian
         $monthNames = [
