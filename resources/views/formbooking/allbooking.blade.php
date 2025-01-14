@@ -529,7 +529,11 @@
         }
 
         .search-container {
-            min-width: 250px;
+            /* min-width: 250px; */
+            /* margin-top: 1rem;
+            margin-bottom: 1rem; */
+            max-width: 300px;
+            margin-left: auto;
         }
 
         .input-group {
