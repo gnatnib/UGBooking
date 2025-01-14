@@ -206,12 +206,13 @@
 
                 const statusBtn = $(this).find('td .actions .btn').first();
                 const status = statusBtn.text().trim();
-                // Use bg-success-light to match the table's green status style
                 const statusClass = status === 'Ready' ? 'bg-success-light' : 'bg-danger-light';
 
-                const roomType = $(this).find('td:first').next().text()
-                    .trim(); // Get room type from first visible column
-                const capacity = $(this).find('td:nth-child(3)').text().trim();
+                // Fix capacity retrieval by getting it directly from the capacity column
+                const capacity = $(this).find('td:nth-child(4)').text()
+            .trim(); // Changed from 3 to 4 since there's a hidden column
+
+                const roomType = $(this).find('td:first').next().text().trim();
 
                 const roomDetails = {
                     roomType: roomType,
