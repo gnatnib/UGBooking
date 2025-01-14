@@ -1,4 +1,3 @@
-
 @extends('layouts.master')
 @section('content')
     <div class="page-wrapper">
@@ -15,15 +14,13 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="row formtype">
-                            <input class="form-control" type="hidden" name="bkg_room_id" 
-                                value="{{ $roomEdit->bkg_room_id }}" readonly>
+                            <input type="hidden" name="bkg_room_id" value="{{ $roomEdit->bkg_room_id }}">
 
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Room Type</label>
                                     <div class="input-group">
-                                        <select class="form-control @error('room_type') is-invalid @enderror" id="room_type"
-                                            name="room_type">
+                                        <select class="form-control @error('room_type') is-invalid @enderror" id="room_type" name="room_type">
                                             <option selected value="{{ $roomEdit->room_type }}">{{ $roomEdit->room_type }}</option>
                                             @foreach ($data as $items)
                                                 <option value="{{ $items->room_name }}">{{ $items->room_name }}</option>
@@ -36,8 +33,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Capacity</label>
-                                    <input type="number" class="form-control @error('capacity') is-invalid @enderror"
-                                        id="capacity" name="capacity" value="{{ $roomEdit->capacity }}" min="1" max="50">
+                                    <input type="number" class="form-control @error('capacity') is-invalid @enderror" id="capacity" name="capacity" value="{{ $roomEdit->capacity }}" min="1" max="50">
                                 </div>
                             </div>
 
@@ -45,8 +41,7 @@
                                 <div class="form-group">
                                     <label>Room Images</label>
                                     <div class="custom-file">
-                                        <input type="file" class="custom-file-input @error('room_images') is-invalid @enderror" 
-                                            id="room_images" name="room_images[]" multiple accept="image/*">
+                                        <input type="file" class="custom-file-input @error('room_images') is-invalid @enderror" id="room_images" name="room_images[]" multiple accept="image/*">
                                         <label class="custom-file-label" for="room_images">Choose files</label>
                                     </div>
                                     <small class="form-text text-muted">You can select multiple images</small>
@@ -57,12 +52,8 @@
                                             @foreach(json_decode($roomEdit->images) as $index => $image)
                                                 <div class="col-md-4 mb-2">
                                                     <div class="position-relative">
-                                                        <img src="{{ asset('uploads/rooms/' . $image) }}"
-                                                            alt="Room Photo" class="img-thumbnail" 
-                                                            style="height: 150px; object-fit: cover;">
-                                                        <button type="button" class="btn btn-danger btn-sm position-absolute"
-                                                                style="top: 5px; right: 20px;"
-                                                                onclick="removeImage(this, '{{ $image }}')">
+                                                        <img src="{{ asset('uploads/rooms/' . $image) }}" alt="Room Photo" class="img-thumbnail" style="height: 150px; object-fit: cover;">
+                                                        <button type="button" class="btn btn-danger btn-sm position-absolute" style="top: 5px; right: 20px;" onclick="removeImage(this, '{{ $image }}')">
                                                             <i class="fas fa-times"></i>
                                                         </button>
                                                     </div>
@@ -80,8 +71,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Status</label>
-                                    <select class="form-control @error('status') is-invalid @enderror" id="status"
-                                        name="status">
+                                    <select class="form-control @error('status') is-invalid @enderror" id="status" name="status">
                                         <option value="Ready" {{ $roomEdit->status === 'Ready' ? 'selected' : '' }}>Ready</option>
                                         <option value="Maintenance" {{ $roomEdit->status === 'Maintenance' ? 'selected' : '' }}>Maintenance</option>
                                     </select>
@@ -96,8 +86,7 @@
                                             @foreach(json_decode($roomEdit->facilities) as $facility)
                                                 <div class="facility-item mb-2">
                                                     <div class="input-group">
-                                                        <input type="text" class="form-control" name="facilities[]" 
-                                                               value="{{ $facility }}" placeholder="Enter facility name">
+                                                        <input type="text" class="form-control" name="facilities[]" value="{{ $facility }}" placeholder="Enter facility name">
                                                         <div class="input-group-append">
                                                             <button type="button" class="btn btn-danger remove-facility">
                                                                 <i class="fas fa-times"></i>
@@ -109,8 +98,7 @@
                                         @else
                                             <div class="facility-item mb-2">
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control" name="facilities[]" 
-                                                           placeholder="Enter facility name">
+                                                    <input type="text" class="form-control" name="facilities[]" placeholder="Enter facility name">
                                                     <div class="input-group-append">
                                                         <button type="button" class="btn btn-danger remove-facility">
                                                             <i class="fas fa-times"></i>
@@ -150,9 +138,7 @@
                             <div class="col-md-4 mb-2">
                                 <div class="position-relative">
                                     <img src="${e.target.result}" class="img-thumbnail" style="height: 150px; object-fit: cover;">
-                                    <button type="button" class="btn btn-danger btn-sm position-absolute" 
-                                            style="top: 5px; right: 20px;"
-                                            onclick="$(this).closest('.col-md-4').remove();">
+                                    <button type="button" class="btn btn-danger btn-sm position-absolute" style="top: 5px; right: 20px;" onclick="$(this).closest('.col-md-4').remove();">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
@@ -162,9 +148,8 @@
                     reader.readAsDataURL(file);
                 });
 
-                // Update file input label
                 $(this).siblings('.custom-file-label').html(
-                    files.length > 1 ? ${files.length} files selected : files[0].name
+                    files.length > 1 ? `${files.length} files selected` : files[0].name
                 );
             });
 
