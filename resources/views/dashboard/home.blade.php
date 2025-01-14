@@ -69,7 +69,7 @@
                                     <h6 class="text-muted">Today's Booked Meeting Rooms</h6>
                                 </div>
                                 <div class="ml-auto mt-md-3 mt-lg-0">
-                                    <button class="btn btn-view" data-toggle="modal" data-target="#todayBookingsModal">
+                                    <button class="btn badge-view text-white" data-toggle="modal" data-target="#todayBookingsModal">
                                         View
                                     </button>
                                 </div>
@@ -145,7 +145,19 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($allBookings as $booking)
-                                            <tr>
+                                            <tr class="booking-row cursor-pointer" data-toggle="modal" 
+                                                data-booking-id="{{ $booking->bkg_id }}"
+                                                data-name="{{ $booking->name }}"
+                                                data-division="{{ $booking->user->division }}"
+                                                data-email="{{ $booking->email }}"
+                                                data-total-numbers="{{ $booking->total_numbers }}"
+                                                data-room-type="{{ $booking->room_type }}"
+                                                data-phone="{{ $booking->phone_number }}"
+                                                data-status="{{ $booking->status_meet }}"
+                                                data-date="{{ $booking->date }}"
+                                                data-time-start="{{ $booking->time_start }}"
+                                                data-time-end="{{ $booking->time_end }}">
+                                            
                                                 <td class="text-nowrap">
                                                     <div>{{ $booking->bkg_id }}</div>
                                                 </td>
@@ -196,6 +208,66 @@
                 </div>
             </div>
 
+            <!-- Booking Details Modal -->
+            <div class="modal fade" id="bookingDetailsModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Booking Details</h5>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="booking-info">
+                                <div class="row mb-3">
+                                    <div class="col-5 font-weight-bold">Booking ID</div>
+                                    <div class="col-7" id="modalBookingId"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-5 font-weight-bold">Date</div>
+                                    <div class="col-7" id="modalDate"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-5 font-weight-bold">Time</div>
+                                    <div class="col-7" id="modalTime"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-5 font-weight-bold">Name</div>
+                                    <div class="col-7" id="modalName"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-5 font-weight-bold">Division</div>
+                                    <div class="col-7" id="modalDivision"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-5 font-weight-bold">Email</div>
+                                    <div class="col-7" id="modalEmail"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-5 font-weight-bold">Phone</div>
+                                    <div class="col-7" id="modalPhone"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-5 font-weight-bold">Room</div>
+                                    <div class="col-7" id="modalRoom"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-5 font-weight-bold">Participants</div>
+                                    <div class="col-7" id="modalParticipants"></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-5 font-weight-bold">Status</div>
+                                    <div class="col-7" id="modalStatus"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- Modal for Today's Bookings -->
             <div class="modal fade" id="todayBookingsModal" tabindex="-1" role="dialog"
                 aria-labelledby="todayBookingsModalLabel" aria-hidden="true">
@@ -264,14 +336,44 @@
 
             @push('styles')
                 <style>
+                    .booking-row {
+                        cursor: pointer;
+                        transition: background-color 0.3s ease;
+                    }
+
+                    .booking-row:hover {
+                        background-color: #f8f9fa;
+                    }
+
+                    .booking-info .row {
+                        border-bottom: 1px solid #eee;
+                        padding: 8px 0;
+                    }
+
+                    .booking-info .row:last-child {
+                        border-bottom: none;
+                    }
+
+                    #bookingDetailsModal .modal-header {
+                        background-color: #FFBF00;
+                        color: white;
+                    }
+
+                    #bookingDetailsModal .close {
+                        color: white;
+                    }
+
+                    .booking-info {
+                        padding: 15px;
+                    }
                     /* Card & Button Styles */
                     .cursor-pointer {
                         cursor: pointer;
                     }
 
                     .btn-view {
-                        background-color: #FFBF00;
-                        color: white;
+                        background-color: white;
+                        color: #FFBF00;
                         border: none;
                         padding: 8px 20px;
                         border-radius: 5px;
@@ -280,8 +382,8 @@
                     }
 
                     .btn-view:hover {
-                        background-color: #FFB300;
-                        color: white;
+                        background-color: white;
+                        color: #FFBF00;
                         transform: translateY(-2px);
                         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
                     }
@@ -578,6 +680,60 @@
                                 location.reload();
                             }
                         }, 60000);
+                    });
+
+                    // Add this inside your existing $(document).ready function
+                    $('#bookingTable tbody tr').on('click', function(e) {
+                        // Prevent triggering when clicking on WhatsApp icon
+                        if ($(e.target).closest('.whatsapp-link').length) {
+                            return;
+                        }
+                        
+                        const bookingId = $(this).data('booking-id');
+                        const name = $(this).data('name');
+                        const division = $(this).data('division');
+                        const email = $(this).data('email');
+                        const totalNumbers = $(this).data('total-numbers');
+                        const roomType = $(this).data('room-type');
+                        const phone = $(this).data('phone');
+                        const status = $(this).data('status');
+                        const date = $(this).data('date');
+                        const timeStart = $(this).data('time-start');
+                        const timeEnd = $(this).data('time-end');
+
+                        // Format status badge
+                        let statusBadge;
+                        switch(status) {
+                            case 'Booked':
+                                statusBadge = '<span class="badge badge-warning">Booked</span>';
+                                break;
+                            case 'In meeting':
+                                statusBadge = '<span class="badge badge-success">In Meeting</span>';
+                                break;
+                            case 'Finished':
+                                statusBadge = '<span class="badge badge-green">Finished</span>';
+                                break;
+                            case 'cancel':
+                                statusBadge = '<span class="badge badge-danger">Cancel</span>';
+                                break;
+                            default:
+                                statusBadge = status;
+                        }
+
+                        // Update modal content
+                        $('#modalBookingId').text(bookingId);
+                        $('#modalDate').text(date);
+                        $('#modalTime').text(`${timeStart} - ${timeEnd}`);
+                        $('#modalName').text(name);
+                        $('#modalDivision').text(division);
+                        $('#modalEmail').html(`<a href="mailto:${email}">${email}</a>`);
+                        $('#modalPhone').text(phone);
+                        $('#modalRoom').text(roomType);
+                        $('#modalParticipants').text(totalNumbers);
+                        $('#modalStatus').html(statusBadge);
+
+                        // Show modal
+                        $('#bookingDetailsModal').modal('show');
                     });
                 </script>
             @endpush
