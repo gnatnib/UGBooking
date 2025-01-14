@@ -28,10 +28,10 @@ class RoomSeeder extends Seeder
                 'facilities' => [
                     'LCD Projector',
                     'Sound System',
-                    'TV',
-                    'Whiteboard',
-                    'Water Dispenser',
-                    'Air Conditioning'
+                    'Air Purifier',
+                    'Whiteboard 3',
+                    'Air Conditioning',
+                    'Jumlah Kursi 11',
                 ]
             ],
             [
@@ -42,23 +42,25 @@ class RoomSeeder extends Seeder
                 'images' => ['RuangMeetingKecil_1.jpg', 'RuangMeetingKecil_2.jpg', 'RuangMeetingKecil_3.jpg'],
                 'base_image' => 'RuangMeetingKecil_3.jpg',
                 'facilities' => [
-                    'LCD Projector',
                     'TV',
                     'Whiteboard',
-                    'Air Conditioning'
+                    'Air Conditioning',
+                    'Air Purifier',
+                    'Jumlah Kursi 6'
                 ]
             ],
             [
                 'room_type' => 'Ruang Diskusi',
                 'bkg_room_id' => 'RD-01',
-                'capacity' => 4,
+                'capacity' => 5,
                 'status' => 'Ready',
                 'images' => ['ruangdiskusi_1.jpg', 'ruangdiskusi_2.jpg', 'ruangdiskusi.jpg'],
-                'base_image' => 'diskusi.jpg',
+                'base_image' => 'ruangdiskusi_1.jpg',
                 'facilities' => [
-                    'TV',
-                    'Whiteboard',
-                    'Air Conditioning'
+                    'Air Conditioning',
+                    'Air Purifier',
+                    'Jumlah Kursi 5'
+
                 ]
             ]
         ];
