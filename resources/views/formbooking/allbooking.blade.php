@@ -430,6 +430,10 @@
             margin-bottom: 0;
         }
 
+        .form-group {
+            margin-left: 1rem;
+        }
+
         .form-control {
             height: 38px;
         }
@@ -529,11 +533,7 @@
         }
 
         .search-container {
-            /* min-width: 250px; */
-            /* margin-top: 1rem;
-            margin-bottom: 1rem; */
-            max-width: 300px;
-            margin-left: auto;
+            min-width: 250px;
         }
 
         .input-group {
