@@ -361,7 +361,7 @@
             padding: 8px;
             line-height: 1.5;
         }
-
+        
         .tooltip .tooltip-inner {
             max-width: 200px;
             /* Limit width to ensure readability */
