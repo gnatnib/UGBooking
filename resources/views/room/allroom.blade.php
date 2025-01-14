@@ -209,9 +209,13 @@
                 // Use bg-success-light to match the table's green status style
                 const statusClass = status === 'Ready' ? 'bg-success-light' : 'bg-danger-light';
 
+                const roomType = $(this).find('td:first').next().text()
+                    .trim(); // Get room type from first visible column
+                const capacity = $(this).find('td:nth-child(3)').text().trim();
+
                 const roomDetails = {
-                    roomType: $(this).find('td:nth-child(3)').text().trim(),
-                    capacity: $(this).find('td:nth-child(4)').text().trim(),
+                    roomType: roomType,
+                    capacity: capacity,
                     facilities: allFacilities,
                     status: status
                 };
@@ -231,6 +235,60 @@
                         confirmButton: 'btn btn-primary'
                     }
                 });
+            });
+        });
+
+        $(document).ready(function() {
+            $('.carousel-item img').on('click', function(e) {
+                e.stopPropagation();
+
+                const carouselId = $(this).closest('.carousel').attr('id');
+                const allImages = $(`#${carouselId} .carousel-item img`).map(function() {
+                    return {
+                        src: $(this).attr('src'),
+                        alt: $(this).attr('alt')
+                    };
+                }).get();
+
+                const currentIndex = allImages.findIndex(img => img.src === $(this).attr('src'));
+
+                const showNavigationButtons = (index, total) => {
+                    return `
+                ${index > 0 ? '<button class="swal2-nav swal2-prev">‹</button>' : ''}
+                ${index < total - 1 ? '<button class="swal2-nav swal2-next">›</button>' : ''}
+            `;
+                };
+
+                const showImage = (index) => {
+                    Swal.fire({
+                        html: `
+                    <div class="swal2-image-container">
+                        <img src="${allImages[index].src}" class="swal2-image" alt="${allImages[index].alt}">
+                        ${showNavigationButtons(index, allImages.length)}
+                    </div>
+                `,
+                        title: allImages[index].alt,
+                        showConfirmButton: false,
+                        showCancelButton: false,
+                        showCloseButton: true,
+                        width: '80%',
+                        customClass: {
+                            popup: 'image-viewer-popup',
+                            image: 'img-fluid'
+                        },
+                        didRender: () => {
+                            $('.swal2-next').on('click', () => {
+                                if (index < allImages.length - 1) showImage(index +
+                                    1);
+                            });
+                            $('.swal2-prev').on('click', () => {
+                                if (index > 0) showImage(index - 1);
+                            });
+                        }
+                    });
+                };
+
+                showImage(currentIndex);
             });
         });
     </script>
@@ -404,6 +462,59 @@
         .badge-secondary {
             background-color: #6c757d;
             cursor: pointer;
+        }
+
+        .image-viewer-popup {
+            max-width: 90vw !important;
+            padding: 1rem !important;
+            position: relative;
+        }
+
+        .image-viewer-popup .swal2-image-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .image-viewer-popup .swal2-image {
+            max-height: 80vh !important;
+            object-fit: contain;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .swal2-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.6);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .swal2-nav:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .swal2-prev {
+            left: 20px;
+        }
+
+        .swal2-next {
+            right: 20px;
+        }
+
+        .room-carousel img {
+            cursor: zoom-in !important;
         }
     </style>
 @endsection
