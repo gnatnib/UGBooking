@@ -16,37 +16,47 @@
             </div>
 
             <div class="row mb-4">
-                <div class="col-md-8">
-                    <form id="filterForm" action="{{ route('form/allbooking') }}" method="GET" class="form-inline">
-                        <div class="form-group mx-sm-3">
-                            <label for="month" class="mr-2">Month:</label>
-                            <select name="month" id="month" class="form-control">
-                                <option value="">All Months</option>
-                                @foreach ($months as $key => $month)
-                                    <option value="{{ $key }}" {{ request('month') == $key ? 'selected' : '' }}>
-                                        {{ $month }}
-                                    </option>
-                                @endforeach
-                            </select>
+                <div class="col-12">
+                    <form id="filterForm" action="{{ route('form/allbooking') }}" method="GET"
+                        class="d-flex align-items-center flex-wrap">
+                        <div class="d-flex align-items-center flex-wrap filter-group">
+                            <div class="form-group d-flex align-items-center me-3">
+                                <label for="month" class="me-2">Month:</label>
+                                <select name="month" id="month" class="form-control">
+                                    <option value="">All Months</option>
+                                    @foreach ($months as $key => $month)
+                                        <option value="{{ $key }}"
+                                            {{ request('month') == $key ? 'selected' : '' }}>
+                                            {{ $month }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group d-flex align-items-center me-3">
+                                <label for="year" class="me-2">Year:</label>
+                                <select name="year" id="year" class="form-control">
+                                    <option value="">All Years</option>
+                                    @foreach ($years as $year)
+                                        <option value="{{ $year }}"
+                                            {{ request('year') == $year ? 'selected' : '' }}>
+                                            {{ $year }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-secondary me-3"
+                                onclick="window.location.href='{{ route('form/allbooking') }}'">
+                                Reset Filter
+                            </button>
                         </div>
-                        <div class="form-group mx-sm-3">
-                            <label for="year" class="mr-2">Year:</label>
-                            <select name="year" id="year" class="form-control">
-                                <option value="">All Years</option>
-                                @foreach ($years as $year)
-                                    <option value="{{ $year }}" {{ request('year') == $year ? 'selected' : '' }}>
-                                        {{ $year }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <a href="{{ route('form/allbooking') }}" class="btn btn-secondary">Reset Filter</a>
-                        <div class="input-group mx-3" style="width: 250px;">
-                            <input type="text" class="form-control" placeholder="Search..." id="searchBooking">
-                            <div class="input-group-append">
-                                <span class="input-group-text">
-                                    <i class="fas fa-search"></i>
-                                </span>
+                        <div class="search-container ms-auto">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Search..." id="searchBooking">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -165,7 +175,8 @@
                                                                     @endif
                                                                     @if (Auth::user()->role_name == 'superadmin')
                                                                         <a class="dropdown-item bookingDelete"
-                                                                            data-toggle="modal" data-target="#delete_asset"
+                                                                            data-toggle="modal"
+                                                                            data-target="#delete_asset"
                                                                             data-id="{{ $bookings->bkg_id }}">
                                                                             <i class="fas fa-trash-alt m-r-5"></i> Delete
                                                                         </a>
@@ -407,7 +418,7 @@
                 );
             });
         });
-            </script>
+    </script>
 
     <style>
         .form-inline {
@@ -483,28 +494,29 @@
         .whatsapp-icon {
             vertical-align: middle;
         }
-        .search-box {
-        min-width: 250px;
-    }
 
-    @media (max-width: 768px) {
         .search-box {
-            width: 100%;
+            min-width: 250px;
         }
-        
-        .form-group {
-            margin-right: 0 !important;
-            width: 100%;
-        }
-        
-        .btn {
-            width: 100%;
-            margin-top: 10px;
-        }
-        
-        .input-group {
-            width: 100% !important;
-        }
+
+        @media (max-width: 768px) {
+            .search-box {
+                width: 100%;
+            }
+
+            .form-group {
+                margin-right: 0 !important;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .input-group {
+                width: 100% !important;
+            }
         }
 
         #filterForm {
@@ -512,9 +524,20 @@
         }
 
         .form-group {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .search-container {
+            min-width: 250px;
+        }
+
+        .input-group {
+            width: 100%;
+        }
+
+        .filter-group {
+            gap: 15px;
         }
 
         .form-group label {
@@ -529,6 +552,29 @@
         .form-control:focus {
             box-shadow: none;
             border-color: #ced4da;
+        }
+
+        @media (max-width: 992px) {
+            .search-container {
+                width: 100%;
+                margin-top: 15px;
+            }
+
+            .filter-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-group {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .btn {
+                width: 100%;
+            }
         }
     </style>
 @endsection
