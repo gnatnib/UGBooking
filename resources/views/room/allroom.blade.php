@@ -176,16 +176,28 @@
     </div>
 
     @section('script')
-    <script>
+   <script>
 $(document).ready(function() {
-    // Event listener untuk badge fasilitas
-    $(document).on('click', '.facility-badge', function(e) {
+    // Event listener untuk baris tabel (kecuali kolom gambar dan aksi)
+    $('.datatable tbody').on('click', 'tr', function(e) {
+        // Pastikan kolom gambar dan aksi tidak memicu event
+        if ($(e.target).closest('.room-carousel, .dropdown-action').length) {
+            return;
+        }
+
         const roomDetails = {
-            id: $(this).data('id'),
-            roomType: $(this).data('room-type'),
-            capacity: $(this).data('capacity'),
-            facilities: $(this).data('facilities')
+            id: $(this).find('.id').text().trim(),
+            roomType: $(this).find('td:nth-child(3)').text().trim(),
+            capacity: $(this).find('td:nth-child(4)').text().trim(),
+            facilities: $(this).find('.facility-badge').map(function() {
+                return $(this).text().trim();
+            }).get().join(', '),
+            images: $(this).find('.room-carousel .carousel-item img').map(function() {
+                return $(this).attr('src');
+            }).get()
         };
+
+        
 
         Swal.fire({
             title: `Room Details - ${roomDetails.roomType}`,
@@ -193,7 +205,8 @@ $(document).ready(function() {
                 <div class="room-details">
                     <p><strong>Room Type:</strong> ${roomDetails.roomType}</p>
                     <p><strong>Capacity:</strong> ${roomDetails.capacity} people</p>
-                    <p><strong>Facilities:</strong> ${roomDetails.facilities}</p>
+                    <p><strong>Facilities:</strong> ${roomDetails.facilities || 'No facilities listed'}</p>
+                    
                 </div>
             `,
             confirmButtonText: 'Close',
@@ -202,39 +215,9 @@ $(document).ready(function() {
             }
         });
     });
-
-    // Inisialisasi DataTable
-    if (!$.fn.DataTable.isDataTable('.datatable')) {
-        $('.datatable').DataTable({
-            "responsive": true,
-            "columnDefs": [
-                { "orderable": false, "targets": [3, 4, 6] },
-                { "width": "15%", "targets": 0 },
-                { "width": "20%", "targets": 1 },
-                { "width": "10%", "targets": 2 },
-                { "width": "15%", "targets": 3 },
-                { "width": "20%", "targets": 4 },
-                { "width": "10%", "targets": 5 },
-                { "width": "10%", "targets": 6 }
-            ]
-        });
-    }
-
-    // Menginisialisasi tooltips
-    $('[data-toggle="tooltip"]').tooltip();
-
-    // Auto-hide alerts
-    setTimeout(function() {
-        $(".alert").fadeOut("slow");
-    }, 3000);
-
-    // Initialize all carousels
-    $('.carousel').carousel({
-        interval: false
-    });
 });
+</script>
 
-    </script>
 
     <style>
         .room-carousel {
