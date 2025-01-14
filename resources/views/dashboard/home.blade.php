@@ -111,22 +111,28 @@
                 <div class="col-md-12 d-flex">
                     <div class="card card-table flex-fill">
                         <!-- Bagian yang dimodifikasi -->
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="card-title mb-0">Booking</h4>
-                            <div class="d-flex gap-3 align-items-center">
-                                @if (Auth::user()->role_name == 'admin' || Auth::user()->role_name == 'superadmin')
-                                    <!-- Replace the existing export button -->
-                                    <a href="{{ route('export.bookings') }}" class="btn btn-export">
-                                        <i class="fas fa-download"></i>
-                                        Export to CSV
-                                    </a>
-                                @endif
-                                <div class="input-group mx-3" style="width: 250px;">
-                                    <input type="text" class="form-control" placeholder="Search..." id="searchBooking">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">
-                                            <i class="fas fa-search"></i>
-                                        </span>
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col-12 col-sm-12 col-md-4 mb-2 mb-md-0">
+                                    <h4 class="card-title">Booking</h4>
+                                </div>
+                                <div class="col-12 col-sm-12 col-md-8">
+                                    <div class="d-flex flex-column flex-sm-row justify-content-end gap-2">
+                                        @if (Auth::user()->role_name == 'admin' || Auth::user()->role_name == 'superadmin')
+                                            <a href="{{ route('export.bookings') }}" class="btn btn-success mb-2 mb-sm-0">
+                                                <i class="fas fa-download mr-2"></i> Export to CSV
+                                            </a>
+                                        @endif
+                                        <div class="search-box">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="Search..." id="searchBooking">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">
+                                                        <i class="fas fa-search"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -339,146 +345,222 @@
 
             @push('styles')
            
-<style>
-    /* Chart Responsiveness */
-    .donut-chart-container {
-        min-height: 300px;
-        position: relative;
-        width: 100%;
-    }
+            <style>
 
-    @media (min-width: 768px) {
-        .donut-chart-container {
-            min-height: 400px;
-        }
-    }
+                /* Export Button Styling */
+            .btn-export {
+                background-color: #FFBF00;
+                border: none;
+                color: #000;
+                padding: 0.5rem 1rem;
+                border-radius: 0.5rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                transition: all 0.3s ease;
+                font-weight: 500;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
 
-    /* Export Button Styling */
-    .btn-export {
-        background-color: #FFBF00;
-        border: none;
-        color: #000;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: all 0.3s ease;
-        font-weight: 500;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+            .btn-export:hover {
+                background-color: #F1B100;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
 
-    .btn-export:hover {
-        background-color: #F1B100;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
+            .btn-export i {
+                font-size: 1rem;
+            }
 
-    .btn-export i {
-        font-size: 1rem;
-    }
+            /* Search Box Styling */
+            .input-group {
+                position: relative;
+                max-width: 300px;
+                margin: 0 !important;
+            }
 
-    /* Chart Legend Styling */
-    .chart-legend {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 1rem;
-        margin-top: 1rem;
-        padding: 0.5rem;
-    }
+            .input-group .form-control {
+                border-radius: 0.5rem 0 0 0.5rem;
+                border: 1px solid #ddd;
+                padding: 0.5rem 1rem;
+            }
 
-    .legend-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.875rem;
-        color: #666;
-    }
+            .input-group .input-group-append .input-group-text {
+                background-color: #fff;
+                border-radius: 0 0.5rem 0.5rem 0;
+                border: 1px solid #ddd;
+                border-left: none;
+            }
 
-    .legend-color {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-    }
+            .input-group .form-control:focus {
+                border-color: #FFBF00;
+                box-shadow: 0 0 0 2px rgba(255, 191, 0, 0.2);
+                outline: none;
+            }
 
-    /* Search Box Styling */
-    .search-container {
-        position: relative;
-        max-width: 300px;
-        width: 100%;
-        margin: 0.5rem 0;
-    }
+            /* Responsive styles */
+            @media (max-width: 768px) {
+                .card-header {
+                    flex-direction: column;
+                    align-items: stretch !important;
+                    gap: 1rem;
+                }
 
-    .search-container input {
-        width: 100%;
-        padding: 0.5rem 1rem;
-        padding-right: 2.5rem;
-        border: 1px solid #ddd;
-        border-radius: 0.5rem;
-        transition: all 0.3s ease;
-    }
+                .d-flex.gap-3 {
+                    flex-direction: column;
+                }
 
-    .search-container input:focus {
-        border-color: #FFBF00;
-        box-shadow: 0 0 0 2px rgba(255, 191, 0, 0.2);
-        outline: none;
-    }
+                .btn-export {
+                    width: 100%;
+                    justify-content: center;
+                }
 
-    .search-container i {
-        position: absolute;
-        right: 0.75rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #666;
-    }
+                .input-group {
+                    width: 100% !important;
+                    max-width: 100%;
+                    margin: 0 !important;
+                }
+            }
 
-    /* Add to your existing CSS */
-@media (max-width: 768px) {
-    #donut-chart {
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        margin: 0 auto !important;
-        padding: 0 !important;
-        width: 100% !important;
-    }
+                /* Chart Responsiveness */
+                .donut-chart-container {
+                    min-height: 300px;
+                    position: relative;
+                    width: 100%;
+                }
 
-    .apexcharts-canvas {
-        margin: 0 auto !important;
-        display: block !important;
-    }
+                @media (min-width: 768px) {
+                    .donut-chart-container {
+                        min-height: 400px;
+                    }
+                }
 
-    .card-body {
-        padding: 1rem !important;
-    }
+                /* Export Button Styling */
+                .btn-export {
+                    background-color: #FFBF00;
+                    border: none;
+                    color: #000;
+                    padding: 0.5rem 1rem;
+                    border-radius: 0.5rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    transition: all 0.3s ease;
+                    font-weight: 500;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                }
 
-    .apexcharts-legend {
-        padding: 0 !important;
-        justify-content: center !important;
-        left: 0 !important;
-        right: 0 !important;
-        margin: 0 auto !important;
-    }
-}
+                .btn-export:hover {
+                    background-color: #F1B100;
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                }
 
-/* General chart styles */
-.card-chart {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 1rem;
-}
+                .btn-export i {
+                    font-size: 1rem;
+                }
 
-.donut-chart-container {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    min-height: 300px;
-}
-</style>
+                /* Chart Legend Styling */
+                .chart-legend {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    gap: 1rem;
+                    margin-top: 1rem;
+                    padding: 0.5rem;
+                }
+
+                .legend-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    font-size: 0.875rem;
+                    color: #666;
+                }
+
+                .legend-color {
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 50%;
+                }
+
+                /* Search Box Styling */
+                .search-container {
+                    position: relative;
+                    max-width: 300px;
+                    width: 100%;
+                    margin: 0.5rem 0;
+                }
+
+                .search-container input {
+                    width: 100%;
+                    padding: 0.5rem 1rem;
+                    padding-right: 2.5rem;
+                    border: 1px solid #ddd;
+                    border-radius: 0.5rem;
+                    transition: all 0.3s ease;
+                }
+
+                .search-container input:focus {
+                    border-color: #FFBF00;
+                    box-shadow: 0 0 0 2px rgba(255, 191, 0, 0.2);
+                    outline: none;
+                }
+
+                .search-container i {
+                    position: absolute;
+                    right: 0.75rem;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: #666;
+                }
+
+                /* Add to your existing CSS */
+            @media (max-width: 768px) {
+                #donut-chart {
+                    display: flex !important;
+                    justify-content: center !important;
+                    align-items: center !important;
+                    margin: 0 auto !important;
+                    padding: 0 !important;
+                    width: 100% !important;
+                }
+
+                .apexcharts-canvas {
+                    margin: 0 auto !important;
+                    display: block !important;
+                }
+
+                .card-body {
+                    padding: 1rem !important;
+                }
+
+                .apexcharts-legend {
+                    padding: 0 !important;
+                    justify-content: center !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    margin: 0 auto !important;
+                }
+            }
+
+            /* General chart styles */
+            .card-chart {
+                background: #fff;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                margin-bottom: 1rem;
+            }
+
+            .donut-chart-container {
+                position: relative;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                min-height: 300px;
+            }
+            </style>
                 <style>
                     .booking-row {
                         cursor: pointer;
@@ -676,36 +758,153 @@
                         transform: translateY(-1px);
                     }
 
-                    /* Export button style */
-                    .btn-primary {
+                    /* Card Header Base Styles */
+                    .card-header {
+                        padding: 1.5rem;
+                        background: #fff;
+                    }
+
+                    /* Gap Utility */
+                    .gap-2 {
+                        gap: 0.5rem;
+                    }
+
+                    /* Export Button Styles */
+                    .btn-export {
                         background-color: #FFBF00;
                         border: none;
-                        color: #000000;
-                        padding: 8px 20px;
-                        border-radius: 5px;
-                        font-weight: 500;
+                        color: #000;
+                        padding: 0.5rem 1rem;
+                        border-radius: 0.5rem;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
                         transition: all 0.3s ease;
+                        font-weight: 500;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                        white-space: nowrap;
+                        min-width: 140px;
+                        justify-content: center;
                     }
 
-                    .btn-primary:hover {
-                        background-color: #FFB300;
-                        color: #000000;
-                        transform: translateY(-2px);
-                        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                    .btn-export:hover {
+                        background-color: #F1B100;
+                        transform: translateY(-1px);
+                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                        color: #000;
+                        text-decoration: none;
                     }
 
-                    /* Card header layout */
-                    .card-header {
-                        padding: 1rem 1.5rem;
+                    .btn-export i {
+                        font-size: 1rem;
                     }
 
-                    .gap-3 {
-                        gap: 1rem;
+                    /* Search Box Container */
+                    .search-box {
+                        flex: 1;
+                        max-width: 300px;
+                        min-width: 200px;
                     }
 
-                    /* Search box width */
-                    .input-group {
-                        width: 250px !important;
+                    /* Search Input Group */
+                    .search-box .input-group {
+                        width: 100% !important;
+                    }
+
+                    .search-box .form-control {
+                        height: 38px;
+                        border-radius: 0.5rem 0 0 0.5rem;
+                        border: 1px solid #ddd;
+                        padding: 0.5rem 1rem;
+                    }
+
+                    .search-box .input-group-append .input-group-text {
+                        background-color: #fff;
+                        border-radius: 0 0.5rem 0.5rem 0;
+                        border: 1px solid #ddd;
+                        border-left: none;
+                    }
+
+                    .search-box .form-control:focus {
+                        border-color: #FFBF00;
+                        box-shadow: 0 0 0 2px rgba(255, 191, 0, 0.2);
+                        outline: none;
+                    }
+
+                    /* Large Desktop */
+                    @media (min-width: 1200px) {
+                        .search-box {
+                            max-width: 300px;
+                        }
+                    }
+
+                    /* Desktop */
+                    @media (min-width: 992px) and (max-width: 1199px) {
+                        .search-box {
+                            max-width: 250px;
+                        }
+                    }
+
+                    /* Tablet */
+                    @media (min-width: 768px) and (max-width: 991px) {
+                        .card-header {
+                            padding: 1.25rem;
+                        }
+
+                        .search-box {
+                            max-width: 220px;
+                        }
+                    }
+
+                    /* Small Tablet */
+                    @media (min-width: 576px) and (max-width: 767px) {
+                        .card-header {
+                            padding: 1rem;
+                        }
+
+                        .btn-export {
+                            min-width: 120px;
+                        }
+
+                        .search-box {
+                            max-width: 200px;
+                        }
+                    }
+
+                    /* Mobile */
+                    @media (max-width: 575px) {
+                        .card-header {
+                            padding: 1rem;
+                        }
+
+                        .d-flex.flex-column.flex-sm-row {
+                            gap: 0.75rem;
+                        }
+
+                        .btn-export {
+                            width: 100%;
+                            min-width: 100%;
+                        }
+
+                        .search-box {
+                            max-width: 100%;
+                            width: 100%;
+                        }
+
+                        .search-box .input-group {
+                            width: 100% !important;
+                        }
+                    }
+
+                    /* Extra Small Mobile */
+                    @media (max-width: 375px) {
+                        .card-header {
+                            padding: 0.75rem;
+                        }
+
+                        .btn-export {
+                            padding: 0.4rem 0.75rem;
+                        }
                     }
 
                     .whatsapp-link {
@@ -727,12 +926,13 @@
                     td.text-center {
                         text-align: center;
                     }
+                    
                 </style>
             @endpush
 
             @push('scripts')
                 <script>
-                    var roomStatsJson = {!! $roomStatsJson !!};
+                     var roomStatsJson = {!! $roomStatsJson !!};
                     $(document).ready(function() {
 
                         // bar chart dashboard
@@ -771,7 +971,6 @@
                                     background: 'transparent',
                                     events: {
                                         mounted: function(chartContext, config) {
-                                            // Center the chart container after rendering
                                             const chart = document.querySelector('#donut-chart');
                                             if (chart) {
                                                 chart.style.display = 'flex';
@@ -788,21 +987,14 @@
                                         donut: {
                                             size: '70%',
                                             labels: {
-                                                show: true,
-                                                total: {
-                                                    show: false,
-                                                    label: 'Total Bookings',
-                                                    formatter: function (w) {
-                                                        return w.globals.seriesTotals.reduce((a, b) => a + b, 0) + '%';
-                                                    }
-                                                }
+                                                show: false  // Ini akan menghilangkan label di tengah donut
                                             }
                                         },
                                         offsetY: 0
                                     }
                                 },
                                 dataLabels: {
-                                    enabled: true,
+                                    enabled: true,  // Mempertahankan label persentase di setiap bagian
                                     formatter: function (val) {
                                         return val.toFixed(1) + '%';
                                     }
@@ -819,9 +1011,6 @@
                                     itemMargin: {
                                         horizontal: 10,
                                         vertical: 5
-                                    },
-                                    formatter: function(seriesName, opts) {
-                                        return [seriesName];
                                     }
                                 },
                                 responsive: [{
@@ -837,8 +1026,12 @@
                                         }
                                     }
                                 }],
-                                stroke: {
-                                    width: 2
+                                tooltip: {
+                                    y: {
+                                        formatter: function(value) {
+                                            return value;
+                                        }
+                                    }
                                 }
                             };
 
