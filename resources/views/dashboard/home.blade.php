@@ -71,7 +71,10 @@
                                 <div class="ml-auto mt-md-3 mt-lg-0">
                                     <button class="btn badge-view text-white" data-toggle="modal"
                                         data-target="#todayBookingsModal">
-                                        View
+                                        <a href="#" class="btn btn-warning"
+                                            style="background-color: #FFBF00; padding: 0.5rem 1rem; border-radius: 0.5rem; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); border: none;">
+                                            View
+                                        </a>
                                     </button>
                                 </div>
                             </div>
@@ -125,7 +128,8 @@
                                         @endif
                                         <div class="search-box">
                                             <div class="input-group">
-                                                <input type="text" class="form-control" placeholder="Search..." id="searchBooking">
+                                                <input type="text" class="form-control" placeholder="Search..."
+                                                    id="searchBooking">
                                                 <div class="input-group-append">
                                                     <span class="input-group-text">
                                                         <i class="fas fa-search"></i>
@@ -163,7 +167,8 @@
                                                 data-total-numbers="{{ $booking->total_numbers }}"
                                                 data-room-type="{{ $booking->room_type }}"
                                                 data-phone="{{ $booking->phone_number }}"
-                                                data-status="{{ $booking->status_meet }}" data-date="{{ $booking->date }}"
+                                                data-status="{{ $booking->status_meet }}"
+                                                data-date="{{ $booking->date }}"
                                                 data-time-start="{{ $booking->time_start }}"
                                                 data-time-end="{{ $booking->time_end }}">
 
@@ -344,224 +349,221 @@
             </div>
 
             @push('styles')
-           
-            <style>
-
-                /* Export Button Styling */
-            .btn-export {
-                background-color: #FFBF00;
-                border: none;
-                color: #000;
-                padding: 0.5rem 1rem;
-                border-radius: 0.5rem;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                transition: all 0.3s ease;
-                font-weight: 500;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            }
-
-            .btn-export:hover {
-                background-color: #F1B100;
-                transform: translateY(-1px);
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            }
-
-            .btn-export i {
-                font-size: 1rem;
-            }
-
-            /* Search Box Styling */
-            .input-group {
-                position: relative;
-                max-width: 300px;
-                margin: 0 !important;
-            }
-
-            .input-group .form-control {
-                border-radius: 0.5rem 0 0 0.5rem;
-                border: 1px solid #ddd;
-                padding: 0.5rem 1rem;
-            }
-
-            .input-group .input-group-append .input-group-text {
-                background-color: #fff;
-                border-radius: 0 0.5rem 0.5rem 0;
-                border: 1px solid #ddd;
-                border-left: none;
-            }
-
-            .input-group .form-control:focus {
-                border-color: #FFBF00;
-                box-shadow: 0 0 0 2px rgba(255, 191, 0, 0.2);
-                outline: none;
-            }
-
-            /* Responsive styles */
-            @media (max-width: 768px) {
-                .card-header {
-                    flex-direction: column;
-                    align-items: stretch !important;
-                    gap: 1rem;
-                }
-
-                .d-flex.gap-3 {
-                    flex-direction: column;
-                }
-
-                .btn-export {
-                    width: 100%;
-                    justify-content: center;
-                }
-
-                .input-group {
-                    width: 100% !important;
-                    max-width: 100%;
-                    margin: 0 !important;
-                }
-            }
-
-                /* Chart Responsiveness */
-                .donut-chart-container {
-                    min-height: 300px;
-                    position: relative;
-                    width: 100%;
-                }
-
-                @media (min-width: 768px) {
-                    .donut-chart-container {
-                        min-height: 400px;
-                    }
-                }
-
-                /* Export Button Styling */
-                .btn-export {
-                    background-color: #FFBF00;
-                    border: none;
-                    color: #000;
-                    padding: 0.5rem 1rem;
-                    border-radius: 0.5rem;
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    transition: all 0.3s ease;
-                    font-weight: 500;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                }
-
-                .btn-export:hover {
-                    background-color: #F1B100;
-                    transform: translateY(-1px);
-                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                }
-
-                .btn-export i {
-                    font-size: 1rem;
-                }
-
-                /* Chart Legend Styling */
-                .chart-legend {
-                    display: flex;
-                    flex-wrap: wrap;
-                    justify-content: center;
-                    gap: 1rem;
-                    margin-top: 1rem;
-                    padding: 0.5rem;
-                }
-
-                .legend-item {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    font-size: 0.875rem;
-                    color: #666;
-                }
-
-                .legend-color {
-                    width: 12px;
-                    height: 12px;
-                    border-radius: 50%;
-                }
-
-                /* Search Box Styling */
-                .search-container {
-                    position: relative;
-                    max-width: 300px;
-                    width: 100%;
-                    margin: 0.5rem 0;
-                }
-
-                .search-container input {
-                    width: 100%;
-                    padding: 0.5rem 1rem;
-                    padding-right: 2.5rem;
-                    border: 1px solid #ddd;
-                    border-radius: 0.5rem;
-                    transition: all 0.3s ease;
-                }
-
-                .search-container input:focus {
-                    border-color: #FFBF00;
-                    box-shadow: 0 0 0 2px rgba(255, 191, 0, 0.2);
-                    outline: none;
-                }
-
-                .search-container i {
-                    position: absolute;
-                    right: 0.75rem;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    color: #666;
-                }
-
-                /* Add to your existing CSS */
-            @media (max-width: 768px) {
-                #donut-chart {
-                    display: flex !important;
-                    justify-content: center !important;
-                    align-items: center !important;
-                    margin: 0 auto !important;
-                    padding: 0 !important;
-                    width: 100% !important;
-                }
-
-                .apexcharts-canvas {
-                    margin: 0 auto !important;
-                    display: block !important;
-                }
-
-                .card-body {
-                    padding: 1rem !important;
-                }
-
-                .apexcharts-legend {
-                    padding: 0 !important;
-                    justify-content: center !important;
-                    left: 0 !important;
-                    right: 0 !important;
-                    margin: 0 auto !important;
-                }
-            }
-
-            /* General chart styles */
-            .card-chart {
-                background: #fff;
-                border-radius: 8px;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                margin-bottom: 1rem;
-            }
-
-            .donut-chart-container {
-                position: relative;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                width: 100%;
-                min-height: 300px;
-            }
-            </style>
                 <style>
+                    /* Export Button Styling */
+                    .btn-export {
+                        background-color: #FFBF00;
+                        border: none;
+                        color: #000;
+                        padding: 0.5rem 1rem;
+                        border-radius: 0.5rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        transition: all 0.3s ease;
+                        font-weight: 500;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    }
+
+                    .btn-export:hover {
+                        background-color: #F1B100;
+                        transform: translateY(-1px);
+                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    }
+
+                    .btn-export i {
+                        font-size: 1rem;
+                    }
+
+                    /* Search Box Styling */
+                    .input-group {
+                        position: relative;
+                        max-width: 300px;
+                        margin: 0 !important;
+                    }
+
+                    .input-group .form-control {
+                        border-radius: 0.5rem 0 0 0.5rem;
+                        border: 1px solid #ddd;
+                        padding: 0.5rem 1rem;
+                    }
+
+                    .input-group .input-group-append .input-group-text {
+                        background-color: #fff;
+                        border-radius: 0 0.5rem 0.5rem 0;
+                        border: 1px solid #ddd;
+                        border-left: none;
+                    }
+
+                    .input-group .form-control:focus {
+                        border-color: #FFBF00;
+                        box-shadow: 0 0 0 2px rgba(255, 191, 0, 0.2);
+                        outline: none;
+                    }
+
+                    /* Responsive styles */
+                    @media (max-width: 768px) {
+                        .card-header {
+                            flex-direction: column;
+                            align-items: stretch !important;
+                            gap: 1rem;
+                        }
+
+                        .d-flex.gap-3 {
+                            flex-direction: column;
+                        }
+
+                        .btn-export {
+                            width: 100%;
+                            justify-content: center;
+                        }
+
+                        .input-group {
+                            width: 100% !important;
+                            max-width: 100%;
+                            margin: 0 !important;
+                        }
+                    }
+
+                    /* Chart Responsiveness */
+                    .donut-chart-container {
+                        min-height: 300px;
+                        position: relative;
+                        width: 100%;
+                    }
+
+                    @media (min-width: 768px) {
+                        .donut-chart-container {
+                            min-height: 400px;
+                        }
+                    }
+
+                    /* Export Button Styling */
+                    .btn-export {
+                        background-color: #FFBF00;
+                        border: none;
+                        color: #000;
+                        padding: 0.5rem 1rem;
+                        border-radius: 0.5rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        transition: all 0.3s ease;
+                        font-weight: 500;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    }
+
+                    .btn-export:hover {
+                        background-color: #F1B100;
+                        transform: translateY(-1px);
+                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    }
+
+                    .btn-export i {
+                        font-size: 1rem;
+                    }
+
+                    /* Chart Legend Styling */
+                    .chart-legend {
+                        display: flex;
+                        flex-wrap: wrap;
+                        justify-content: center;
+                        gap: 1rem;
+                        margin-top: 1rem;
+                        padding: 0.5rem;
+                    }
+
+                    .legend-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        font-size: 0.875rem;
+                        color: #666;
+                    }
+
+                    .legend-color {
+                        width: 12px;
+                        height: 12px;
+                        border-radius: 50%;
+                    }
+
+                    /* Search Box Styling */
+                    .search-container {
+                        position: relative;
+                        max-width: 300px;
+                        width: 100%;
+                        margin: 0.5rem 0;
+                    }
+
+                    .search-container input {
+                        width: 100%;
+                        padding: 0.5rem 1rem;
+                        padding-right: 2.5rem;
+                        border: 1px solid #ddd;
+                        border-radius: 0.5rem;
+                        transition: all 0.3s ease;
+                    }
+
+                    .search-container input:focus {
+                        border-color: #FFBF00;
+                        box-shadow: 0 0 0 2px rgba(255, 191, 0, 0.2);
+                        outline: none;
+                    }
+
+                    .search-container i {
+                        position: absolute;
+                        right: 0.75rem;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        color: #666;
+                    }
+
+                    /* Add to your existing CSS */
+                    @media (max-width: 768px) {
+                        #donut-chart {
+                            display: flex !important;
+                            justify-content: center !important;
+                            align-items: center !important;
+                            margin: 0 auto !important;
+                            padding: 0 !important;
+                            width: 100% !important;
+                        }
+
+                        .apexcharts-canvas {
+                            margin: 0 auto !important;
+                            display: block !important;
+                        }
+
+                        .card-body {
+                            padding: 1rem !important;
+                        }
+
+                        .apexcharts-legend {
+                            padding: 0 !important;
+                            justify-content: center !important;
+                            left: 0 !important;
+                            right: 0 !important;
+                            margin: 0 auto !important;
+                        }
+                    }
+
+                    /* General chart styles */
+                    .card-chart {
+                        background: #fff;
+                        border-radius: 8px;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                        margin-bottom: 1rem;
+                    }
+
+                    .donut-chart-container {
+                        position: relative;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 100%;
+                        min-height: 300px;
+                    }
+
                     .booking-row {
                         cursor: pointer;
                         transition: background-color 0.3s ease;
@@ -681,6 +683,22 @@
                         border-radius: 5px;
                         font-size: 0.9rem;
                         display: inline-block;
+                    }
+
+                    .btn.badge-view {
+                        background-color: #FFBF00;
+                        padding: 0.5rem 1rem;
+                        border-radius: 0.5rem;
+                        font-weight: 500;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                        border: none;
+                    }
+
+                    .btn.badge-view:hover {
+                        background-color: #F1B100;
+                        transform: translateY(-1px);
+                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                     }
 
                     .badge-info {
@@ -926,13 +944,12 @@
                     td.text-center {
                         text-align: center;
                     }
-                    
                 </style>
             @endpush
 
             @push('scripts')
                 <script>
-                     var roomStatsJson = {!! $roomStatsJson !!};
+                    var roomStatsJson = {!! $roomStatsJson !!};
                     $(document).ready(function() {
 
                         // bar chart dashboard
@@ -947,11 +964,12 @@
                             gridLineColor: '#eef0f2',
                             resize: true,
                             barSizeRatio: 0.42,
-                            xLabelAngle: 0,
-                            gridTextSize: 10,
+                            xLabelMargin: 10,
+                            xLabelAngle: window.innerWidth <= 768 ? 20 : 0,
+                            gridTextSize: window.innerWidth <= 768 ? 8 : 10,
                             ymin: 0,
-                            ymax: Math.ceil(Math.max(...roomStatsJson.map(item => item.a))),
                             parseTime: false,
+                            postUnits: '', // Add this line
                             goals: [0],
                             goalLineColors: ['#eef0f2'],
                             yLabelFormat: function(y) {
@@ -959,115 +977,129 @@
                             },
                             numLines: Math.ceil(Math.max(...roomStatsJson.map(item => item.a))) + 1,
                             grid: true,
-                            gridSteps: 1
+                            gridSteps: 1,
+                            padding: window.innerWidth <= 768 ? 30 : 20,
+                            labelMargin: window.innerWidth <= 768 ? 8 : 4,
+                            redraw: true
                         });
 
                         // Donut chart
-                            var divisionData = {!! $divisionStatsJson !!};
-                            var options = {
-                                chart: {
-                                    type: 'donut',
-                                    height: 350,
-                                    background: 'transparent',
-                                    events: {
-                                        mounted: function(chartContext, config) {
-                                            const chart = document.querySelector('#donut-chart');
-                                            if (chart) {
-                                                chart.style.display = 'flex';
-                                                chart.style.justifyContent = 'center';
-                                            }
+                        var divisionData = {!! $divisionStatsJson !!};
+                        var options = {
+                            chart: {
+                                type: 'donut',
+                                height: 350,
+                                background: 'transparent',
+                                events: {
+                                    mounted: function(chartContext, config) {
+                                        const chart = document.querySelector('#donut-chart');
+                                        if (chart) {
+                                            chart.style.display = 'flex';
+                                            chart.style.justifyContent = 'center';
                                         }
                                     }
+                                }
+                            },
+                            series: divisionData.map(item => item.value),
+                            labels: divisionData.map(item => item.name),
+                            colors: ['#1D5B79', '#FAD02E', '#2E97A7'],
+                            plotOptions: {
+                                pie: {
+                                    donut: {
+                                        size: '70%',
+                                        labels: {
+                                            show: false // Ini akan menghilangkan label di tengah donut
+                                        }
+                                    },
+                                    offsetY: 0
+                                }
+                            },
+                            dataLabels: {
+                                enabled: true, // Mempertahankan label persentase di setiap bagian
+                                formatter: function(val) {
+                                    return val.toFixed(1) + '%';
+                                }
+                            },
+                            legend: {
+                                position: 'bottom',
+                                horizontalAlign: 'center',
+                                fontSize: '14px',
+                                markers: {
+                                    width: 12,
+                                    height: 12,
+                                    radius: 6
                                 },
-                                series: divisionData.map(item => item.value),
-                                labels: divisionData.map(item => item.name),
-                                colors: ['#1D5B79', '#FAD02E', '#2E97A7'],
-                                plotOptions: {
-                                    pie: {
-                                        donut: {
-                                            size: '70%',
-                                            labels: {
-                                                show: false  // Ini akan menghilangkan label di tengah donut
-                                            }
-                                        },
+                                itemMargin: {
+                                    horizontal: 10,
+                                    vertical: 5
+                                }
+                            },
+                            responsive: [{
+                                breakpoint: 480,
+                                options: {
+                                    chart: {
+                                        height: 300
+                                    },
+                                    legend: {
+                                        position: 'bottom',
+                                        fontSize: '12px',
                                         offsetY: 0
                                     }
-                                },
-                                dataLabels: {
-                                    enabled: true,  // Mempertahankan label persentase di setiap bagian
-                                    formatter: function (val) {
-                                        return val.toFixed(1) + '%';
+                                }
+                            }],
+                            tooltip: {
+                                y: {
+                                    formatter: function(value) {
+                                        return value;
                                     }
+                                }
+                            }
+                        };
+
+                        var chart = new ApexCharts(document.querySelector("#donut-chart"), options);
+                        chart.render();
+
+                        let resizeTimeout;
+                        window.addEventListener('resize', function() {
+                            clearTimeout(resizeTimeout);
+                            resizeTimeout = setTimeout(function() {
+                                if (window.barChart) {
+                                    barChart.options.xLabelAngle = window.innerWidth <= 768 ? 20 : 0;
+                                    barChart.options.gridTextSize = window.innerWidth <= 768 ? 8 : 10;
+                                    barChart.options.padding = window.innerWidth <= 768 ? 30 : 20;
+                                    barChart.options.labelMargin = window.innerWidth <= 768 ? 8 : 4;
+                                    barChart.redraw(); // Force redraw
+                                }
+                            }, 250);
+                        });
+
+                        setTimeout(() => {
+                            if (window.barChart) {
+                                barChart.redraw();
+                            }
+                        }, 100);
+
+                        // Make sure chart is centered on mobile
+                        if (window.innerWidth <= 768) {
+                            chart.updateOptions({
+                                chart: {
+                                    width: '100%',
+                                    height: 300
                                 },
                                 legend: {
                                     position: 'bottom',
                                     horizontalAlign: 'center',
-                                    fontSize: '14px',
-                                    markers: {
-                                        width: 12,
-                                        height: 12,
-                                        radius: 6
-                                    },
-                                    itemMargin: {
-                                        horizontal: 10,
-                                        vertical: 5
-                                    }
+                                    floating: false,
+                                    offsetY: 10
                                 },
-                                responsive: [{
-                                    breakpoint: 480,
-                                    options: {
-                                        chart: {
-                                            height: 300
-                                        },
-                                        legend: {
-                                            position: 'bottom',
-                                            fontSize: '12px',
-                                            offsetY: 0
-                                        }
-                                    }
-                                }],
-                                tooltip: {
-                                    y: {
-                                        formatter: function(value) {
-                                            return value;
-                                        }
+                                plotOptions: {
+                                    pie: {
+                                        offsetX: 0,
+                                        offsetY: -10
                                     }
                                 }
-                            };
-
-                            var chart = new ApexCharts(document.querySelector("#donut-chart"), options);
-                            chart.render();
-
-                                // Handle resize and responsiveness
-                                window.addEventListener('resize', function() {
-                                    chart.updateOptions({
-                                        chart: {
-                                            height: window.innerWidth < 768 ? 300 : 350
-                                        }
-                                    });
-                                });
-
-                                // Make sure chart is centered on mobile
-                                if (window.innerWidth <= 768) {
-                                    chart.updateOptions({
-                                        chart: {
-                                            width: '100%',
-                                            height: 300
-                                        },
-                                        legend: {
-                                            position: 'bottom',
-                                            horizontalAlign: 'center',
-                                            floating: false,
-                                            offsetY: 10
-                                        },
-                                        plotOptions: {
-                                            pie: {
-                                                offsetX: 0,
-                                                offsetY: -10
-                                            }
-                                        }
-                                    });
-                                }
+                            });
+                        }
 
                         // Search functionality
                         $("#searchBooking").on("keyup", function() {
@@ -1140,8 +1172,6 @@
                         $('#bookingDetailsModal').modal('show');
                     });
                 </script>
-                
-
             @endpush
 
         @endsection
