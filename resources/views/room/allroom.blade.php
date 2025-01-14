@@ -92,22 +92,30 @@
                                                             $displayedFacilities = array_slice($facilities, 0, $maxDisplay);
                                                             $remainingCount = count($facilities) - $maxDisplay;
                                                         @endphp
-
+                                            
                                                         @foreach($displayedFacilities as $facility)
-                                                            <span class="badge badge-info">{{ $facility }}</span>
+                                                            <span class="badge badge-info facility-badge" 
+                                                                  data-id="{{ $rooms->id }}"
+                                                                  data-room-type="{{ $rooms->room_type }}"
+                                                                  data-capacity="{{ $rooms->capacity }}"
+                                                                  data-facilities="{{ implode(', ', $facilities) }}">
+                                                                {{ $facility }}
+                                                            </span>
                                                         @endforeach
-
+                                            
                                                         @if($remainingCount > 0)
-                                                            <span class="badge badge-secondary" 
-                                                                  data-toggle="tooltip" 
-                                                                  data-html="true"
-                                                                  title="@foreach(array_slice($facilities, $maxDisplay) as $facility){{ $facility }}<br>@endforeach">
+                                                            <span class="badge badge-secondary facility-badge" 
+                                                                  data-id="{{ $rooms->id }}"
+                                                                  data-room-type="{{ $rooms->room_type }}"
+                                                                  data-capacity="{{ $rooms->capacity }}"
+                                                                  data-facilities="{{ implode(', ', $facilities) }}"
+                                                                  title="Click to view all facilities">
                                                                 +{{ $remainingCount }}
                                                             </span>
                                                         @endif
                                                     </div>
                                                 @endif
-                                            </td>
+                                            </td>                                            
                                             <td>
                                                 @if($rooms->status == 'Ready')
                                                     <div class="actions"> 
@@ -169,47 +177,63 @@
 
     @section('script')
     <script>
-        $(document).ready(function() {
-            // Initialize DataTable
-            if (!$.fn.DataTable.isDataTable('.datatable')) {
-                $('.datatable').DataTable({
-                    "responsive": true,
-                    "columnDefs": [
-                        { "orderable": false, "targets": [3, 4, 6] },
-                        { "width": "15%", "targets": 0 },
-                        { "width": "20%", "targets": 1 },
-                        { "width": "10%", "targets": 2 },
-                        { "width": "15%", "targets": 3 },
-                        { "width": "20%", "targets": 4 },
-                        { "width": "10%", "targets": 5 },
-                        { "width": "10%", "targets": 6 }
-                    ]
-                });
-            }
-            
-            // Initialize tooltips
-            $('[data-toggle="tooltip"]').tooltip();
+$(document).ready(function() {
+    // Event listener untuk badge fasilitas
+    $(document).on('click', '.facility-badge', function(e) {
+        const roomDetails = {
+            id: $(this).data('id'),
+            roomType: $(this).data('room-type'),
+            capacity: $(this).data('capacity'),
+            facilities: $(this).data('facilities')
+        };
 
-            // Delete room handling
-            $(document).on('click', '.delete_asset', function() {
-                var _this = $(this).parents('tr');
-                $('#e_id').val(_this.find('.id').text());
-                var images = _this.find('.carousel-item img').map(function() {
-                    return $(this).attr('src').split('/').pop();
-                }).get();
-                $('#e_images').val(JSON.stringify(images));
-            });
-            
-            // Auto-hide alerts
-            setTimeout(function() {
-                $(".alert").fadeOut("slow");
-            }, 3000);
-    
-            // Initialize all carousels
-            $('.carousel').carousel({
-                interval: false
-            });
+        Swal.fire({
+            title: `Room Details - ${roomDetails.roomType}`,
+            html: `
+                <div class="room-details">
+                    <p><strong>Room Type:</strong> ${roomDetails.roomType}</p>
+                    <p><strong>Capacity:</strong> ${roomDetails.capacity} people</p>
+                    <p><strong>Facilities:</strong> ${roomDetails.facilities}</p>
+                </div>
+            `,
+            confirmButtonText: 'Close',
+            customClass: {
+                confirmButton: 'btn btn-primary'
+            }
         });
+    });
+
+    // Inisialisasi DataTable
+    if (!$.fn.DataTable.isDataTable('.datatable')) {
+        $('.datatable').DataTable({
+            "responsive": true,
+            "columnDefs": [
+                { "orderable": false, "targets": [3, 4, 6] },
+                { "width": "15%", "targets": 0 },
+                { "width": "20%", "targets": 1 },
+                { "width": "10%", "targets": 2 },
+                { "width": "15%", "targets": 3 },
+                { "width": "20%", "targets": 4 },
+                { "width": "10%", "targets": 5 },
+                { "width": "10%", "targets": 6 }
+            ]
+        });
+    }
+
+    // Menginisialisasi tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+
+    // Auto-hide alerts
+    setTimeout(function() {
+        $(".alert").fadeOut("slow");
+    }, 3000);
+
+    // Initialize all carousels
+    $('.carousel').carousel({
+        interval: false
+    });
+});
+
     </script>
 
     <style>
