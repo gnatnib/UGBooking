@@ -41,9 +41,19 @@
                             </select>
                         </div>
                         <a href="{{ route('form/allbooking') }}" class="btn btn-secondary">Reset Filter</a>
+                        <div class="input-group mx-3" style="width: 250px;">
+                            <input type="text" class="form-control" placeholder="Search..." id="searchBooking">
+                            <div class="input-group-append">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
+
+
 
             <div class="row">
                 <div class="col-sm-12">
@@ -383,7 +393,21 @@
                 $('#filterForm').submit();
             });
         });
-    </script>
+
+        //search
+        // Add this inside your existing $(document).ready function
+        $('#searchBooking').on('keyup', function() {
+            var value = $(this).val().toLowerCase();
+            $('.booking-row').filter(function() {
+                $(this).toggle(
+                    $(this).text().toLowerCase().indexOf(value) > -1 ||
+                    $(this).data('name').toLowerCase().indexOf(value) > -1 ||
+                    $(this).data('division').toLowerCase().indexOf(value) > -1 ||
+                    $(this).data('room-type').toLowerCase().indexOf(value) > -1
+                );
+            });
+        });
+            </script>
 
     <style>
         .form-inline {
@@ -458,6 +482,53 @@
 
         .whatsapp-icon {
             vertical-align: middle;
+        }
+        .search-box {
+        min-width: 250px;
+    }
+
+    @media (max-width: 768px) {
+        .search-box {
+            width: 100%;
+        }
+        
+        .form-group {
+            margin-right: 0 !important;
+            width: 100%;
+        }
+        
+        .btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .input-group {
+            width: 100% !important;
+        }
+        }
+
+        #filterForm {
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .form-group label {
+            white-space: nowrap;
+        }
+
+        .input-group-text {
+            background-color: #fff;
+            border-left: none;
+        }
+
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #ced4da;
         }
     </style>
 @endsection
