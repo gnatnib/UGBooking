@@ -92,13 +92,15 @@
                         </div>
                     </div>
                 </div>
+                <!-- Replace the existing chart card structure -->
                 <div class="col-md-12 col-lg-6">
                     <div class="card card-chart">
                         <div class="card-header">
                             <h4 class="card-title">ROOMS BOOKED</h4>
                         </div>
                         <div class="card-body">
-                            <div id="donut-chart"></div>
+                            <div id="donut-chart" class="donut-chart-container"></div>
+                            <div class="chart-legend" id="chartLegend"></div>
                         </div>
                     </div>
                 </div>
@@ -113,8 +115,10 @@
                             <h4 class="card-title mb-0">Booking</h4>
                             <div class="d-flex gap-3 align-items-center">
                                 @if (Auth::user()->role_name == 'admin' || Auth::user()->role_name == 'superadmin')
-                                    <a href="{{ route('export.bookings') }}" class="btn btn-success">
-                                        <i class="fas fa-download mr-2"></i> Export to CSV
+                                    <!-- Replace the existing export button -->
+                                    <a href="{{ route('export.bookings') }}" class="btn btn-export">
+                                        <i class="fas fa-download"></i>
+                                        Export to CSV
                                     </a>
                                 @endif
                                 <div class="input-group mx-3" style="width: 250px;">
@@ -334,6 +338,147 @@
             </div>
 
             @push('styles')
+           
+<style>
+    /* Chart Responsiveness */
+    .donut-chart-container {
+        min-height: 300px;
+        position: relative;
+        width: 100%;
+    }
+
+    @media (min-width: 768px) {
+        .donut-chart-container {
+            min-height: 400px;
+        }
+    }
+
+    /* Export Button Styling */
+    .btn-export {
+        background-color: #FFBF00;
+        border: none;
+        color: #000;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-export:hover {
+        background-color: #F1B100;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-export i {
+        font-size: 1rem;
+    }
+
+    /* Chart Legend Styling */
+    .chart-legend {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding: 0.5rem;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #666;
+    }
+
+    .legend-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+
+    /* Search Box Styling */
+    .search-container {
+        position: relative;
+        max-width: 300px;
+        width: 100%;
+        margin: 0.5rem 0;
+    }
+
+    .search-container input {
+        width: 100%;
+        padding: 0.5rem 1rem;
+        padding-right: 2.5rem;
+        border: 1px solid #ddd;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .search-container input:focus {
+        border-color: #FFBF00;
+        box-shadow: 0 0 0 2px rgba(255, 191, 0, 0.2);
+        outline: none;
+    }
+
+    .search-container i {
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+    }
+
+    /* Add to your existing CSS */
+@media (max-width: 768px) {
+    #donut-chart {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    .apexcharts-canvas {
+        margin: 0 auto !important;
+        display: block !important;
+    }
+
+    .card-body {
+        padding: 1rem !important;
+    }
+
+    .apexcharts-legend {
+        padding: 0 !important;
+        justify-content: center !important;
+        left: 0 !important;
+        right: 0 !important;
+        margin: 0 auto !important;
+    }
+}
+
+/* General chart styles */
+.card-chart {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+}
+
+.donut-chart-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 300px;
+}
+</style>
                 <style>
                     .booking-row {
                         cursor: pointer;
@@ -618,51 +763,118 @@
                         });
 
                         // Donut chart
-                        var divisionData = {!! $divisionStatsJson !!};
-                        var options = {
-                            chart: {
-                                type: 'donut',
-                                height: 350
-                            },
-                            series: divisionData.map(item => item.value),
-                            labels: divisionData.map(item => item.name),
-                            colors: ['#1D5B79', '#FAD02E', '#2E97A7', '#F7B801', '#468B97', '#EFD345', '#78C1CD'],
-                            plotOptions: {
-                                pie: {
-                                    donut: {
-                                        size: '70%'
+                            var divisionData = {!! $divisionStatsJson !!};
+                            var options = {
+                                chart: {
+                                    type: 'donut',
+                                    height: 350,
+                                    background: 'transparent',
+                                    events: {
+                                        mounted: function(chartContext, config) {
+                                            // Center the chart container after rendering
+                                            const chart = document.querySelector('#donut-chart');
+                                            if (chart) {
+                                                chart.style.display = 'flex';
+                                                chart.style.justifyContent = 'center';
+                                            }
+                                        }
                                     }
-                                }
-                            },
-                            title: {
-                                text: 'Room Bookings by Division',
-                                align: 'center'
-                            },
-                            legend: {
-                                position: 'bottom'
-                            },
-                            responsive: [{
-                                breakpoint: 480,
-                                options: {
-                                    chart: {
-                                        width: 200
+                                },
+                                series: divisionData.map(item => item.value),
+                                labels: divisionData.map(item => item.name),
+                                colors: ['#1D5B79', '#FAD02E', '#2E97A7'],
+                                plotOptions: {
+                                    pie: {
+                                        donut: {
+                                            size: '70%',
+                                            labels: {
+                                                show: true,
+                                                total: {
+                                                    show: false,
+                                                    label: 'Total Bookings',
+                                                    formatter: function (w) {
+                                                        return w.globals.seriesTotals.reduce((a, b) => a + b, 0) + '%';
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        offsetY: 0
+                                    }
+                                },
+                                dataLabels: {
+                                    enabled: true,
+                                    formatter: function (val) {
+                                        return val.toFixed(1) + '%';
+                                    }
+                                },
+                                legend: {
+                                    position: 'bottom',
+                                    horizontalAlign: 'center',
+                                    fontSize: '14px',
+                                    markers: {
+                                        width: 12,
+                                        height: 12,
+                                        radius: 6
                                     },
-                                    legend: {
-                                        position: 'bottom'
+                                    itemMargin: {
+                                        horizontal: 10,
+                                        vertical: 5
+                                    },
+                                    formatter: function(seriesName, opts) {
+                                        return [seriesName];
                                     }
+                                },
+                                responsive: [{
+                                    breakpoint: 480,
+                                    options: {
+                                        chart: {
+                                            height: 300
+                                        },
+                                        legend: {
+                                            position: 'bottom',
+                                            fontSize: '12px',
+                                            offsetY: 0
+                                        }
+                                    }
+                                }],
+                                stroke: {
+                                    width: 2
                                 }
-                            }]
-                        };
+                            };
 
-                        var chart = new ApexCharts(document.querySelector("#donut-chart"), options);
-                        chart.render();
+                            var chart = new ApexCharts(document.querySelector("#donut-chart"), options);
+                            chart.render();
 
-                        // Handle resize
-                        $(window).resize(function() {
-                            if (window.barChart) {
-                                window.barChart.redraw();
-                            }
-                        });
+                                // Handle resize and responsiveness
+                                window.addEventListener('resize', function() {
+                                    chart.updateOptions({
+                                        chart: {
+                                            height: window.innerWidth < 768 ? 300 : 350
+                                        }
+                                    });
+                                });
+
+                                // Make sure chart is centered on mobile
+                                if (window.innerWidth <= 768) {
+                                    chart.updateOptions({
+                                        chart: {
+                                            width: '100%',
+                                            height: 300
+                                        },
+                                        legend: {
+                                            position: 'bottom',
+                                            horizontalAlign: 'center',
+                                            floating: false,
+                                            offsetY: 10
+                                        },
+                                        plotOptions: {
+                                            pie: {
+                                                offsetX: 0,
+                                                offsetY: -10
+                                            }
+                                        }
+                                    });
+                                }
 
                         // Search functionality
                         $("#searchBooking").on("keyup", function() {
@@ -735,6 +947,8 @@
                         $('#bookingDetailsModal').modal('show');
                     });
                 </script>
+                
+
             @endpush
 
         @endsection
