@@ -39,8 +39,8 @@ class RoomSeeder extends Seeder
                 'bkg_room_id' => 'RMK-01',
                 'capacity' => 8,
                 'status' => 'Ready',
-                'images' => ['RuangMeetingKecil_1.jpeg', 'RuangMeetingKecil_2.jpeg'],
-                'base_image' => 'RuangMeetingKecil.jpeg',
+                'images' => ['RuangMeetingKecil_1.jpg', 'RuangMeetingKecil_2.jpg', 'RuangMeetingKecil_3.jpg'],
+                'base_image' => 'RuangMeetingKecil_3.jpg',
                 'facilities' => [
                     'LCD Projector',
                     'TV',
@@ -53,7 +53,7 @@ class RoomSeeder extends Seeder
                 'bkg_room_id' => 'RD-01',
                 'capacity' => 4,
                 'status' => 'Ready',
-                'images' => ['diskusi_1.jpg', 'diskusi_2.jpg'],
+                'images' => ['diskusi_1.jpg', 'diskusi_2.jpg', 'diskusi.jpg'],
                 'base_image' => 'diskusi.jpg',
                 'facilities' => [
                     'TV',
