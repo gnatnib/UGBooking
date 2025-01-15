@@ -139,7 +139,7 @@
                                                     @endif
                                                 </td>
 
-                                                <td class="text-right">
+                                                <td class="text-center">
                                                     @if (Auth::user()->role_name == 'admin' ||
                                                             Auth::user()->role_name == 'superadmin' ||
                                                             Auth::user()->name == $bookings->name)

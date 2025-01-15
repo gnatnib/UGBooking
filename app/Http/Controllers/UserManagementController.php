@@ -91,6 +91,7 @@ class UserManagementController extends Controller
                 'name'         => $request->name,
                 'email'        => $request->email,
                 'phone_number' => $request->phone_number,
+                'role_name'    => $request->role_name,
                 'division'     => $request->division,
                 'department'   => $request->department,
             ];

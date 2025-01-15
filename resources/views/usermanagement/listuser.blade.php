@@ -88,7 +88,7 @@
                 searchable: false,
                 render: function(data, type, row) {
                     return `
-                        <div class="dropdown dropdown-action">
+                        <div class="dropdown dropdown-action text-center">
                             <a href="" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-ellipsis-v ellipse_color"></i>
                             </a>

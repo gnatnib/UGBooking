@@ -138,11 +138,11 @@
                                                         </div>
                                                     @endif
                                                 </td>
-                                                <td class="text-right">
-                                                    <div class="dropdown dropdown-action">
+                                                <td class="text-center">
+                                                    <div class="dropdown dropdown-action items-center text-center">
                                                         <a href="#" class="action-icon dropdown-toggle"
                                                             data-toggle="dropdown" aria-expanded="false">
-                                                            <i class="fas fa-ellipsis-v ellipse_color"></i>
+                                                            <i class="fas fa-ellipsis-v ellipse_color items-center"></i>
                                                         </a>
                                                         <div class="dropdown-menu dropdown-menu-right">
                                                             <a class="dropdown-item"
