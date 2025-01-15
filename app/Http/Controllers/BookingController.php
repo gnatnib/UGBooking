@@ -19,45 +19,45 @@ class BookingController extends Controller
 {
 
     public function updateBookingStatus()
-{
-    try {
-        $now = Carbon::now();
-        $currentDate = $now->format('Y-m-d');
-        $currentTime = $now->format('H:i:s');
+    {
+        try {
+            $now = Carbon::now();
+            $currentDate = $now->format('Y-m-d');
+            $currentTime = $now->format('H:i:s');
 
-        // Update bookings to 'Booked' if meeting has not started yet and status is not 'cancel'
-        Booking::where('date', $currentDate)
-            ->where('time_start', '>', $currentTime)
-            ->where('status_meet', '!=', 'Booked')
-            ->where('status_meet', '!=', 'cancel')
-            ->update(['status_meet' => 'Booked']);
+            // Update bookings to 'Booked' if meeting has not started yet and status is not 'cancel'
+            Booking::where('date', $currentDate)
+                ->where('time_start', '>', $currentTime)
+                ->where('status_meet', '!=', 'Booked')
+                ->where('status_meet', '!=', 'cancel')
+                ->update(['status_meet' => 'Booked']);
 
-        // Update bookings that are currently in progress to 'In meeting' and status is not 'cancel'
-        Booking::where('date', $currentDate)
-            ->where('time_start', '<=', $currentTime)
-            ->where('time_end', '>', $currentTime)
-            ->where('status_meet', '!=', 'In meeting')
-            ->where('status_meet', '!=', 'cancel')
-            ->update(['status_meet' => 'In meeting']);
+            // Update bookings that are currently in progress to 'In meeting' and status is not 'cancel'
+            Booking::where('date', $currentDate)
+                ->where('time_start', '<=', $currentTime)
+                ->where('time_end', '>', $currentTime)
+                ->where('status_meet', '!=', 'In meeting')
+                ->where('status_meet', '!=', 'cancel')
+                ->update(['status_meet' => 'In meeting']);
 
-        // Update bookings that have ended to 'Finished' and status is not 'cancel'
-        Booking::where(function ($query) use ($currentDate, $currentTime) {
-            $query->where('date', '<', $currentDate)
-                ->orWhere(function ($q) use ($currentDate, $currentTime) {
-                    $q->where('date', '=', $currentDate)
-                        ->where('time_end', '<=', $currentTime);
-                });
-        })
-            ->where('status_meet', '!=', 'Finished')
-            ->where('status_meet', '!=', 'cancel')
-            ->update(['status_meet' => 'Finished']);
+            // Update bookings that have ended to 'Finished' and status is not 'cancel'
+            Booking::where(function ($query) use ($currentDate, $currentTime) {
+                $query->where('date', '<', $currentDate)
+                    ->orWhere(function ($q) use ($currentDate, $currentTime) {
+                        $q->where('date', '=', $currentDate)
+                            ->where('time_end', '<=', $currentTime);
+                    });
+            })
+                ->where('status_meet', '!=', 'Finished')
+                ->where('status_meet', '!=', 'cancel')
+                ->update(['status_meet' => 'Finished']);
 
-        return true;
-    } catch (\Exception $e) {
-        Log::error('Error updating booking statuses: ' . $e->getMessage());
-        return false;
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Error updating booking statuses: ' . $e->getMessage());
+            return false;
+        }
     }
-}
 
     public function endMeeting(Request $request)
     {
@@ -182,7 +182,7 @@ class BookingController extends Controller
     }
 
     /** Page */
-        public function bookingAdd()
+    public function bookingAdd()
     {
         $currentUser = Auth::user();
 
@@ -220,9 +220,9 @@ class BookingController extends Controller
             ->whereNotIn('status_meet', ['Finished', 'cancel']) // Abaikan status 'Finished' dan 'cancel'
             ->where(function ($q) use ($time_start, $time_end) {
                 $q->whereBetween('time_start', [$time_start, $time_end])
-                ->orWhereBetween('time_end', [$time_start, $time_end])
-                ->orWhereRaw('? BETWEEN time_start AND time_end', [$time_start])
-                ->orWhereRaw('? BETWEEN time_start AND time_end', [$time_end]);
+                    ->orWhereBetween('time_end', [$time_start, $time_end])
+                    ->orWhereRaw('? BETWEEN time_start AND time_end', [$time_start])
+                    ->orWhereRaw('? BETWEEN time_start AND time_end', [$time_end]);
             });
 
         if ($excluding_bkg_id) {
@@ -241,19 +241,30 @@ class BookingController extends Controller
             'name'          => 'required|string|max:255',
             'room_type'     => 'required|string|max:255',
             'total_numbers' => 'required|integer|min:1',
-            'date'          => ['required', 'date_format:Y-m-d', 'after_or_equal:today'],
-            'time_start'    => ['required', 'date_format:H:i', function ($attribute, $value, $fail) use ($request) {
-                $currentDateTime = Carbon::now();
-                $selectedDateTime = Carbon::parse($request->date . ' ' . $value);
+            'date'          => [
+                'required',
+                'date_format:Y-m-d',
+                'after_or_equal:today'
+            ],
+            'time_start'    => [
+                'required',
+                'date_format:H:i',
+                function ($attribute, $value, $fail) use ($request) {
+                    $currentDateTime = Carbon::now();
+                    $selectedDateTime = Carbon::parse($request->date . ' ' . $value);
 
-                if ($selectedDateTime->isPast()) {
-                    $fail('The selected time must be greater than or equal to the current time.');
+                    if ($selectedDateTime->isPast()) {
+                        $fail('Please select a time after the current time.');
+                    }
                 }
-            }],
+            ],
             'time_end'      => 'required|after:time_start',
             'email'         => 'required|email|max:255',
             'phone_number'  => 'required|string|max:255',
             'message'       => 'required|string|max:255',
+        ], [
+            'date.after_or_equal' => 'Please select today\'s date or a future date.',
+            'time_end.after' => 'End time must be after start time.',
         ]);
 
 
@@ -311,25 +322,25 @@ class BookingController extends Controller
     /** Update Record */
     public function updateRecord(Request $request)
     {
-       $request->validate([
-        'bkg_id'        => 'required',
-        'name'          => 'required|string|max:255',
-        'room_type'     => 'required|string|max:255',
-        'total_numbers' => 'required|integer|min:1',
-        'date'          => ['required', 'date_format:Y-m-d', 'after_or_equal:today'],
-        'time_start'    => ['required', 'date_format:H:i', function ($attribute, $value, $fail) use ($request) {
-            $currentDateTime = Carbon::now();
-            $selectedDateTime = Carbon::parse($request->date . ' ' . $value);
+        $request->validate([
+            'bkg_id'        => 'required',
+            'name'          => 'required|string|max:255',
+            'room_type'     => 'required|string|max:255',
+            'total_numbers' => 'required|integer|min:1',
+            'date'          => ['required', 'date_format:Y-m-d', 'after_or_equal:today'],
+            'time_start'    => ['required', 'date_format:H:i', function ($attribute, $value, $fail) use ($request) {
+                $currentDateTime = Carbon::now();
+                $selectedDateTime = Carbon::parse($request->date . ' ' . $value);
 
-            if ($selectedDateTime->isPast()) {
-                $fail('The selected time must be greater than or equal to the current time.');
-            }
-        }],
-        'time_end'      => 'required|after:time_start',
-        'email'         => 'required|email|max:255',
-        'phone_number'  => 'required|string|max:255',
-        'message'       => 'required|string|max:255',
-    ]);
+                if ($selectedDateTime->isPast()) {
+                    $fail('The selected time must be greater than or equal to the current time.');
+                }
+            }],
+            'time_end'      => 'required|after:time_start',
+            'email'         => 'required|email|max:255',
+            'phone_number'  => 'required|string|max:255',
+            'message'       => 'required|string|max:255',
+        ]);
 
 
         DB::beginTransaction();
@@ -410,37 +421,37 @@ class BookingController extends Controller
         }
     }
 
-        public function cancelRecord(Request $request)
-{
-    DB::beginTransaction();
-    try {
-        // Validasi input
-        $validated = $request->validate([
-            'id' => 'required|exists:bookings,bkg_id', // Pastikan ID valid dan ada di tabel
-        ]);
+    public function cancelRecord(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            // Validasi input
+            $validated = $request->validate([
+                'id' => 'required|exists:bookings,bkg_id', // Pastikan ID valid dan ada di tabel
+            ]);
 
-        // Cari booking berdasarkan ID
-        $booking = Booking::where('bkg_id', $validated['id'])->firstOrFail();
+            // Cari booking berdasarkan ID
+            $booking = Booking::where('bkg_id', $validated['id'])->firstOrFail();
 
-        // Ubah status_meet menjadi 'cancel'
-        $booking->status_meet = 'cancel';
-        $booking->save();
+            // Ubah status_meet menjadi 'cancel'
+            $booking->status_meet = 'cancel';
+            $booking->save();
 
-        DB::commit();
-        return response()->json([
-            'success' => true,
-            'message' => 'Booking successfully canceled',
-        ]);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Cancel booking error: ' . $e->getMessage());
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Booking successfully canceled',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Cancel booking error: ' . $e->getMessage());
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to cancel booking',
-        ], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to cancel booking',
+            ], 500);
+        }
     }
-}
 
 
     /** View Calendar Page */
@@ -456,60 +467,60 @@ class BookingController extends Controller
 
     /** Get Events for Calendar */
     public function events(Request $request)
-{
-    try {
-        // Update booking statuses first
-        $this->updateBookingStatus();
+    {
+        try {
+            // Update booking statuses first
+            $this->updateBookingStatus();
 
-        $start = $request->input('start');
-        $end = $request->input('end');
-        $room = $request->input('room');
+            $start = $request->input('start');
+            $end = $request->input('end');
+            $room = $request->input('room');
 
-        Log::info('Fetching events with:', [
-            'start' => $start,
-            'end' => $end,
-            'room' => $room
-        ]);
+            Log::info('Fetching events with:', [
+                'start' => $start,
+                'end' => $end,
+                'room' => $room
+            ]);
 
-        $query = DB::table('bookings');
+            $query = DB::table('bookings');
 
-        // Filter by room if provided
-        if ($room) {
-            $query->where('room_type', $room);
+            // Filter by room if provided
+            if ($room) {
+                $query->where('room_type', $room);
+            }
+
+            // Add filter to exclude 'cancel' bookings
+            $query->where('status_meet', '!=', 'cancel');
+
+            $bookings = $query->get();
+            $events = [];
+
+            foreach ($bookings as $booking) {
+                $events[] = [
+                    'id' => $booking->bkg_id,
+                    'title' => $booking->room_type,
+                    'start' => $booking->date . 'T' . $booking->time_start,
+                    'end' => $booking->date . 'T' . $booking->time_end,
+                    'color' => $this->getEventColor($booking->room_type),
+                    'extendedProps' => [
+                        'room_type' => $booking->room_type,
+                        'name' => $booking->name,
+                        'time_start' => $booking->time_start,
+                        'time_end' => $booking->time_end,
+                        'total_numbers' => $booking->total_numbers,
+                        'message' => $booking->message,
+                        'status_meet' => $booking->status_meet
+                    ]
+                ];
+            }
+
+            Log::info('Returning events:', ['count' => count($events)]);
+            return response()->json($events);
+        } catch (\Exception $e) {
+            Log::error('Error in events method:', ['error' => $e->getMessage()]);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        // Add filter to exclude 'cancel' bookings
-        $query->where('status_meet', '!=', 'cancel');
-
-        $bookings = $query->get();
-        $events = [];
-
-        foreach ($bookings as $booking) {
-            $events[] = [
-                'id' => $booking->bkg_id,
-                'title' => $booking->room_type,
-                'start' => $booking->date . 'T' . $booking->time_start,
-                'end' => $booking->date . 'T' . $booking->time_end,
-                'color' => $this->getEventColor($booking->room_type),
-                'extendedProps' => [
-                    'room_type' => $booking->room_type,
-                    'name' => $booking->name,
-                    'time_start' => $booking->time_start,
-                    'time_end' => $booking->time_end,
-                    'total_numbers' => $booking->total_numbers,
-                    'message' => $booking->message,
-                    'status_meet' => $booking->status_meet
-                ]
-            ];
-        }
-
-        Log::info('Returning events:', ['count' => count($events)]);
-        return response()->json($events);
-    } catch (\Exception $e) {
-        Log::error('Error in events method:', ['error' => $e->getMessage()]);
-        return response()->json(['error' => $e->getMessage()], 500);
     }
-}
 
     private function getEventColor($roomType)
     {
