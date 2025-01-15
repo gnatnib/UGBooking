@@ -80,8 +80,8 @@
                                     <label>Date</label>
                                     <div class="cal-icon">
                                         <input type="date" class="form-control @error('date') is-invalid @enderror"
-                                            name="date" value="{{ old('date') }}" pattern="\d{4}-\d{2}-\d{2}"
-                                            required>
+                                            name="date" value="{{ old('date', $bookingEdit->date) }}"
+                                            pattern="\d{4}-\d{2}-\d{2}" required>
                                         @error('date')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -91,27 +91,35 @@
                                 </div>
                             </div>
 
+                            <!-- Start Time -->
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Start Time</label>
                                     <div class="time-icon">
+                                        <i class="far fa-clock"></i>
                                         <input type="time" class="form-control @error('time_start') is-invalid @enderror"
                                             name="time_start" value="{{ old('time_start', $bookingEdit->time_start) }}">
                                         @error('time_start')
-                                            <span class="invalid-feedback">{{ $message }}</span>
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
                                         @enderror
                                     </div>
                                 </div>
                             </div>
 
+                            <!-- End Time -->
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>End Time</label>
                                     <div class="time-icon">
+                                        <i class="far fa-clock"></i>
                                         <input type="time" class="form-control @error('time_end') is-invalid @enderror"
                                             name="time_end" value="{{ old('time_end', $bookingEdit->time_end) }}">
                                         @error('time_end')
-                                            <span class="invalid-feedback">{{ $message }}</span>
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
                                         @enderror
                                     </div>
                                 </div>
@@ -149,7 +157,7 @@
                                 </div>
                             </div>
 
-                          
+
                         </div>
                     </div>
                 </div>
@@ -183,11 +191,11 @@
             z-index: 1;
         }
 
-        /* Ensure the date input is fully clickable */
         input[type="date"] {
             position: relative;
             z-index: 2;
             background: transparent;
+            padding-right: 30px;
         }
 
         /* Hide the default calendar icon in Webkit browsers */
@@ -227,39 +235,86 @@
             font-size: 18px;
         }
 
-        /* Update the time-icon related styles in your style section */
+        /* Time icon styling */
         .time-icon {
             position: relative;
         }
 
-        /* Remove the pointer cursor from the input */
+        .time-icon i {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            color: #999;
+            z-index: 2;
+            pointer-events: none;
+        }
+
         .time-icon input {
             cursor: text;
         }
 
-        /* Style only the clock icon */
-        .time-icon i {
-            color: #999;
-            cursor: pointer;
-            pointer-events: all;
-            /* Ensures the icon is clickable */
-        }
-
-        .time-icon:hover i {
-            color: #666;
-        }
-
-        /* Keep the time picker clickable but don't affect input cursor */
         input[type="time"]::-webkit-calendar-picker-indicator {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 2.5rem;
-            /* Limit clickable area to just the icon area */
-            height: 100%;
             opacity: 0;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            right: 0;
+            top: 0;
             cursor: pointer;
-            z-index: 3;
+        }
+
+        /* Validation styling */
+        .form-control.is-invalid {
+            background-image: none !important;
+            border-color: #dc3545;
+        }
+
+        .invalid-feedback {
+            display: block;
+            margin-top: 0.25rem;
+            position: absolute;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Calendar icon container */
+        .cal-icon {
+            position: relative;
+        }
+
+        /* Alert styling */
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+            border-radius: 0.25rem;
+        }
+
+        /* Button styling */
+        .btn {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: 0.25rem;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .buttonedit {
+            margin-right: 10px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .col-md-4 {
+                margin-bottom: 1rem;
+            }
         }
     </style>
 @endsection
