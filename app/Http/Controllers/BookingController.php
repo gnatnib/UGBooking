@@ -244,7 +244,13 @@ class BookingController extends Controller
             'date'          => [
                 'required',
                 'date_format:Y-m-d',
-                'after_or_equal:today'
+                'after_or_equal:today',
+                function ($attribute, $value, $fail) {
+                    $maxDate = Carbon::now()->addDays(7)->format('Y-m-d');
+                    if ($value > $maxDate) {
+                        $fail('Pembookingan Ruangan hanya untuk 7 hari kedepan.');
+                        }
+                    }
             ],
             'time_start'    => [
                 'required',
