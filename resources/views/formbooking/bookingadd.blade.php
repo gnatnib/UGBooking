@@ -277,14 +277,23 @@
                 }
             });
 
+            // Check if room type is already selected (for validation errors)
+            const selectedRoomType = $('#roomTypeSelect').val();
+            if (selectedRoomType && selectedRoomType !== '--Select Room Type--') {
+                loadRoomPreview(selectedRoomType);
+            }
+
             // Room type selection handling
             $('#roomTypeSelect').on('change', function() {
                 const selectedRoomType = $(this).val();
-                if (!selectedRoomType) {
+                if (!selectedRoomType || selectedRoomType === '--Select Room Type--') {
                     $('.room-preview').addClass('d-none');
                     return;
                 }
+                loadRoomPreview(selectedRoomType);
+            });
 
+            function loadRoomPreview(selectedRoomType) {
                 $.ajax({
                     url: '/api/room-details/' + encodeURIComponent(selectedRoomType),
                     type: 'GET',
@@ -300,22 +309,20 @@
 
                             const images = JSON.parse(room.images);
                             images.forEach((image, index) => {
-                                // Add carousel item
                                 carouselInner.append(`
-                                <div class="carousel-item ${index === 0 ? 'active' : ''}">
-                                    <img src="/uploads/rooms/${image}" 
-                                        class="d-block w-100" 
-                                        alt="Room Image ${index + 1}">
-                                </div>
-                            `);
+                                    <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                                        <img src="/uploads/rooms/${image}" 
+                                            class="d-block w-100" 
+                                            alt="Room Image ${index + 1}">
+                                    </div>
+                                `);
 
-                                // Add indicator
                                 carouselIndicators.append(`
-                                <li data-target="#room-images-carousel" 
-                                    data-slide-to="${index}" 
-                                    class="${index === 0 ? 'active' : ''}">
-                                </li>
-                            `);
+                                    <li data-target="#room-images-carousel" 
+                                        data-slide-to="${index}" 
+                                        class="${index === 0 ? 'active' : ''}">
+                                    </li>
+                                `);
                             });
 
                             // Show/hide carousel controls based on number of images
@@ -338,11 +345,11 @@
                             const facilities = JSON.parse(room.facilities);
                             facilities.forEach(facility => {
                                 facilitiesList.append(`
-                                <div class="facility-item">
-                                    <i class="fas fa-check-circle"></i>
-                                    <span>${facility}</span>
-                                </div>
-                            `);
+                                    <div class="facility-item">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>${facility}</span>
+                                    </div>
+                                `);
                             });
 
                             $('.room-preview').removeClass('d-none');
@@ -351,10 +358,9 @@
                     error: function(xhr, status, error) {
                         console.error('AJAX Error:', error);
                         alert('Failed to fetch room details');
-                        $('.room-preview').addClass('d-none');
                     }
                 });
-            });
+            }
 
             // User dropdown handler
             const userDropdown = document.getElementById('userDropdown');
