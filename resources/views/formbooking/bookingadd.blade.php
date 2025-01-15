@@ -40,11 +40,9 @@
                                             name="user_id" required>
                                             <option selected disabled>-- Select Name --</option>
                                             @foreach ($users as $user)
-                                                <option value="{{ $user->id }}" 
-                                                    data-name="{{ $user->name }}"
+                                                <option value="{{ $user->id }}" data-name="{{ $user->name }}"
                                                     data-division="{{ $user->division }}"
-                                                    data-phone="{{ $user->phone_number }}"
-                                                    data-email="{{ $user->email }}">
+                                                    data-phone="{{ $user->phone_number }}" data-email="{{ $user->email }}">
                                                     {{ $user->name }}
                                                 </option>
                                             @endforeach
@@ -163,7 +161,8 @@
                                     <div class="form-group">
                                         <label>Email</label>
                                         <input type="email" class="form-control @error('email') is-invalid @enderror"
-                                            name="email" value="{{ old('email', Auth::user()->email ?? '') }}" readonly>
+                                            name="email" value="{{ old('email', Auth::user()->email ?? '') }}"
+                                            readonly>
                                         @error('email')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -229,10 +228,12 @@
                                     <div class="carousel-inner">
                                         <!-- Will be populated by JavaScript -->
                                     </div>
-                                    <a class="carousel-control-prev" href="#room-images-carousel" role="button" data-slide="prev">
+                                    <a class="carousel-control-prev" href="#room-images-carousel" role="button"
+                                        data-slide="prev">
                                         <span class="carousel-control-prev-icon"></span>
                                     </a>
-                                    <a class="carousel-control-next" href="#room-images-carousel" role="button" data-slide="next">
+                                    <a class="carousel-control-next" href="#room-images-carousel" role="button"
+                                        data-slide="next">
                                         <span class="carousel-control-next-icon"></span>
                                     </a>
                                     <ol class="carousel-indicators">
@@ -263,114 +264,122 @@
 
 @section('script')
     <script>
-    $(document).ready(function() {
-        // Form validation for time
-        $('form').on('submit', function(e) {
-            var startTime = $('input[name="time_start"]').val();
-            var endTime = $('input[name="time_end"]').val();
+        $(document).ready(function() {
+            // Form validation for time
+            $('form').on('submit', function(e) {
+                var startTime = $('input[name="time_start"]').val();
+                var endTime = $('input[name="time_end"]').val();
 
-            if (startTime && endTime && startTime >= endTime) {
-                e.preventDefault();
-                alert('End time must be after start time');
-                return false;
-            }
-        });
-
-        // Room type selection handling
-        $('#roomTypeSelect').on('change', function() {
-            const selectedRoomType = $(this).val();
-            if (!selectedRoomType) {
-                $('.room-preview').addClass('d-none');
-                return;
-            }
-
-            $.ajax({
-                url: '/api/room-details/' + encodeURIComponent(selectedRoomType),
-                type: 'GET',
-                success: function(response) {
-                    if (response.success) {
-                        const room = response.room;
-                        
-                        // Update images carousel
-                        const carouselInner = $('.carousel-inner');
-                        const carouselIndicators = $('.carousel-indicators');
-                        carouselInner.empty();
-                        carouselIndicators.empty();
-                        
-                        const images = JSON.parse(room.images);
-                        images.forEach((image, index) => {
-                            // Add carousel item
-                            carouselInner.append(`
-                                <div class="carousel-item ${index === 0 ? 'active' : ''}">
-                                    <img src="/uploads/rooms/${image}" 
-                                        class="d-block w-100" 
-                                        alt="Room Image ${index + 1}">
-                                </div>
-                            `);
-
-                            // Add indicator
-                            carouselIndicators.append(`
-                                <li data-target="#room-images-carousel" 
-                                    data-slide-to="${index}" 
-                                    class="${index === 0 ? 'active' : ''}">
-                                </li>
-                            `);
-                        });
-
-                        // Show/hide carousel controls based on number of images
-                        if (images.length <= 1) {
-                            $('.carousel-control-prev, .carousel-control-next, .carousel-indicators').hide();
-                        } else {
-                            $('.carousel-control-prev, .carousel-control-next, .carousel-indicators').show();
-                        }
-
-                        // Update room info
-                        $('#room-type-display').text(room.room_type);
-                        $('#room-capacity').text(`Capacity: ${room.capacity} participants`);
-
-                        // Update facilities
-                        const facilitiesList = $('.facilities-list');
-                        facilitiesList.empty();
-                        
-                        const facilities = JSON.parse(room.facilities);
-                        facilities.forEach(facility => {
-                            facilitiesList.append(`
-                                <div class="facility-item">
-                                    <i class="fas fa-check-circle"></i>
-                                    <span>${facility}</span>
-                                </div>
-                            `);
-                        });
-
-                        $('.room-preview').removeClass('d-none');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('AJAX Error:', error);
-                    alert('Failed to fetch room details');
-                    $('.room-preview').addClass('d-none');
+                if (startTime && endTime && startTime >= endTime) {
+                    e.preventDefault();
+                    alert('End time must be after start time');
+                    return false;
                 }
             });
-        });
 
-        // User dropdown handler
-        const userDropdown = document.getElementById('userDropdown');
-        if (userDropdown) {
-            userDropdown.addEventListener('change', function() {
-                const selectedOption = userDropdown.options[userDropdown.selectedIndex];
-                const phone = selectedOption.getAttribute('data-phone');
-                const email = selectedOption.getAttribute('data-email');
-                const name = selectedOption.getAttribute('data-name');
-                const division = selectedOption.getAttribute('data-division');
+            // Check if room type is already selected (for validation errors)
+            const selectedRoomType = $('#roomTypeSelect').val();
+            if (selectedRoomType && selectedRoomType !== '--Select Room Type--') {
+                loadRoomPreview(selectedRoomType);
+            }
 
-                document.getElementById('phoneInput').value = phone || '';
-                document.getElementById('emailInput').value = email || '';
-                document.getElementById('hiddenNameInput').value = name || '';
-                document.getElementById('hiddenDivisionInput').value = division || '';
+            // Room type selection handling
+            $('#roomTypeSelect').on('change', function() {
+                const selectedRoomType = $(this).val();
+                if (!selectedRoomType || selectedRoomType === '--Select Room Type--') {
+                    $('.room-preview').addClass('d-none');
+                    return;
+                }
+                loadRoomPreview(selectedRoomType);
             });
-        }
-    });
-</script>
+
+            function loadRoomPreview(selectedRoomType) {
+                $.ajax({
+                    url: '/api/room-details/' + encodeURIComponent(selectedRoomType),
+                    type: 'GET',
+                    success: function(response) {
+                        if (response.success) {
+                            const room = response.room;
+
+                            // Update images carousel
+                            const carouselInner = $('.carousel-inner');
+                            const carouselIndicators = $('.carousel-indicators');
+                            carouselInner.empty();
+                            carouselIndicators.empty();
+
+                            const images = JSON.parse(room.images);
+                            images.forEach((image, index) => {
+                                carouselInner.append(`
+                                    <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                                        <img src="/uploads/rooms/${image}" 
+                                            class="d-block w-100" 
+                                            alt="Room Image ${index + 1}">
+                                    </div>
+                                `);
+
+                                carouselIndicators.append(`
+                                    <li data-target="#room-images-carousel" 
+                                        data-slide-to="${index}" 
+                                        class="${index === 0 ? 'active' : ''}">
+                                    </li>
+                                `);
+                            });
+
+                            // Show/hide carousel controls based on number of images
+                            if (images.length <= 1) {
+                                $('.carousel-control-prev, .carousel-control-next, .carousel-indicators')
+                                    .hide();
+                            } else {
+                                $('.carousel-control-prev, .carousel-control-next, .carousel-indicators')
+                                    .show();
+                            }
+
+                            // Update room info
+                            $('#room-type-display').text(room.room_type);
+                            $('#room-capacity').text(`Capacity: ${room.capacity} participants`);
+
+                            // Update facilities
+                            const facilitiesList = $('.facilities-list');
+                            facilitiesList.empty();
+
+                            const facilities = JSON.parse(room.facilities);
+                            facilities.forEach(facility => {
+                                facilitiesList.append(`
+                                    <div class="facility-item">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>${facility}</span>
+                                    </div>
+                                `);
+                            });
+
+                            $('.room-preview').removeClass('d-none');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', error);
+                        alert('Failed to fetch room details');
+                    }
+                });
+            }
+
+            // User dropdown handler
+            const userDropdown = document.getElementById('userDropdown');
+            if (userDropdown) {
+                userDropdown.addEventListener('change', function() {
+                    const selectedOption = userDropdown.options[userDropdown.selectedIndex];
+                    const phone = selectedOption.getAttribute('data-phone');
+                    const email = selectedOption.getAttribute('data-email');
+                    const name = selectedOption.getAttribute('data-name');
+                    const division = selectedOption.getAttribute('data-division');
+
+                    document.getElementById('phoneInput').value = phone || '';
+                    document.getElementById('emailInput').value = email || '';
+                    document.getElementById('hiddenNameInput').value = name || '';
+                    document.getElementById('hiddenDivisionInput').value = division || '';
+                });
+            }
+        });
+    </script>
 
 
     <style>
@@ -424,39 +433,49 @@
             font-size: 18px;
         }
 
-        /* Update the time-icon related styles in your style section */
+        /* Time icon styling */
         .time-icon {
             position: relative;
         }
 
-        /* Remove the pointer cursor from the input */
+        .time-icon i {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            color: #999;
+            z-index: 2;
+            pointer-events: none;
+        }
+
         .time-icon input {
             cursor: text;
         }
 
-        /* Style only the clock icon */
-        .time-icon i {
-            color: #999;
-            cursor: pointer;
-            pointer-events: all;
-            /* Ensures the icon is clickable */
-        }
-
-        .time-icon:hover i {
-            color: #666;
-        }
-
-        /* Keep the time picker clickable but don't affect input cursor */
         input[type="time"]::-webkit-calendar-picker-indicator {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 2.5rem;
-            /* Limit clickable area to just the icon area */
-            height: 100%;
             opacity: 0;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            right: 0;
+            top: 0;
             cursor: pointer;
-            z-index: 3;
+        }
+
+        /* Validation styling */
+        .form-control.is-invalid {
+            background-image: none !important;
+            border-color: #dc3545;
+        }
+
+        .invalid-feedback {
+            display: block;
+            margin-top: 0.25rem;
+            position: absolute;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
         }
     </style>
 @endsection
