@@ -38,17 +38,20 @@
                                         <label>Name</label>
                                         <select class="form-control @error('name') is-invalid @enderror" id="userDropdown"
                                             name="user_id" required>
-                                            <option selected disabled>-- Select Name --</option>
+                                            <option disabled>-- Select Name --</option>
                                             @foreach ($users as $user)
                                                 <option value="{{ $user->id }}" data-name="{{ $user->name }}"
                                                     data-division="{{ $user->division }}"
-                                                    data-phone="{{ $user->phone_number }}" data-email="{{ $user->email }}">
+                                                    data-phone="{{ $user->phone_number }}" data-email="{{ $user->email }}"
+                                                    {{ old('user_id') == $user->id ? 'selected' : '' }}>
                                                     {{ $user->name }}
                                                 </option>
                                             @endforeach
                                         </select>
-                                        <input type="hidden" name="name" id="hiddenNameInput">
-                                        <input type="hidden" name="division" id="hiddenDivisionInput">
+                                        <input type="hidden" name="name" id="hiddenNameInput"
+                                            value="{{ old('name') }}">
+                                        <input type="hidden" name="division" id="hiddenDivisionInput"
+                                            value="{{ old('division') }}">
                                         @error('name')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -365,18 +368,27 @@
             // User dropdown handler
             const userDropdown = document.getElementById('userDropdown');
             if (userDropdown) {
-                userDropdown.addEventListener('change', function() {
+                // Function to update hidden fields based on selected option
+                function updateHiddenFields() {
                     const selectedOption = userDropdown.options[userDropdown.selectedIndex];
-                    const phone = selectedOption.getAttribute('data-phone');
-                    const email = selectedOption.getAttribute('data-email');
-                    const name = selectedOption.getAttribute('data-name');
-                    const division = selectedOption.getAttribute('data-division');
+                    if (selectedOption && !selectedOption.disabled) {
+                        const phone = selectedOption.getAttribute('data-phone');
+                        const email = selectedOption.getAttribute('data-email');
+                        const name = selectedOption.getAttribute('data-name');
+                        const division = selectedOption.getAttribute('data-division');
 
-                    document.getElementById('phoneInput').value = phone || '';
-                    document.getElementById('emailInput').value = email || '';
-                    document.getElementById('hiddenNameInput').value = name || '';
-                    document.getElementById('hiddenDivisionInput').value = division || '';
-                });
+                        document.getElementById('phoneInput').value = phone || '';
+                        document.getElementById('emailInput').value = email || '';
+                        document.getElementById('hiddenNameInput').value = name || '';
+                        document.getElementById('hiddenDivisionInput').value = division || '';
+                    }
+                }
+
+                // Update fields when dropdown changes
+                userDropdown.addEventListener('change', updateHiddenFields);
+
+                // Update fields on page load if there's a selected value
+                updateHiddenFields();
             }
         });
     </script>
