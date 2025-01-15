@@ -119,14 +119,14 @@
                                 <div class="col-12 col-sm-12 col-md-4 mb-2 mb-md-0">
                                     <h4 class="card-title">Booking</h4>
                                 </div>
-                                <div class="col-12 col-sm-12 col-md-8">
-                                    <div class="d-flex flex-column flex-sm-row justify-content-end gap-2">
+                                <div class="col-12 col-sm-12 col-md-8 ">
+                                    <div class="d-flex flex-column flex-sm-row justify-content-end gap-2 mx-4">
                                         @if (Auth::user()->role_name == 'admin' || Auth::user()->role_name == 'superadmin')
                                             <a href="{{ route('export.bookings') }}" class="btn btn-success mb-2 mb-sm-0">
                                                 <i class="fas fa-download mr-2"></i> Export to CSV
                                             </a>
                                         @endif
-                                        <div class="search-box">
+                                        <div class="search-box mx-4">
                                             <div class="input-group">
                                                 <input type="text" class="form-control" placeholder="Search..."
                                                     id="searchBooking">
