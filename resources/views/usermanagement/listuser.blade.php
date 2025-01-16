@@ -86,7 +86,7 @@
                 data: null,
                 orderable: false,
                 searchable: false,
-                render: function(data, type, row) {
+                render: function (data, type, row) {
                     return `
                         <div class="dropdown dropdown-action text-center">
                             <a href="" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -96,7 +96,7 @@
                                 <a class="dropdown-item" href="/users/add/edit/${row.user_id}">
                                     <i class="fas fa-pencil-alt m-r-5"></i> Edit
                                 </a>
-                                <a class="dropdown-item delete-user" href="javascript:void(0);" data-id="${row.id}">
+                                <a class="dropdown-item delete-user" href="javascript:void(0);" data-id="${row.user_id}">
                                     <i class="fas fa-trash-alt m-r-5"></i> Delete
                                 </a>
                             </div>
