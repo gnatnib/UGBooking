@@ -197,33 +197,74 @@ class RoomsController extends Controller
     
     /** Delete Room Record */
     public function deleteRecord(Request $request)
-    {
-        DB::beginTransaction();
-        try {
-            $room = Room::findOrFail($request->id);
-            
-            // Delete all room images
-            if ($room->images) {
-                foreach(json_decode($room->images) as $image) {
+{
+    DB::beginTransaction();
+    try {
+        // Validate the incoming request
+        $request->validate([
+            'id' => 'required|exists:rooms,id'
+        ]);
+
+        // Find the room
+        $room = Room::findOrFail($request->id);
+        
+        // Delete associated images if they exist
+        if ($room->images) {
+            $images = json_decode($room->images, true);
+            if (is_array($images)) {
+                foreach ($images as $image) {
                     $filePath = public_path('uploads/rooms/' . $image);
                     if (file_exists($filePath)) {
-                        unlink($filePath);
+                        try {
+                            unlink($filePath);
+                            Log::info("Deleted image: {$filePath}");
+                        } catch (\Exception $e) {
+                            Log::warning("Failed to delete image {$filePath}: " . $e->getMessage());
+                            // Continue with deletion even if image removal fails
+                        }
                     }
                 }
             }
-    
-            $room->delete();
-            
-            DB::commit();
-            flash()->success('Room deleted successfully');
-            return redirect()->back();
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error('Error deleting room: ' . $e->getMessage());
-            flash()->error('Failed to delete room');
-            return redirect()->back();
         }
+
+        // Delete the room record
+        $result = $room->delete();
+        
+        if (!$result) {
+            throw new \Exception('Failed to delete room record');
+        }
+
+        DB::commit();
+        
+        return redirect()
+            ->back()
+            ->with('success', 'Room deleted successfully');
+            
+    } catch (\Illuminate\Database\QueryException $e) {
+        DB::rollback();
+        Log::error('Database error while deleting room: ' . $e->getMessage());
+        
+        // Check for foreign key violation
+        if ($e->getCode() == 23000) {
+            return redirect()
+                ->back()
+                ->with('error', 'Cannot delete room because it is referenced by other records');
+        }
+        
+        return redirect()
+            ->back()
+            ->with('error', 'Database error occurred while deleting room');
+            
+    } catch (\Exception $e) {
+        DB::rollback();
+        Log::error('Error deleting room: ' . $e->getMessage());
+        Log::error('Stack trace: ' . $e->getTraceAsString());
+        
+        return redirect()
+            ->back()
+            ->with('error', 'Failed to delete room. ' . $e->getMessage());
     }
+}
 
     /** Add Room Type */
     public function addRoomType(Request $request)
