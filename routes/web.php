@@ -14,7 +14,7 @@ use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\BookingExportController;
 use App\Http\Controllers\view;
-
+use App\Http\Middleware\RoleMiddleware;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -85,40 +85,40 @@ Route::controller(BookingController::class)->group(function () {
     Route::get('form/booking/events', 'events')->middleware('auth')->name('form/booking/events');
 });
 // ----------------------------- rooms -----------------------------//
-Route::controller(RoomsController::class)->group(function () {
-    Route::get('form/allrooms/page', 'allrooms')->middleware('auth')->name('form/allrooms/page');
-    Route::get('form/addroom/page', 'addRoom')->middleware('auth')->name('form/addroom/page');
-    Route::get('form/room/edit/{bkg_room_id}', 'editRoom')->middleware('auth');
-    Route::post('form/room/save', 'saveRecordRoom')->middleware('auth')->name('form/room/save');
-    Route::post('form/room/delete', 'deleteRecord')->middleware('auth')->name('form/room/delete');
-    Route::post('form/room/update', 'updateRecord')->middleware('auth')->name('form/room/update');
-    //add ruangan
-    Route::post('form/room-type/add', 'addRoomType')->middleware('auth')->name('room.type.add');
-    //delete ruangan
-    Route::post('form/room-type/delete', [RoomsController::class, 'deleteRoomType'])
-        ->middleware('auth')
-        ->name('room.type.delete');
-    Route::get('/api/room-details/{roomType}', [RoomsController::class, 'getRoomDetails']);
-});
+Route::controller(RoomsController::class)
+    ->middleware(['auth', RoleMiddleware::class]) 
+    ->group(function () {
+        Route::get('form/allrooms/page', 'allrooms')->name('form/allrooms/page');
+        Route::get('form/addroom/page', 'addRoom')->name('form/addroom/page');
+        Route::get('form/room/edit/{bkg_room_id}', 'editRoom');
+        Route::post('form/room/save', 'saveRecordRoom')->name('form/room/save');
+        Route::post('form/room/delete', 'deleteRecord')->name('form/room/delete');
+        Route::post('form/room/update', 'updateRecord')->name('form/room/update');
+        // Add ruangan
+        Route::post('form/room-type/add', 'addRoomType')->name('room.type.add');
+        // Delete ruangan
+        Route::post('form/room-type/delete', 'deleteRoomType')->name('room.type.delete');
+        Route::get('/api/room-details/{roomType}', 'getRoomDetails');
+    });
+
 
 // ----------------------- user management -------------------------//
-Route::controller(UserManagementController::class)->group(function () {
-    Route::get('users/list/page', 'userList')->middleware('auth')->name('users/list/page');
-    Route::get('users/add/new', 'userAddNew')->middleware('auth')->name('users/add/new');
+Route::controller(UserManagementController::class)->middleware(['auth', RoleMiddleware::class])->group(function () {
+    Route::get('users/list/page', 'userList')->name('users/list/page');
+    Route::get('users/add/new', 'userAddNew')->name('users/add/new');
     /** add new users */
     Route::get('users/add/edit/{user_id}', 'userView');
-    /** add new users */
-    Route::post('users/update', 'userUpdate')->name('users/update');
     /** update record */
+    Route::post('users/update', 'userUpdate')->name('users/update');
+    /** delete record */
     Route::get('users/delete/{id}', 'userDelete')->name('users/delete');
-    /** delere record */
-    Route::get('get-users-data', 'getUsersData')->name('get-users-data');
     /** get all data users */
-    Route::get('user/list', [UserManagementController::class, 'userList'])->name('user/list');
-    Route::get('user/add/new', [UserManagementController::class, 'userAddNew'])->name('user/add/new');
-    Route::post('user/save', [UserManagementController::class, 'saveUser'])->name('user/save');
-    Route::post('user/save', [UserManagementController::class, 'saveUser'])->name('user/save');
+    Route::get('get-users-data', 'getUsersData')->name('get-users-data');
+    Route::get('user/list', 'userList')->name('user/list');
+    Route::get('user/add/new', 'userAddNew')->name('user/add/new');
+    Route::post('user/save', 'saveUser')->name('user/save');
 });
+
 
 // ----------------------- booking management -------------------------//
 Route::controller(BookingExportController::class)->group(function () {
