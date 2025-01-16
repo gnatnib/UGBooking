@@ -92,14 +92,14 @@
                                                     @if ($rooms->facilities)
                                                         <div class="d-flex flex-wrap gap-1">
                                                             @php
-                                                                $facilities = json_decode($rooms->facilities);
-                                                                $maxDisplay = 3;
-                                                                $displayedFacilities = array_slice(
-                                                                    $facilities,
-                                                                    0,
-                                                                    $maxDisplay,
-                                                                );
-                                                                $remainingCount = count($facilities) - $maxDisplay;
+        $facilities = json_decode($rooms->facilities);
+        $maxDisplay = 3;
+        $displayedFacilities = array_slice(
+            $facilities,
+            0,
+            $maxDisplay,
+        );
+        $remainingCount = count($facilities) - $maxDisplay;
                                                             @endphp
 
                                                             @foreach ($displayedFacilities as $facility)
@@ -172,16 +172,14 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-body text-center">
-                        <form action="{{ route('form/room/delete') }}" method="POST">
+                        <form action="{{ route('form/room/delete') }}" method="POST" id="delete_room_form">
                             @csrf
                             <img src="{{ URL::to('assets/img/sent.png') }}" alt="" width="50" height="46">
                             <h3 class="delete_class">Are you sure want to delete this Room?</h3>
                             <div class="m-t-20">
                                 <a href="#" class="btn btn-white" data-dismiss="modal">Close</a>
-                                <input class="form-control" type="hidden" id="e_id" name="id"
-                                    value="">
-                                <input class="form-control" type="hidden" id="e_images" name="images"
-                                    value="">
+                                <input type="hidden" id="e_id" name="id" value="">
+                                <input type="hidden" id="e_images" name="images" value="">
                                 <button type="submit" class="btn btn-danger">Delete</button>
                             </div>
                         </form>
@@ -292,6 +290,24 @@
                 showImage(currentIndex);
             });
         });
+        // Add this to your script section
+            $(document).ready(function () {
+                // When delete button is clicked
+                $('.delete_asset').on('click', function (e) {
+                    e.preventDefault();
+                    // Get the room ID from the current row
+                    const id = $(this).closest('tr').find('.id').text();
+                    // Get the images JSON string from data attribute if needed
+                    const images = $(this).closest('tr').find('td:eq(1)').data('images') || '';
+
+                    // Set the values in the delete modal form
+                    $('#e_id').val(id);
+                    $('#e_images').val(images);
+
+                    // Log for debugging
+                    console.log('Setting room ID for deletion:', id);
+                });
+            });
     </script>
 
 
