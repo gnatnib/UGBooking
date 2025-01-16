@@ -24,10 +24,10 @@ class RoleMiddleware
 
         // Check if it's a booking-related route
         if ($request->is('form/booking/*') || $request->is('form/allbooking*')) {
-            return $next($request); // Allow access to booking routes for all authenticated users
+            return $next($request); // akses booking list dan form untuk semua role
         }
 
-        // For other restricted routes (room management, user management)
+        // management room dan user management user hanya bisa diakses oleh superadmin
         if (Auth::user()->role_name !== 'superadmin') {
             if ($request->ajax()) {
                 return response()->json(['error' => 'Unauthorized'], 403);
