@@ -110,24 +110,26 @@ class UserManagementController extends Controller
 
     /** Delete Record */
     public function userDelete($id)
-    {
-        try {
-            $user = User::find($id);
+{
+    try {
+        $user = User::where('user_id', $id)->first(); // Change to match your actual ID column
 
-            if (!$user) {
-                return redirect()->back()->with('error', 'User not found!');
-            }
-
-            // Simpan nama user untuk pesan
-            $userName = $user->name;
-
-            $user->delete();
-            return redirect()->back()->with('success', "User '{$userName}' has been deleted successfully.");
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
-            return redirect()->back()->with('error', 'Failed to delete user. Please try again.');
+        if (!$user) {
+            return response()->json(['error' => 'User not found!'], 404);
         }
+
+        
+        $user->delete();
+        
+        flash()->success('Delete User successfully :)');
+        return redirect()->back();
+    } catch (\Exception $e) {
+        Log::error($e->getMessage());
+        return response()->json([
+            'error' => 'Failed to delete user. Please try again.'
+        ], 500);
     }
+}
 
     /** Get Users Data */
     public function getUsersData(Request $request)
