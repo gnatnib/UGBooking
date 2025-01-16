@@ -85,8 +85,9 @@ Route::controller(BookingController::class)->group(function () {
     Route::get('form/booking/events', 'events')->middleware('auth')->name('form/booking/events');
 });
 // ----------------------------- rooms -----------------------------//
+Route::get('/api/room-details/{roomType}', [RoomsController::class, 'getRoomDetails']);
 Route::controller(RoomsController::class)
-    ->middleware(['auth', RoleMiddleware::class]) 
+    ->middleware(['auth', RoleMiddleware::class])
     ->group(function () {
         Route::get('form/allrooms/page', 'allrooms')->name('form/allrooms/page');
         Route::get('form/addroom/page', 'addRoom')->name('form/addroom/page');
@@ -98,7 +99,6 @@ Route::controller(RoomsController::class)
         Route::post('form/room-type/add', 'addRoomType')->name('room.type.add');
         // Delete ruangan
         Route::post('form/room-type/delete', 'deleteRoomType')->name('room.type.delete');
-        Route::get('/api/room-details/{roomType}', 'getRoomDetails');
     });
 
 

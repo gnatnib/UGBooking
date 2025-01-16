@@ -9,7 +9,11 @@
                     </div>
                 </div>
             </div>
-            @if (session('error'))
+            @if (session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @elseif (session('error'))
                 <div class="alert alert-danger">
                     {{ session('error') }}
                 </div>
@@ -360,7 +364,11 @@
                     },
                     error: function(xhr, status, error) {
                         console.error('AJAX Error:', error);
-                        alert('Failed to fetch room details');
+                        if (xhr.status === 403) {
+                            $('.room-preview').addClass('d-none');
+                        } else {
+                            alert('Failed to load room details');
+                        }
                     }
                 });
             }
