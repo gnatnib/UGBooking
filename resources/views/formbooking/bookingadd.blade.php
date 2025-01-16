@@ -25,7 +25,7 @@
                     <div class="col-lg-8">
                         <div class="row formtype">
                             @if (Auth::user()->role_name == 'user')
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Name</label>
                                         <input class="form-control @error('name') is-invalid @enderror" type="text"
