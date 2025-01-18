@@ -83,10 +83,10 @@ Contributions are welcomed, make sure to fork and create a new branch first befo
 - All contributors who helped with the project
 
 ## 🖋️ Authors
-- @gnatnib
-- @RahmanHanifs
-- @FarrelIrbah
-- @MuhammadRajaFadhilHabibi
+- [@gnatnib](https://github.com/gnatnib)
+- [@RahmanHanifs](https://github.com/RahmanHanifs)
+- [@FarrelIrbah](https://github.com/FarrelIrbah)
+- [@MuhammadRajaFadhilHabibi](https://github.com/MuhammadRajaFadhilHabibi)
 
 
 ## ⭐ Kindly give this repository a star!
