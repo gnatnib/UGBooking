@@ -2,7 +2,7 @@
 
 A modern and efficient room booking system built with Laravel 11 and PHP, designed to streamline the process of managing and reserving rooms within an organization.
 
-![Laravel Version](https://img.shields.io/badge/Laravel-11.0-red.svg)
+![Laravel Version](https://img.shields.io/badge/Laravel-11.36.1-red.svg)
 ![PHP Version](https://img.shields.io/badge/PHP-8.2-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
