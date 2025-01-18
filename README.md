@@ -82,7 +82,11 @@ Contributions are welcomed, make sure to fork and create a new branch first befo
 - Laravel Team
 - All contributors who helped with the project
 
-## 📞 Contact
-- E-mail: bintang.syafrian@gmail.com
+## 🖋️ Authors
+- @gnatnib
+- @RahmanHanifs
+- @FarrelIrbah
+- @MuhammadRajaFadhilHabibi
+
 
 ## ⭐ Kindly give this repository a star!
