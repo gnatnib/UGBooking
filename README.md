@@ -4,7 +4,7 @@ A modern and efficient room booking system built with Laravel 11 and PHP, design
 
 ![Laravel Version](https://img.shields.io/badge/Laravel-11.36.1-red.svg)
 ![PHP Version](https://img.shields.io/badge/PHP-8.3.6-blue.svg)
-![Node.Js Version](https://img.shields.io/badge/Nodejs-20.17.0-green.svg)
+![Node.Js Version](https://img.shields.io/badge/Node.js-20.17.0-green.svg)
 
 ## ✨ Features
 
