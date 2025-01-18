@@ -4,6 +4,7 @@ A modern and efficient room booking system built with Laravel 11 and PHP, design
 
 ![Laravel Version](https://img.shields.io/badge/Laravel-11.36.1-red.svg)
 ![PHP Version](https://img.shields.io/badge/PHP-8.3.6-blue.svg)
+![Node.Js Version](https://img.shields.io/badge/Nodejs-20.17.0-green.svg)
 
 ## ✨ Features
 
@@ -69,10 +70,10 @@ php artisan serve
 ```
 
 ## 🛠️ Requirements
-- PHP >= 8.2
-- Laravel >= 11.x.x
-- Node.js >= 18.x.x
-- MySQL >= 8.x.x
+- PHP >= 8.3.6
+- Laravel >= 11.36.1
+- Node.js >= 20.17.0
+- MySQL >= 8.0.30
 
 ## 🤝 Contributing
 Contributions are welcomed, make sure to fork and create a new branch first before submitting a pull request!
