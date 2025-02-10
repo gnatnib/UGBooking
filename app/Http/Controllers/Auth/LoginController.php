@@ -56,21 +56,21 @@ class LoginController extends Controller
     public function authenticate(Request $request)
     {
         $request->validate([
-            'email'    => 'required|string|email',
+            'user_id'  => 'required|string',
             'password' => 'required|string',
         ]);
 
-        $email    = $request->email;
+        $user_id  = $request->user_id;
         $password = $request->password;
 
-        if (Auth::attempt(['email' => $email, 'password' => $password, 'status' => 'Active'])) {
+        if (Auth::attempt(['user_id' => $user_id, 'password' => $password, 'status' => 'Active'])) {
             flash()->success('Login successfully :)');
             return redirect()->intended('home');
-        } elseif (Auth::attempt(['email' => $email, 'password' => $password, 'status' => null])) {
+        } elseif (Auth::attempt(['user_id' => $user_id, 'password' => $password, 'status' => null])) {
             flash()->success('Login successfully :)');
             return redirect()->intended('home');
         } else {
-            flash()->error('Wrong Username or Password');
+            flash()->error('Wrong User ID or Password');
             return redirect('login');
         }
     }
