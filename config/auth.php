@@ -59,17 +59,14 @@ return [
     |
     */
 
-    'providers' => [
+        'providers' => [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+            'username' => 'user_id', // Tambahkan ini agar login menggunakan user_id
         ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
     ],
+
 
     /*
     |--------------------------------------------------------------------------

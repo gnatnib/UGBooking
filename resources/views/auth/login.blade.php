@@ -14,7 +14,8 @@
                             <form method="POST" action="{{ route('login') }}">
                                 @csrf
                                 <div class="form-group">
-                                    <input class="form-control  @error('email') is-invalid @enderror" type="text" name="email" placeholder="Enter Email" value="{{ old('email') }}" required autocomplete="off">
+                                    <input class="form-control @error('user_id') is-invalid @enderror" type="text" name="user_id"
+                                        placeholder="Enter User ID" value="{{ old('user_id') }}" required autocomplete="off">
                                 </div>
                                 <div class="form-group">
                                     <input class="form-control  @error('password') is-invalid @enderror" type="password" name="password" placeholder="Enter Password" value="{{ old('password') }}" required autocomplete="off">
