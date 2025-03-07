@@ -34,10 +34,13 @@ class UserManagementController extends Controller
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:8|confirmed',
                 'phone_number' => 'required|string|max:15',
-                'role_name' => 'required|string|in:admin,user',
+                'role_name' => 'required|string|in:superadmin,admin,user',
                 'division' => 'required|string',
                 'department' => 'required|string|max:50',
                 'profile' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            ], [
+                'role_name.required' => 'The role field must be selected.',
+                'role_name.in' => 'Please select a valid role.'
             ]);
 
             // Handle file upload
@@ -45,7 +48,6 @@ class UserManagementController extends Controller
             if ($request->hasFile('profile')) {
                 $avatar = $request->file('profile');
                 $avatarName = time() . '.' . $avatar->getClientOriginalExtension();
-                // Store directly in public/uploads/avatar directory
                 $avatar->move(public_path('uploads/avatar'), $avatarName);
             }
 
@@ -65,7 +67,7 @@ class UserManagementController extends Controller
             ]);
 
             DB::commit();
-            flash()->success('User added successfully :)');
+            flash()->success('User added successfully');
             return redirect()->route('user/list');
         } catch (\Exception $e) {
             DB::rollback();
@@ -87,49 +89,90 @@ class UserManagementController extends Controller
     {
         DB::beginTransaction();
         try {
-            $updateRecord = [
-                'name'         => $request->name,
-                'email'        => $request->email,
+            // Get existing user
+            $user = User::where('user_id', $request->user_id)->first();
+            
+            if (!$user) {
+                throw new \Exception('User not found');
+            }
+
+            // Validate email uniqueness except for current user
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email,' . $user->id,
+                'phone_number' => 'required|string|max:15',
+                'role_name' => 'required|in:superadmin,admin,user',
+                'division' => 'required|string',
+                'department' => 'required|string|max:50',
+                'password' => 'nullable|min:8|confirmed',
+                'profile' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            ], [
+                'role_name.required' => 'The role field must be selected.',
+                'role_name.in' => 'Please select a valid role.'
+            ]);
+
+            $updateData = [
+                'name' => $request->name,
+                'email' => $request->email,
                 'phone_number' => $request->phone_number,
-                'role_name'    => $request->role_name,
-                'division'     => $request->division,
-                'department'   => $request->department,
+                'role_name' => $request->role_name,
+                'division' => $request->division,
+                'department' => $request->department,
             ];
-            User::where('user_id', $request->user_id)->update($updateRecord);
+
+            // Update password if provided
+            if ($request->filled('password')) {
+                $updateData['password'] = Hash::make($request->password);
+            }
+
+            // Handle profile image upload
+            if ($request->hasFile('profile')) {
+                $avatar = $request->file('profile');
+                $avatarName = time() . '.' . $avatar->getClientOriginalExtension();
+                $avatar->move(public_path('uploads/avatar'), $avatarName);
+                $updateData['avatar'] = $avatarName;
+
+                // Remove old avatar if exists
+                if ($user->avatar && file_exists(public_path('uploads/avatar/' . $user->avatar))) {
+                    unlink(public_path('uploads/avatar/' . $user->avatar));
+                }
+            }
+
+            // Update user
+            $user->update($updateData);
 
             DB::commit();
-            flash()->success('Updated record successfully :)');
-            return redirect()->back();
+            flash()->success('User updated successfully');
+            return redirect()->route('user/list');
         } catch (\Exception $e) {
             DB::rollback();
-            flash()->error('Update record fail :)');
+            flash()->error('Failed to update user: ' . $e->getMessage());
             Log::error($e->getMessage());
-            return redirect()->back();
+            return redirect()->back()->withInput();
         }
     }
 
     /** Delete Record */
     public function userDelete($id)
-{
-    try {
-        $user = User::where('user_id', $id)->first(); // Change to match your actual ID column
+    {
+        try {
+            $user = User::where('user_id', $id)->first();
 
-        if (!$user) {
-            return response()->json(['error' => 'User not found!'], 404);
+            if (!$user) {
+                return response()->json(['error' => 'User not found!'], 404);
+            }
+
+            $user->delete();
+            
+            flash()->success('Delete User successfully :)');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return response()->json([
+                'error' => 'Failed to delete user. Please try again.'
+            ], 500);
         }
-
-        
-        $user->delete();
-        
-        flash()->success('Delete User successfully :)');
-        return redirect()->back();
-    } catch (\Exception $e) {
-        Log::error($e->getMessage());
-        return response()->json([
-            'error' => 'Failed to delete user. Please try again.'
-        ], 500);
     }
-}
 
     /** Get Users Data */
     public function getUsersData(Request $request)
