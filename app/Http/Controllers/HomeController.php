@@ -160,17 +160,16 @@ class HomeController extends Controller
 
         return back()->with('success', 'Password updated successfully');
     }
-
     /**
      * Update user profile
      */
     public function updateProfile(Request $request)
     {
-        $user = User::find(Auth::id());
+        $user = User::where('user_id', Auth::user()->user_id)->first();
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'email' => 'required|email|unique:users,email,' .$user->user_id . ',user_id',
             'phone_number' => 'required|string|max:15',
             'division' => 'required|string|in:Building Management,Construction and Property,IT Business and Solution,Finance and Accounting,Human Capital and General Affair,Risk, System, and Compliance,Internal Audit',
             'department' => 'required|string|max:255',
